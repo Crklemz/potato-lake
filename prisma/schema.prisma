@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model HomePage {
+  id           Int      @id @default(autoincrement())
+  heroTitle    String
+  heroSubtitle String?
+  heroImageUrl String?
+  introHeading String
+  introText    String
+  updatedAt    DateTime @updatedAt
+}
+
+model ResortsPage {
+  id             Int      @id @default(autoincrement())
+  sectionHeading String
+  sectionText    String
+  resorts        Resort[]
+  updatedAt      DateTime @updatedAt
+}
+
+model Resort {
+  id            Int         @id @default(autoincrement())
+  resortsPageId Int
+  name          String
+  address       String
+  phone         String
+  imageUrl      String?
+  resortsPage   ResortsPage @relation(fields: [resortsPageId], references: [id])
+}
+
+model FishingPage {
+  id          Int      @id @default(autoincrement())
+  fishHeading String
+  fishText    String
+  imageUrl    String?
+  updatedAt   DateTime @updatedAt
+}
+
+model DnrPage {
+  id        Int      @id @default(autoincrement())
+  dnrHeading String
+  dnrText   String
+  mapUrl    String?
+  updatedAt DateTime @updatedAt
+}
+
+model NewsPage {
+  id          Int     @id @default(autoincrement())
+  mainHeading String
+  events      Event[]
+  updatedAt   DateTime @updatedAt
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  newsPageId  Int
+  title       String
+  date        DateTime
+  description String
+  imageUrl    String?
+  newsPage    NewsPage @relation(fields: [newsPageId], references: [id])
+}
+
+model AreaServicesPage {
+  id          Int       @id @default(autoincrement())
+  heading     String
+  description String
+  sponsors    Sponsor[]
+  updatedAt   DateTime  @updatedAt
+}
+
+model Sponsor {
+  id                  Int                @id @default(autoincrement())
+  areaServicesPageId  Int
+  name                String
+  logoUrl             String?
+  link                String?
+  areaServicesPage    AreaServicesPage   @relation(fields: [areaServicesPageId], references: [id])
+}
+
+model AssociationPage {
+  id           Int      @id @default(autoincrement())
+  heading      String
+  description  String
+  meetingNotes String?
+  updatedAt    DateTime @updatedAt
+}
