@@ -62,7 +62,10 @@ export default function AdminDashboard() {
               <p className="text-neutral-dark mb-4">
                 Manage hero content, intro text, and featured sections.
               </p>
-              <button className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors">
+              <button 
+                onClick={() => router.push('/admin/home-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
                 Edit Home Page
               </button>
             </div>
@@ -73,7 +76,10 @@ export default function AdminDashboard() {
               <p className="text-neutral-dark mb-4">
                 Add, edit, or remove resort listings and information.
               </p>
-              <button className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors">
+              <button 
+                onClick={() => router.push('/admin/resorts-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
                 Manage Resorts
               </button>
             </div>
@@ -84,7 +90,10 @@ export default function AdminDashboard() {
               <p className="text-neutral-dark mb-4">
                 Update fishing information and reports.
               </p>
-              <button className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors">
+              <button 
+                onClick={() => router.push('/admin/fishing-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
                 Edit Fishing Page
               </button>
             </div>
@@ -95,7 +104,10 @@ export default function AdminDashboard() {
               <p className="text-neutral-dark mb-4">
                 Update DNR information and regulations.
               </p>
-              <button className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors">
+              <button 
+                onClick={() => router.push('/admin/dnr-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
                 Edit DNR Page
               </button>
             </div>
@@ -106,7 +118,10 @@ export default function AdminDashboard() {
               <p className="text-neutral-dark mb-4">
                 Manage news articles and upcoming events.
               </p>
-              <button className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors">
+              <button 
+                onClick={() => router.push('/admin/events-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
                 Manage Events
               </button>
             </div>
@@ -117,7 +132,10 @@ export default function AdminDashboard() {
               <p className="text-neutral-dark mb-4">
                 Manage sponsor listings and business information.
               </p>
-              <button className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors">
+              <button 
+                onClick={() => router.push('/admin/sponsors-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
                 Manage Sponsors
               </button>
             </div>
@@ -128,7 +146,10 @@ export default function AdminDashboard() {
               <p className="text-neutral-dark mb-4">
                 Update association information and meeting notes.
               </p>
-              <button className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors">
+              <button 
+                onClick={() => router.push('/admin/association-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
                 Edit Association Page
               </button>
             </div>
