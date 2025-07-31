@@ -35,6 +35,8 @@ model Resort {
   address       String
   phone         String
   imageUrl      String?
+  description   String?
+  websiteUrl    String?
   resortsPage   ResortsPage @relation(fields: [resortsPageId], references: [id])
 }
 
@@ -93,5 +95,51 @@ model AssociationPage {
   heading      String
   description  String
   meetingNotes String?
+  updatedAt    DateTime @updatedAt
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String
+  altText   String?
+  caption   String?
+  pageType  String
+  pageId    Int
+  createdAt DateTime @default(now())
+}
+
+model SeoMeta {
+  id          Int      @id @default(autoincrement())
+  page        String
+  title       String
+  description String
+  keywords    String?
+  updatedAt   DateTime @updatedAt
+}
+
+model MembershipTier {
+  id            Int      @id @default(autoincrement())
+  name          String
+  price         Float
+  isLifetime    Boolean
+  benefits      String
+  showInListing Boolean
+  updatedAt     DateTime @updatedAt
+}
+
+model Resource {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  fileUrl     String
+  category    String?
+  updatedAt   DateTime @updatedAt
+}
+
+model Member {
+  id           Int      @id @default(autoincrement())
+  name         String
+  tier         String
+  isHighlighted Boolean
   updatedAt    DateTime @updatedAt
 }
