@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 interface SeoMeta {
   id: number
@@ -28,15 +28,7 @@ export default function SeoEditPage({ params }: { params: Promise<{ page: string
     getParams()
   }, [params])
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/admin/login')
-    } else if (status === 'authenticated' && pageName) {
-      fetchSeoMeta()
-    }
-  }, [status, router, pageName])
-
-  const fetchSeoMeta = async () => {
+  const fetchSeoMeta = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -50,7 +42,15 @@ export default function SeoEditPage({ params }: { params: Promise<{ page: string
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [pageName])
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/admin/login')
+    } else if (status === 'authenticated' && pageName) {
+      fetchSeoMeta()
+    }
+  }, [status, router, pageName, fetchSeoMeta])
 
   if (status === 'loading') {
     return (
@@ -148,57 +148,57 @@ export default function SeoEditPage({ params }: { params: Promise<{ page: string
             </div>
 
             <form onSubmit={handleSave} className="space-y-6">
-                              <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Page Title
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
-                    defaultValue={seoMeta?.title || `${getPageDisplayName(pageName)} - Potato Lake Association`}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter page title (50-60 characters recommended)"
-                    maxLength={60}
-                    required
-                  />
-                  <p className="text-sm text-neutral-dark mt-1">
-                    This appears in browser tabs and search results
-                  </p>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-dark mb-2">
+                  Page Title
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  defaultValue={seoMeta?.title || `${getPageDisplayName(pageName)} - Potato Lake Association`}
+                  className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                  placeholder="Enter page title (50-60 characters recommended)"
+                  maxLength={60}
+                  required
+                />
+                <p className="text-sm text-neutral-dark mt-1">
+                  This appears in browser tabs and search results
+                </p>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Meta Description
-                  </label>
-                  <textarea
-                    name="description"
-                    rows={3}
-                    defaultValue={seoMeta?.description || `Learn more about ${getPageDisplayName(pageName).toLowerCase()} at Potato Lake Association.`}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter meta description (150-160 characters recommended)"
-                    maxLength={160}
-                    required
-                  />
-                  <p className="text-sm text-neutral-dark mt-1">
-                    This appears in search result snippets
-                  </p>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-dark mb-2">
+                  Meta Description
+                </label>
+                <textarea
+                  name="description"
+                  rows={3}
+                  defaultValue={seoMeta?.description || `Learn more about ${getPageDisplayName(pageName).toLowerCase()} at Potato Lake Association.`}
+                  className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                  placeholder="Enter meta description (150-160 characters recommended)"
+                  maxLength={160}
+                  required
+                />
+                <p className="text-sm text-neutral-dark mt-1">
+                  This appears in search result snippets
+                </p>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Keywords (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    name="keywords"
-                    defaultValue={seoMeta?.keywords || ''}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter keywords separated by commas"
-                  />
-                  <p className="text-sm text-neutral-dark mt-1">
-                    Keywords are less important for modern SEO but can still be useful
-                  </p>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-dark mb-2">
+                  Keywords (Optional)
+                </label>
+                <input
+                  type="text"
+                  name="keywords"
+                  defaultValue={seoMeta?.keywords || ''}
+                  className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                  placeholder="Enter keywords separated by commas"
+                />
+                <p className="text-sm text-neutral-dark mt-1">
+                  Keywords are less important for modern SEO but can still be useful
+                </p>
+              </div>
 
               <div className="bg-neutral-light p-4 rounded-lg">
                 <h3 className="font-semibold text-neutral-dark mb-2">SEO Preview</h3>
@@ -215,23 +215,23 @@ export default function SeoEditPage({ params }: { params: Promise<{ page: string
                 </div>
               </div>
 
-                              <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => router.push('/admin')}
-                    className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
-                    disabled={isLoading}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Saving...' : 'Save SEO Settings'}
-                  </button>
-                </div>
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => router.push('/admin')}
+                  className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
+                  disabled={isLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Saving...' : 'Save SEO Settings'}
+                </button>
+              </div>
             </form>
           </div>
 

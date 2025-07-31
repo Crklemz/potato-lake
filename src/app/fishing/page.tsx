@@ -1,4 +1,32 @@
-export default function FishingPage() {
+import { Suspense } from 'react'
+import { prisma } from '@/lib/prisma'
+import { notFound } from 'next/navigation'
+import type { FishingPage } from '@/types/database'
+
+async function getFishingData() {
+  try {
+    const fishingPage = await prisma.fishingPage.findFirst()
+    
+    if (!fishingPage) {
+      // Create default fishing page if none exists
+      const defaultFishingPage = await prisma.fishingPage.create({
+        data: {
+          fishHeading: 'Excellent Fishing Opportunities',
+          fishText: 'Potato Lake is renowned for its excellent fishing opportunities. The lake is home to a variety of fish species including walleye, northern pike, bass, and panfish. Whether you\'re an experienced angler or just starting out, you\'ll find plenty of great spots to cast your line.',
+          imageUrl: null
+        }
+      })
+      return defaultFishingPage
+    }
+    
+    return fishingPage
+  } catch (error) {
+    console.error('Error fetching fishing data:', error)
+    throw new Error('Failed to load fishing data')
+  }
+}
+
+function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
   return (
     <div className="min-h-screen bg-neutral-light">
       <div className="container mx-auto px-4 py-12">
@@ -9,13 +37,10 @@ export default function FishingPage() {
           
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-primary">
-              Excellent Fishing Opportunities
+              {fishingPage.fishHeading}
             </h2>
             <p className="text-lg text-neutral-dark leading-relaxed">
-              Potato Lake is renowned for its excellent fishing opportunities. The lake is home to 
-              a variety of fish species including walleye, northern pike, bass, and panfish. 
-              Whether you&apos;re an experienced angler or just starting out, you&apos;ll find plenty of 
-              great spots to cast your line.
+              {fishingPage.fishText}
             </p>
           </div>
 
@@ -44,6 +69,19 @@ export default function FishingPage() {
             </div>
           </div>
 
+          {fishingPage.imageUrl && (
+            <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+              <h3 className="text-2xl font-semibold mb-4 text-primary">Fishing on Potato Lake</h3>
+              <div className="mb-4">
+                <img 
+                  src={fishingPage.imageUrl} 
+                  alt="Fishing on Potato Lake"
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+              </div>
+            </div>
+          )}
+
           <div className="bg-white rounded-lg shadow-md p-8">
             <h3 className="text-2xl font-semibold mb-4 text-primary">Latest Fishing Report</h3>
             <p className="text-neutral-dark leading-relaxed">
@@ -56,4 +94,61 @@ export default function FishingPage() {
       </div>
     </div>
   )
+}
+
+function LoadingFishingPage() {
+  return (
+    <div className="min-h-screen bg-neutral-light">
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="animate-pulse">
+            <div className="h-12 bg-neutral-dark rounded mb-8"></div>
+            
+            <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+              <div className="h-8 bg-primary rounded mb-4"></div>
+              <div className="h-6 bg-neutral-dark rounded mb-2"></div>
+              <div className="h-6 bg-neutral-dark rounded mb-2"></div>
+              <div className="h-6 bg-neutral-dark rounded"></div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md p-6">
+                  <div className="h-6 bg-primary rounded mb-4"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-neutral-dark rounded"></div>
+                    <div className="h-4 bg-neutral-dark rounded"></div>
+                    <div className="h-4 bg-neutral-dark rounded"></div>
+                    <div className="h-4 bg-neutral-dark rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <div className="h-8 bg-primary rounded mb-4"></div>
+              <div className="h-6 bg-neutral-dark rounded mb-2"></div>
+              <div className="h-6 bg-neutral-dark rounded mb-2"></div>
+              <div className="h-6 bg-neutral-dark rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default async function FishingPage() {
+  try {
+    const fishingPage = await getFishingData()
+    
+    return (
+      <Suspense fallback={<LoadingFishingPage />}>
+        <FishingPageContent fishingPage={fishingPage} />
+      </Suspense>
+    )
+  } catch (error) {
+    console.error('Error in FishingPage:', error)
+    notFound()
+  }
 } 

@@ -1,17 +1,56 @@
+import { Suspense } from 'react'
+import { prisma } from '@/lib/prisma'
+import { notFound } from 'next/navigation'
+import type { HomePage } from '@/types/database'
 
+async function getHomePageData() {
+  try {
+    const homePage = await prisma.homePage.findFirst()
+    
+    if (!homePage) {
+      // Create default home page if none exists
+      const defaultHomePage = await prisma.homePage.create({
+        data: {
+          heroTitle: 'Welcome to Potato Lake',
+          heroSubtitle: 'A beautiful destination for fishing and recreation',
+          heroImageUrl: null,
+          introHeading: 'About Potato Lake',
+          introText: 'Potato Lake is a premier fishing and recreational destination located in northern Minnesota. Our association is dedicated to preserving the lake\'s natural beauty and promoting responsible use of this precious resource.'
+        }
+      })
+      return defaultHomePage
+    }
+    
+    return homePage
+  } catch (error) {
+    console.error('Error fetching home page data:', error)
+    throw new Error('Failed to load home page data')
+  }
+}
 
-export default function HomePage() {
+function HomePageContent({ homePage }: { homePage: HomePage }) {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
-        <div className="container mx-auto px-4 text-center">
+        {homePage.heroImageUrl && (
+          <div className="absolute inset-0 z-0">
+            <img 
+              src={homePage.heroImageUrl} 
+              alt="Potato Lake"
+              className="w-full h-full object-cover opacity-20"
+            />
+          </div>
+        )}
+        <div className="container mx-auto px-4 text-center relative z-10">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Welcome to Potato Lake
+            {homePage.heroTitle}
           </h1>
-          <p className="text-xl md:text-2xl mb-8 text-neutral-light">
-            Discover the natural beauty and recreational opportunities of our pristine lake
-          </p>
+          {homePage.heroSubtitle && (
+            <p className="text-xl md:text-2xl mb-8 text-neutral-light">
+              {homePage.heroSubtitle}
+            </p>
+          )}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/resorts" className="bg-accent text-primary px-8 py-3 rounded-lg font-semibold hover:bg-neutral-light transition-colors">
               Explore Resorts
@@ -28,13 +67,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6 text-neutral-dark">
-              About Potato Lake
+              {homePage.introHeading}
             </h2>
             <p className="text-lg text-neutral-dark leading-relaxed">
-              Potato Lake is a beautiful natural lake located in northern Minnesota, 
-              offering excellent fishing, boating, and recreational opportunities. 
-              Our association is dedicated to preserving the lake&apos;s natural beauty 
-              and promoting responsible use of this precious resource.
+              {homePage.introText}
             </p>
           </div>
         </div>
@@ -81,4 +117,51 @@ export default function HomePage() {
       </section>
     </div>
   )
+}
+
+function LoadingHomePage() {
+  return (
+    <div className="min-h-screen">
+      <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
+        <div className="container mx-auto px-4 text-center">
+          <div className="animate-pulse">
+            <div className="h-16 bg-white/20 rounded mb-6"></div>
+            <div className="h-8 bg-white/20 rounded mb-8"></div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="h-12 bg-white/20 rounded w-32"></div>
+              <div className="h-12 bg-white/20 rounded w-32"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-neutral-light rounded mb-6"></div>
+              <div className="h-6 bg-neutral-light rounded mb-4"></div>
+              <div className="h-6 bg-neutral-light rounded mb-4"></div>
+              <div className="h-6 bg-neutral-light rounded"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+export default async function HomePage() {
+  try {
+    const homePage = await getHomePageData()
+    
+    return (
+      <Suspense fallback={<LoadingHomePage />}>
+        <HomePageContent homePage={homePage} />
+      </Suspense>
+    )
+  } catch (error) {
+    console.error('Error in HomePage:', error)
+    notFound()
+  }
 }
