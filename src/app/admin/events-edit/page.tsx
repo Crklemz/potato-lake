@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import FileUpload from '@/components/FileUpload'
 
 interface Event {
   id: number
@@ -21,6 +22,7 @@ export default function EventsEditPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -276,24 +278,34 @@ export default function EventsEditPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Event Image URL
+                    Event Image
                   </label>
+                  <FileUpload
+                    type="image"
+                    currentUrl={editingEvent?.imageUrl}
+                    onUpload={(url) => {
+                      // Update the form field with the uploaded URL
+                      const imageUrlInput = document.querySelector('input[name="imageUrl"]') as HTMLInputElement
+                      if (imageUrlInput) {
+                        imageUrlInput.value = url
+                      }
+                      setUploadError(null)
+                    }}
+                    onError={(error) => {
+                      setUploadError(error)
+                    }}
+                    label="Upload Event Image"
+                    accept="image/*"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                  />
+                  {uploadError && (
+                    <div className="mt-2 text-sm text-red-600">{uploadError}</div>
+                  )}
                   <input
-                    type="url"
+                    type="hidden"
                     name="imageUrl"
                     defaultValue={editingEvent?.imageUrl || ''}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter event image URL"
                   />
-                  {editingEvent?.imageUrl && (
-                    <div className="mt-2">
-                      <img 
-                        src={editingEvent.imageUrl} 
-                        alt="Event preview"
-                        className="w-32 h-24 object-cover rounded-lg border"
-                      />
-                    </div>
-                  )}
                 </div>
 
                 <div className="flex gap-4">

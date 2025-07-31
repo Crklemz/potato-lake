@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import FileUpload from '@/components/FileUpload'
 
 interface Sponsor {
   id: number
@@ -20,6 +21,7 @@ export default function SponsorsEditPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -247,24 +249,34 @@ export default function SponsorsEditPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Logo URL
+                    Sponsor Logo
                   </label>
+                  <FileUpload
+                    type="image"
+                    currentUrl={editingSponsor?.logoUrl}
+                    onUpload={(url) => {
+                      // Update the form field with the uploaded URL
+                      const logoUrlInput = document.querySelector('input[name="logoUrl"]') as HTMLInputElement
+                      if (logoUrlInput) {
+                        logoUrlInput.value = url
+                      }
+                      setUploadError(null)
+                    }}
+                    onError={(error) => {
+                      setUploadError(error)
+                    }}
+                    label="Upload Sponsor Logo"
+                    accept="image/*"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                  />
+                  {uploadError && (
+                    <div className="mt-2 text-sm text-red-600">{uploadError}</div>
+                  )}
                   <input
-                    type="url"
+                    type="hidden"
                     name="logoUrl"
                     defaultValue={editingSponsor?.logoUrl || ''}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter logo URL"
                   />
-                  {editingSponsor?.logoUrl && (
-                    <div className="mt-2">
-                      <img 
-                        src={editingSponsor.logoUrl} 
-                        alt="Logo preview"
-                        className="w-32 h-24 object-contain rounded-lg border"
-                      />
-                    </div>
-                  )}
                 </div>
 
                 <div>

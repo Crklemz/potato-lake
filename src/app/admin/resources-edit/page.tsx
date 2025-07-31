@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import FileUpload from '@/components/FileUpload'
 
 interface Resource {
   id: number
@@ -20,6 +21,7 @@ export default function ResourcesEditPage() {
   const [isAdding, setIsAdding] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -243,19 +245,35 @@ export default function ResourcesEditPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    File URL or Upload
+                    Resource File
                   </label>
+                  <FileUpload
+                    type="file"
+                    currentUrl={editingResource?.fileUrl}
+                    onUpload={(url) => {
+                      // Update the form field with the uploaded URL
+                      const fileUrlInput = document.querySelector('input[name="fileUrl"]') as HTMLInputElement
+                      if (fileUrlInput) {
+                        fileUrlInput.value = url
+                      }
+                      setUploadError(null)
+                    }}
+                    onError={(error) => {
+                      setUploadError(error)
+                    }}
+                    label="Upload Resource File"
+                    accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,image/*"
+                    maxSize={10 * 1024 * 1024} // 10MB
+                  />
+                  {uploadError && (
+                    <div className="mt-2 text-sm text-red-600">{uploadError}</div>
+                  )}
                   <input
-                    type="url"
+                    type="hidden"
                     name="fileUrl"
                     defaultValue={editingResource?.fileUrl || ''}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter file URL or upload file"
                     required
                   />
-                  <p className="text-sm text-neutral-dark mt-1">
-                    For file uploads, drag and drop files here or click to browse
-                  </p>
                 </div>
 
                 <div>
