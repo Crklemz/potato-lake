@@ -153,6 +153,62 @@ export default function AdminDashboard() {
                 Edit Association Page
               </button>
             </div>
+
+            {/* Membership Tiers Management */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-semibold mb-4 text-primary">Membership Tiers</h3>
+              <p className="text-neutral-dark mb-4">
+                Manage membership levels, pricing, and benefits.
+              </p>
+              <button 
+                onClick={() => router.push('/admin/membership-tiers-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
+                Manage Tiers
+              </button>
+            </div>
+
+            {/* Resources Management */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-semibold mb-4 text-primary">Resources</h3>
+              <p className="text-neutral-dark mb-4">
+                Upload and manage documents, maps, and files.
+              </p>
+              <button 
+                onClick={() => router.push('/admin/resources-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
+                Manage Resources
+              </button>
+            </div>
+
+            {/* Members Management */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-semibold mb-4 text-primary">Members</h3>
+              <p className="text-neutral-dark mb-4">
+                Manage member directory and highlight featured members.
+              </p>
+              <button 
+                onClick={() => router.push('/admin/members-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
+                Manage Members
+              </button>
+            </div>
+
+            {/* SEO Management */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-semibold mb-4 text-primary">SEO Settings</h3>
+              <p className="text-neutral-dark mb-4">
+                Configure SEO metadata for all pages.
+              </p>
+              <button 
+                onClick={() => router.push('/admin/seo-edit/home')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
+                Manage SEO
+              </button>
+            </div>
           </div>
 
           <div className="mt-12 bg-white rounded-lg shadow-md p-8">
