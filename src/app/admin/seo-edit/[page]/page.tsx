@@ -12,19 +12,26 @@ interface SeoMeta {
   keywords?: string
 }
 
-export default function SeoEditPage({ params }: { params: { page: string } }) {
+export default function SeoEditPage({ params }: { params: Promise<{ page: string }> }) {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [seoMeta, setSeoMeta] = useState<SeoMeta | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [pageName, setPageName] = useState<string>('')
 
-  const pageName = decodeURIComponent(params.page)
+  useEffect(() => {
+    const getParams = async () => {
+      const resolvedParams = await params
+      setPageName(decodeURIComponent(resolvedParams.page))
+    }
+    getParams()
+  }, [params])
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin/login')
-    } else if (status === 'authenticated') {
+    } else if (status === 'authenticated' && pageName) {
       fetchSeoMeta()
     }
   }, [status, router, pageName])
