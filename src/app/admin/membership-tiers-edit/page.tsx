@@ -19,12 +19,31 @@ export default function MembershipTiersEditPage() {
   const [tiers, setTiers] = useState<MembershipTier[]>([])
   const [editingTier, setEditingTier] = useState<MembershipTier | null>(null)
   const [isAdding, setIsAdding] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin/login')
+    } else if (status === 'authenticated') {
+      fetchTiers()
     }
   }, [status, router])
+
+  const fetchTiers = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/admin/membership-tiers')
+      if (!response.ok) throw new Error('Failed to fetch tiers')
+      const data = await response.json()
+      setTiers(data)
+    } catch (err) {
+      setError('Failed to load membership tiers')
+      console.error('Error fetching tiers:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   if (status === 'loading') {
     return (
@@ -38,16 +57,68 @@ export default function MembershipTiersEditPage() {
     return null
   }
 
-  const handleSave = (tier: Partial<MembershipTier>) => {
-    // TODO: Implement API call to save tier
-    console.log('Saving tier:', tier)
-    setEditingTier(null)
-    setIsAdding(false)
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    
+    const tierData = {
+      name: formData.get('name') as string,
+      price: parseFloat(formData.get('price') as string),
+      benefits: formData.get('benefits') as string,
+      isLifetime: formData.get('isLifetime') === 'on',
+      showInListing: formData.get('showInListing') === 'on'
+    }
+
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const url = editingTier 
+        ? `/api/admin/membership-tiers` 
+        : '/api/admin/membership-tiers'
+      
+      const method = editingTier ? 'PUT' : 'POST'
+      const body = editingTier ? { ...tierData, id: editingTier.id } : tierData
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) throw new Error('Failed to save tier')
+
+      await fetchTiers()
+      setEditingTier(null)
+      setIsAdding(false)
+    } catch (err) {
+      setError('Failed to save membership tier')
+      console.error('Error saving tier:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleDelete = (id: number) => {
-    // TODO: Implement API call to delete tier
-    console.log('Deleting tier:', id)
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this membership tier?')) return
+
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await fetch(`/api/admin/membership-tiers?id=${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) throw new Error('Failed to delete tier')
+
+      await fetchTiers()
+    } catch (err) {
+      setError('Failed to delete membership tier')
+      console.error('Error deleting tier:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -81,64 +152,59 @@ export default function MembershipTiersEditPage() {
               </button>
             </div>
 
-            <div className="space-y-4">
-              {/* Sample Tiers */}
-              <div className="border border-neutral-light rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-neutral-dark">Basic Member</h3>
-                    <p className="text-neutral-dark text-sm">$25/year</p>
-                    <p className="text-neutral-dark text-sm">Access to basic resources and newsletters</p>
-                    <div className="flex gap-2 mt-2">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Lifetime</span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Show in Listing</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => setEditingTier({ id: 1, name: 'Basic Member', price: 25, isLifetime: true, benefits: 'Access to basic resources and newsletters', showInListing: true })}
-                      className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(1)}
-                      className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {error}
               </div>
+            )}
 
-              <div className="border border-neutral-light rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-neutral-dark">Premium Member</h3>
-                    <p className="text-neutral-dark text-sm">$50/year</p>
-                    <p className="text-neutral-dark text-sm">All basic benefits plus exclusive events and priority access</p>
-                    <div className="flex gap-2 mt-2">
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">Annual</span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Show in Listing</span>
+            {isLoading && !tiers.length ? (
+              <div className="text-center py-8">
+                <div className="text-neutral-dark">Loading membership tiers...</div>
+              </div>
+            ) : tiers.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-neutral-dark">No membership tiers found. Create your first tier!</div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {tiers.map((tier) => (
+                  <div key={tier.id} className="border border-neutral-light rounded-lg p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-neutral-dark">{tier.name}</h3>
+                        <p className="text-neutral-dark text-sm">${tier.price}/{tier.isLifetime ? 'lifetime' : 'year'}</p>
+                        <p className="text-neutral-dark text-sm">{tier.benefits}</p>
+                        <div className="flex gap-2 mt-2">
+                          {tier.isLifetime && (
+                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Lifetime</span>
+                          )}
+                          {tier.showInListing && (
+                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Show in Listing</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => setEditingTier(tier)}
+                          className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
+                          disabled={isLoading}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(tier.id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                          disabled={isLoading}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => setEditingTier({ id: 2, name: 'Premium Member', price: 50, isLifetime: false, benefits: 'All basic benefits plus exclusive events and priority access', showInListing: true })}
-                      className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(2)}
-                      className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
 
           {/* Add/Edit Form */}
@@ -148,16 +214,18 @@ export default function MembershipTiersEditPage() {
                 {editingTier ? 'Edit Membership Tier' : 'Add New Membership Tier'}
               </h3>
               
-              <form className="space-y-6">
+              <form onSubmit={handleSave} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
                     Tier Name
                   </label>
                   <input
                     type="text"
+                    name="name"
                     defaultValue={editingTier?.name || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Enter tier name"
+                    required
                   />
                 </div>
 
@@ -167,10 +235,13 @@ export default function MembershipTiersEditPage() {
                   </label>
                   <input
                     type="number"
+                    name="price"
                     step="0.01"
+                    min="0"
                     defaultValue={editingTier?.price || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Enter price"
+                    required
                   />
                 </div>
 
@@ -179,10 +250,12 @@ export default function MembershipTiersEditPage() {
                     Benefits
                   </label>
                   <textarea
+                    name="benefits"
                     rows={4}
                     defaultValue={editingTier?.benefits || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Enter benefits description"
+                    required
                   />
                 </div>
 
@@ -190,6 +263,7 @@ export default function MembershipTiersEditPage() {
                   <label className="flex items-center">
                     <input
                       type="checkbox"
+                      name="isLifetime"
                       defaultChecked={editingTier?.isLifetime || false}
                       className="mr-2"
                     />
@@ -199,6 +273,7 @@ export default function MembershipTiersEditPage() {
                   <label className="flex items-center">
                     <input
                       type="checkbox"
+                      name="showInListing"
                       defaultChecked={editingTier?.showInListing || false}
                       className="mr-2"
                     />
@@ -214,14 +289,16 @@ export default function MembershipTiersEditPage() {
                       setIsAdding(false)
                     }}
                     className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
+                    disabled={isLoading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
+                    disabled={isLoading}
                   >
-                    {editingTier ? 'Update Tier' : 'Add Tier'}
+                    {isLoading ? 'Saving...' : (editingTier ? 'Update Tier' : 'Add Tier')}
                   </button>
                 </div>
               </form>

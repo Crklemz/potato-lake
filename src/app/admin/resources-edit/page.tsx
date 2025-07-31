@@ -18,12 +18,31 @@ export default function ResourcesEditPage() {
   const [resources, setResources] = useState<Resource[]>([])
   const [editingResource, setEditingResource] = useState<Resource | null>(null)
   const [isAdding, setIsAdding] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin/login')
+    } else if (status === 'authenticated') {
+      fetchResources()
     }
   }, [status, router])
+
+  const fetchResources = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/admin/resources')
+      if (!response.ok) throw new Error('Failed to fetch resources')
+      const data = await response.json()
+      setResources(data)
+    } catch (err) {
+      setError('Failed to load resources')
+      console.error('Error fetching resources:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   if (status === 'loading') {
     return (
@@ -37,16 +56,64 @@ export default function ResourcesEditPage() {
     return null
   }
 
-  const handleSave = (resource: Partial<Resource>) => {
-    // TODO: Implement API call to save resource
-    console.log('Saving resource:', resource)
-    setEditingResource(null)
-    setIsAdding(false)
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    
+    const resourceData = {
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+      fileUrl: formData.get('fileUrl') as string,
+      category: formData.get('category') as string
+    }
+
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const url = '/api/admin/resources'
+      const method = editingResource ? 'PUT' : 'POST'
+      const body = editingResource ? { ...resourceData, id: editingResource.id } : resourceData
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) throw new Error('Failed to save resource')
+
+      await fetchResources()
+      setEditingResource(null)
+      setIsAdding(false)
+    } catch (err) {
+      setError('Failed to save resource')
+      console.error('Error saving resource:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleDelete = (id: number) => {
-    // TODO: Implement API call to delete resource
-    console.log('Deleting resource:', id)
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this resource?')) return
+
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await fetch(`/api/admin/resources?id=${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) throw new Error('Failed to delete resource')
+
+      await fetchResources()
+    } catch (err) {
+      setError('Failed to delete resource')
+      console.error('Error deleting resource:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const categories = [
@@ -89,89 +156,54 @@ export default function ResourcesEditPage() {
               </button>
             </div>
 
-            <div className="space-y-4">
-              {/* Sample Resources */}
-              <div className="border border-neutral-light rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-neutral-dark">2024 Fishing Regulations</h3>
-                    <p className="text-neutral-dark text-sm">Updated fishing regulations for Potato Lake</p>
-                    <p className="text-neutral-dark text-sm">Category: Fishing Regulations</p>
-                    <a href="#" className="text-accent hover:text-primary text-sm font-semibold">
-                      View File →
-                    </a>
-                  </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => setEditingResource({ id: 1, title: '2024 Fishing Regulations', description: 'Updated fishing regulations for Potato Lake', fileUrl: '/files/regulations.pdf', category: 'Fishing Regulations' })}
-                      className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(1)}
-                      className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {error}
               </div>
+            )}
 
-              <div className="border border-neutral-light rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-neutral-dark">Lake Map 2024</h3>
-                    <p className="text-neutral-dark text-sm">Detailed map of Potato Lake with depth contours</p>
-                    <p className="text-neutral-dark text-sm">Category: Lake Maps</p>
-                    <a href="#" className="text-accent hover:text-primary text-sm font-semibold">
-                      View File →
-                    </a>
-                  </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => setEditingResource({ id: 2, title: 'Lake Map 2024', description: 'Detailed map of Potato Lake with depth contours', fileUrl: '/files/lake-map.pdf', category: 'Lake Maps' })}
-                      className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(2)}
-                      className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+            {isLoading && !resources.length ? (
+              <div className="text-center py-8">
+                <div className="text-neutral-dark">Loading resources...</div>
               </div>
-
-              <div className="border border-neutral-light rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-neutral-dark">January 2024 Meeting Minutes</h3>
-                    <p className="text-neutral-dark text-sm">Minutes from the January association meeting</p>
-                    <p className="text-neutral-dark text-sm">Category: Meeting Minutes</p>
-                    <a href="#" className="text-accent hover:text-primary text-sm font-semibold">
-                      View File →
-                    </a>
-                  </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => setEditingResource({ id: 3, title: 'January 2024 Meeting Minutes', description: 'Minutes from the January association meeting', fileUrl: '/files/january-minutes.pdf', category: 'Meeting Minutes' })}
-                      className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(3)}
-                      className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+            ) : resources.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-neutral-dark">No resources found. Add your first resource!</div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-4">
+                {resources.map((resource) => (
+                  <div key={resource.id} className="border border-neutral-light rounded-lg p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-neutral-dark">{resource.title}</h3>
+                        <p className="text-neutral-dark text-sm">{resource.description}</p>
+                        <p className="text-neutral-dark text-sm">Category: {resource.category}</p>
+                        <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:text-primary text-sm font-semibold">
+                          View File →
+                        </a>
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => setEditingResource(resource)}
+                          className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
+                          disabled={isLoading}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(resource.id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                          disabled={isLoading}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Add/Edit Form */}
@@ -181,16 +213,18 @@ export default function ResourcesEditPage() {
                 {editingResource ? 'Edit Resource' : 'Add New Resource'}
               </h3>
               
-              <form className="space-y-6">
+              <form onSubmit={handleSave} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
                     Resource Title
                   </label>
                   <input
                     type="text"
+                    name="title"
                     defaultValue={editingResource?.title || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Enter resource title"
+                    required
                   />
                 </div>
 
@@ -199,6 +233,7 @@ export default function ResourcesEditPage() {
                     Description
                   </label>
                   <textarea
+                    name="description"
                     rows={3}
                     defaultValue={editingResource?.description || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
@@ -212,9 +247,11 @@ export default function ResourcesEditPage() {
                   </label>
                   <input
                     type="url"
+                    name="fileUrl"
                     defaultValue={editingResource?.fileUrl || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Enter file URL or upload file"
+                    required
                   />
                   <p className="text-sm text-neutral-dark mt-1">
                     For file uploads, drag and drop files here or click to browse
@@ -226,6 +263,7 @@ export default function ResourcesEditPage() {
                     Category
                   </label>
                   <select
+                    name="category"
                     defaultValue={editingResource?.category || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                   >
@@ -246,14 +284,16 @@ export default function ResourcesEditPage() {
                       setIsAdding(false)
                     }}
                     className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
+                    disabled={isLoading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
+                    disabled={isLoading}
                   >
-                    {editingResource ? 'Update Resource' : 'Add Resource'}
+                    {isLoading ? 'Saving...' : (editingResource ? 'Update Resource' : 'Add Resource')}
                   </button>
                 </div>
               </form>

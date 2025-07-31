@@ -17,14 +17,33 @@ export default function SeoEditPage({ params }: { params: { page: string } }) {
   const router = useRouter()
   const [seoMeta, setSeoMeta] = useState<SeoMeta | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const pageName = decodeURIComponent(params.page)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin/login')
+    } else if (status === 'authenticated') {
+      fetchSeoMeta()
     }
-  }, [status, router])
+  }, [status, router, pageName])
+
+  const fetchSeoMeta = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const response = await fetch(`/api/admin/seo-meta?page=${pageName}`)
+      if (!response.ok) throw new Error('Failed to fetch SEO metadata')
+      const data = await response.json()
+      setSeoMeta(data)
+    } catch (err) {
+      setError('Failed to load SEO metadata')
+      console.error('Error fetching SEO metadata:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   if (status === 'loading') {
     return (
@@ -38,9 +57,40 @@ export default function SeoEditPage({ params }: { params: { page: string } }) {
     return null
   }
 
-  const handleSave = (meta: Partial<SeoMeta>) => {
-    // TODO: Implement API call to save SEO metadata
-    console.log('Saving SEO metadata:', meta)
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    
+    const metaData = {
+      page: pageName,
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+      keywords: formData.get('keywords') as string
+    }
+
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const url = '/api/admin/seo-meta'
+      const method = seoMeta ? 'PUT' : 'POST'
+      const body = seoMeta ? { ...metaData, id: seoMeta.id } : metaData
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) throw new Error('Failed to save SEO metadata')
+
+      await fetchSeoMeta()
+    } catch (err) {
+      setError('Failed to save SEO metadata')
+      console.error('Error saving SEO metadata:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const getPageDisplayName = (page: string) => {
@@ -75,6 +125,12 @@ export default function SeoEditPage({ params }: { params: { page: string } }) {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-md p-8">
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {error}
+              </div>
+            )}
+
             <div className="mb-6">
               <h2 className="text-2xl font-semibold text-neutral-dark mb-2">
                 {getPageDisplayName(pageName)}
@@ -84,53 +140,58 @@ export default function SeoEditPage({ params }: { params: { page: string } }) {
               </p>
             </div>
 
-            <form className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-neutral-dark mb-2">
-                  Page Title
-                </label>
-                <input
-                  type="text"
-                  defaultValue={seoMeta?.title || `${getPageDisplayName(pageName)} - Potato Lake Association`}
-                  className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                  placeholder="Enter page title (50-60 characters recommended)"
-                  maxLength={60}
-                />
-                <p className="text-sm text-neutral-dark mt-1">
-                  This appears in browser tabs and search results
-                </p>
-              </div>
+            <form onSubmit={handleSave} className="space-y-6">
+                              <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Page Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    defaultValue={seoMeta?.title || `${getPageDisplayName(pageName)} - Potato Lake Association`}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter page title (50-60 characters recommended)"
+                    maxLength={60}
+                    required
+                  />
+                  <p className="text-sm text-neutral-dark mt-1">
+                    This appears in browser tabs and search results
+                  </p>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-dark mb-2">
-                  Meta Description
-                </label>
-                <textarea
-                  rows={3}
-                  defaultValue={seoMeta?.description || `Learn more about ${getPageDisplayName(pageName).toLowerCase()} at Potato Lake Association.`}
-                  className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                  placeholder="Enter meta description (150-160 characters recommended)"
-                  maxLength={160}
-                />
-                <p className="text-sm text-neutral-dark mt-1">
-                  This appears in search result snippets
-                </p>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Meta Description
+                  </label>
+                  <textarea
+                    name="description"
+                    rows={3}
+                    defaultValue={seoMeta?.description || `Learn more about ${getPageDisplayName(pageName).toLowerCase()} at Potato Lake Association.`}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter meta description (150-160 characters recommended)"
+                    maxLength={160}
+                    required
+                  />
+                  <p className="text-sm text-neutral-dark mt-1">
+                    This appears in search result snippets
+                  </p>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-dark mb-2">
-                  Keywords (Optional)
-                </label>
-                <input
-                  type="text"
-                  defaultValue={seoMeta?.keywords || ''}
-                  className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                  placeholder="Enter keywords separated by commas"
-                />
-                <p className="text-sm text-neutral-dark mt-1">
-                  Keywords are less important for modern SEO but can still be useful
-                </p>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Keywords (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    name="keywords"
+                    defaultValue={seoMeta?.keywords || ''}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter keywords separated by commas"
+                  />
+                  <p className="text-sm text-neutral-dark mt-1">
+                    Keywords are less important for modern SEO but can still be useful
+                  </p>
+                </div>
 
               <div className="bg-neutral-light p-4 rounded-lg">
                 <h3 className="font-semibold text-neutral-dark mb-2">SEO Preview</h3>
@@ -147,21 +208,23 @@ export default function SeoEditPage({ params }: { params: { page: string } }) {
                 </div>
               </div>
 
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={() => router.push('/admin')}
-                  className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
-                >
-                  Save SEO Settings
-                </button>
-              </div>
+                              <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/admin')}
+                    className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
+                    disabled={isLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Saving...' : 'Save SEO Settings'}
+                  </button>
+                </div>
             </form>
           </div>
 

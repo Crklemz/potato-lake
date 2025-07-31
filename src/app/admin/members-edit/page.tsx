@@ -17,12 +17,31 @@ export default function MembersEditPage() {
   const [members, setMembers] = useState<Member[]>([])
   const [editingMember, setEditingMember] = useState<Member | null>(null)
   const [isAdding, setIsAdding] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin/login')
+    } else if (status === 'authenticated') {
+      fetchMembers()
     }
   }, [status, router])
+
+  const fetchMembers = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/admin/members')
+      if (!response.ok) throw new Error('Failed to fetch members')
+      const data = await response.json()
+      setMembers(data)
+    } catch (err) {
+      setError('Failed to load members')
+      console.error('Error fetching members:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   if (status === 'loading') {
     return (
@@ -36,16 +55,63 @@ export default function MembersEditPage() {
     return null
   }
 
-  const handleSave = (member: Partial<Member>) => {
-    // TODO: Implement API call to save member
-    console.log('Saving member:', member)
-    setEditingMember(null)
-    setIsAdding(false)
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    
+    const memberData = {
+      name: formData.get('name') as string,
+      tier: formData.get('tier') as string,
+      isHighlighted: formData.get('isHighlighted') === 'on'
+    }
+
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const url = '/api/admin/members'
+      const method = editingMember ? 'PUT' : 'POST'
+      const body = editingMember ? { ...memberData, id: editingMember.id } : memberData
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) throw new Error('Failed to save member')
+
+      await fetchMembers()
+      setEditingMember(null)
+      setIsAdding(false)
+    } catch (err) {
+      setError('Failed to save member')
+      console.error('Error saving member:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleDelete = (id: number) => {
-    // TODO: Implement API call to delete member
-    console.log('Deleting member:', id)
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this member?')) return
+
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await fetch(`/api/admin/members?id=${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) throw new Error('Failed to delete member')
+
+      await fetchMembers()
+    } catch (err) {
+      setError('Failed to delete member')
+      console.error('Error deleting member:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const tiers = [
@@ -86,98 +152,53 @@ export default function MembersEditPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Sample Members */}
-              <div className="border border-neutral-light rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-neutral-dark">John Smith</h3>
-                  <div className="flex gap-1">
-                    <button 
-                      onClick={() => setEditingMember({ id: 1, name: 'John Smith', tier: 'Premium Member', isHighlighted: true })}
-                      className="bg-primary text-white px-2 py-1 rounded text-xs hover:bg-accent hover:text-primary transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(1)}
-                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 transition-colors"
-                    >
-                      Del
-                    </button>
-                  </div>
-                </div>
-                <p className="text-neutral-dark text-sm">Premium Member</p>
-                <div className="flex gap-2 mt-2">
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Highlighted</span>
-                </div>
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {error}
               </div>
+            )}
 
-              <div className="border border-neutral-light rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-neutral-dark">Sarah Johnson</h3>
-                  <div className="flex gap-1">
-                    <button 
-                      onClick={() => setEditingMember({ id: 2, name: 'Sarah Johnson', tier: 'Lifetime Member', isHighlighted: false })}
-                      className="bg-primary text-white px-2 py-1 rounded text-xs hover:bg-accent hover:text-primary transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(2)}
-                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 transition-colors"
-                    >
-                      Del
-                    </button>
-                  </div>
-                </div>
-                <p className="text-neutral-dark text-sm">Lifetime Member</p>
+            {isLoading && !members.length ? (
+              <div className="text-center py-8">
+                <div className="text-neutral-dark">Loading members...</div>
               </div>
-
-              <div className="border border-neutral-light rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-neutral-dark">Mike Wilson</h3>
-                  <div className="flex gap-1">
-                    <button 
-                      onClick={() => setEditingMember({ id: 3, name: 'Mike Wilson', tier: 'Basic Member', isHighlighted: false })}
-                      className="bg-primary text-white px-2 py-1 rounded text-xs hover:bg-accent hover:text-primary transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(3)}
-                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 transition-colors"
-                    >
-                      Del
-                    </button>
-                  </div>
-                </div>
-                <p className="text-neutral-dark text-sm">Basic Member</p>
+            ) : members.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-neutral-dark">No members found. Add your first member!</div>
               </div>
-
-              <div className="border border-neutral-light rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-neutral-dark">Lisa Brown</h3>
-                  <div className="flex gap-1">
-                    <button 
-                      onClick={() => setEditingMember({ id: 4, name: 'Lisa Brown', tier: 'Honorary Member', isHighlighted: true })}
-                      className="bg-primary text-white px-2 py-1 rounded text-xs hover:bg-accent hover:text-primary transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(4)}
-                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 transition-colors"
-                    >
-                      Del
-                    </button>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {members.map((member) => (
+                  <div key={member.id} className="border border-neutral-light rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-neutral-dark">{member.name}</h3>
+                      <div className="flex gap-1">
+                        <button 
+                          onClick={() => setEditingMember(member)}
+                          className="bg-primary text-white px-2 py-1 rounded text-xs hover:bg-accent hover:text-primary transition-colors"
+                          disabled={isLoading}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(member.id)}
+                          className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 transition-colors"
+                          disabled={isLoading}
+                        >
+                          Del
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-neutral-dark text-sm">{member.tier}</p>
+                    {member.isHighlighted && (
+                      <div className="flex gap-2 mt-2">
+                        <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Highlighted</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-                <p className="text-neutral-dark text-sm">Honorary Member</p>
-                <div className="flex gap-2 mt-2">
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Highlighted</span>
-                </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
 
           {/* Add/Edit Form */}
@@ -187,16 +208,18 @@ export default function MembersEditPage() {
                 {editingMember ? 'Edit Member' : 'Add New Member'}
               </h3>
               
-              <form className="space-y-6">
+              <form onSubmit={handleSave} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
                     Member Name
                   </label>
                   <input
                     type="text"
+                    name="name"
                     defaultValue={editingMember?.name || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Enter member name"
+                    required
                   />
                 </div>
 
@@ -205,8 +228,10 @@ export default function MembersEditPage() {
                     Membership Tier
                   </label>
                   <select
+                    name="tier"
                     defaultValue={editingMember?.tier || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    required
                   >
                     <option value="">Select a tier</option>
                     {tiers.map((tier) => (
@@ -221,6 +246,7 @@ export default function MembersEditPage() {
                   <label className="flex items-center">
                     <input
                       type="checkbox"
+                      name="isHighlighted"
                       defaultChecked={editingMember?.isHighlighted || false}
                       className="mr-2"
                     />
@@ -236,14 +262,16 @@ export default function MembersEditPage() {
                       setIsAdding(false)
                     }}
                     className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
+                    disabled={isLoading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
+                    disabled={isLoading}
                   >
-                    {editingMember ? 'Update Member' : 'Add Member'}
+                    {isLoading ? 'Saving...' : (editingMember ? 'Update Member' : 'Add Member')}
                   </button>
                 </div>
               </form>
