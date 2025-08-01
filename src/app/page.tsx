@@ -78,34 +78,49 @@ function HomePageContent() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary to-accent text-white py-20 relative">
+      <section className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white py-32 md:py-40 lg:py-48 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
+        </div>
+        
         {homePage.heroImageUrl && (
           <div className="absolute inset-0 z-0">
             <Image 
               src={homePage.heroImageUrl} 
               alt="Potato Lake"
               fill
-              className="object-cover opacity-20"
+              className="object-cover opacity-15"
               priority
             />
           </div>
         )}
+        
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            {homePage.heroTitle}
-          </h1>
-          {homePage.heroSubtitle && (
-            <p className="text-xl md:text-2xl mb-8 text-neutral-light">
-              {homePage.heroSubtitle}
-            </p>
-          )}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/resorts" className="bg-accent text-primary px-8 py-3 rounded-lg font-semibold hover:bg-neutral-light transition-colors">
-              Explore Resorts
-            </a>
-            <a href="/fishing" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary transition-colors">
-              Fishing Info
-            </a>
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight tracking-tight">
+              {homePage.heroTitle}
+            </h1>
+            {homePage.heroSubtitle && (
+              <p className="text-xl md:text-2xl lg:text-3xl mb-12 text-neutral-light font-light leading-relaxed max-w-3xl mx-auto">
+                {homePage.heroSubtitle}
+              </p>
+            )}
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <a href="/resorts" className="bg-accent text-primary px-10 py-4 rounded-full font-semibold hover:bg-white hover:text-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Explore Resorts
+              </a>
+              <a href="/fishing" className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-full font-semibold hover:bg-white hover:text-primary transition-all duration-300 transform hover:scale-105">
+                Fishing Info
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white rounded-full mt-2 animate-pulse"></div>
           </div>
         </div>
       </section>
