@@ -17,7 +17,20 @@ model HomePage {
   heroImageUrl String?
   introHeading String
   introText    String
+  subHeading   String?
+  carouselImages HomePageImage[]
   updatedAt    DateTime @updatedAt
+}
+
+model HomePageImage {
+  id        Int      @id @default(autoincrement())
+  homePageId Int
+  url       String
+  altText   String?
+  caption   String?
+  order     Int      @default(0)
+  homePage  HomePage @relation(fields: [homePageId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 model ResortsPage {

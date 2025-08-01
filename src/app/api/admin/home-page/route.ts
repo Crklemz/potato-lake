@@ -12,7 +12,15 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const homePage = await prisma.homePage.findFirst()
+    const homePage = await prisma.homePage.findFirst({
+      include: {
+        carouselImages: {
+          orderBy: {
+            order: 'asc'
+          }
+        }
+      }
+    })
     
     if (!homePage) {
       // Create default home page if none exists
@@ -22,7 +30,15 @@ export async function GET() {
           heroSubtitle: 'A beautiful destination for fishing and recreation',
           heroImageUrl: null,
           introHeading: 'About Potato Lake',
-          introText: 'Potato Lake is a premier fishing and recreational destination...'
+          introText: 'Potato Lake is a premier fishing and recreational destination located in northern Minnesota. Our association is dedicated to preserving the lake\'s natural beauty and promoting responsible use of this precious resource.',
+          subHeading: 'Discover the Beauty of Our Lake'
+        },
+        include: {
+          carouselImages: {
+            orderBy: {
+              order: 'asc'
+            }
+          }
         }
       })
       return NextResponse.json(defaultHomePage)
@@ -45,7 +61,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { heroTitle, heroSubtitle, heroImageUrl, introHeading, introText } = body
+    const { heroTitle, heroSubtitle, heroImageUrl, introHeading, introText, subHeading } = body
 
     const homePage = await prisma.homePage.findFirst()
     
@@ -60,7 +76,15 @@ export async function PUT(request: NextRequest) {
         heroSubtitle,
         heroImageUrl,
         introHeading,
-        introText
+        introText,
+        subHeading
+      },
+      include: {
+        carouselImages: {
+          orderBy: {
+            order: 'asc'
+          }
+        }
       }
     })
 

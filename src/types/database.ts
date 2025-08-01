@@ -1,4 +1,14 @@
 // Database model types for TypeScript
+export interface HomePageImage {
+  id: number
+  homePageId: number
+  url: string
+  altText: string | null
+  caption: string | null
+  order: number
+  createdAt: Date
+}
+
 export interface HomePage {
   id: number
   heroTitle: string
@@ -6,6 +16,8 @@ export interface HomePage {
   heroImageUrl: string | null
   introHeading: string
   introText: string
+  subHeading: string | null
+  carouselImages: HomePageImage[]
   updatedAt: Date
 }
 

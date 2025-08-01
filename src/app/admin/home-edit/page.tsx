@@ -2,16 +2,9 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-
-interface HomePageData {
-  id: number
-  heroTitle: string
-  heroSubtitle: string | null
-  heroImageUrl: string | null
-  introHeading: string
-  introText: string
-}
+import { useEffect, useState, useCallback } from 'react'
+import FileUpload from '@/components/FileUpload'
+import type { HomePage as HomePageData } from '@/types/database'
 
 export default function HomeEditPage() {
   const { data: session, status } = useSession()
@@ -20,16 +13,13 @@ export default function HomeEditPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [heroImageUrl, setHeroImageUrl] = useState<string>('')
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/admin/login')
-    } else if (status === 'authenticated') {
-      fetchHomePageData()
-    }
-  }, [status, router])
+  const handleHeroImageUpload = (url: string) => {
+    setHeroImageUrl(url)
+  }
 
-  const fetchHomePageData = async () => {
+  const fetchHomePageData = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -37,13 +27,125 @@ export default function HomeEditPage() {
       if (!response.ok) throw new Error('Failed to fetch home page data')
       const data = await response.json()
       setHomePageData(data)
+      setHeroImageUrl(data.heroImageUrl || '')
     } catch (err) {
       setError('Failed to load home page data')
       console.error('Error fetching home page data:', err)
     } finally {
       setIsLoading(false)
     }
+  }, [])
+
+  const handleAddCarouselImage = async (imageUrl: string, altText: string, caption: string) => {
+    try {
+      const response = await fetch('/api/admin/home-page/carousel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: imageUrl,
+          altText,
+          caption,
+          order: homePageData?.carouselImages?.length || 0
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to add carousel image')
+      
+      setSuccess('Carousel image added successfully!')
+      await fetchHomePageData()
+    } catch (err) {
+      setError('Failed to add carousel image')
+      console.error('Error adding carousel image:', err)
+    }
   }
+
+  const handleRemoveCarouselImage = async (imageId: number) => {
+    if (!confirm('Are you sure you want to remove this image?')) return
+
+    try {
+      const response = await fetch(`/api/admin/home-page/carousel/${imageId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) throw new Error('Failed to remove carousel image')
+      
+      setSuccess('Carousel image removed successfully!')
+      await fetchHomePageData()
+    } catch (err) {
+      setError('Failed to remove carousel image')
+      console.error('Error removing carousel image:', err)
+    }
+  }
+
+  function CarouselImageUploader({ onAdd }: { onAdd: (url: string, altText: string, caption: string) => void }) {
+    const [imageUrl, setImageUrl] = useState('')
+    const [altText, setAltText] = useState('')
+    const [caption, setCaption] = useState('')
+
+    const handleImageUpload = (url: string) => {
+      setImageUrl(url)
+    }
+
+    const handleAdd = () => {
+      if (imageUrl.trim()) {
+        onAdd(imageUrl, altText, caption)
+        setImageUrl('')
+        setAltText('')
+        setCaption('')
+      }
+    }
+
+    return (
+      <div className="space-y-4 p-4 border rounded-lg bg-neutral-light">
+        <div>
+          <label className="block text-sm font-medium text-neutral-dark mb-2">Upload Image</label>
+          <FileUpload
+            onUpload={handleImageUpload}
+            onError={(error) => console.error('Upload error:', error)}
+            type="image"
+            currentUrl={imageUrl}
+            label="Upload Carousel Image"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-dark mb-2">Alt Text</label>
+          <input
+            type="text"
+            value={altText}
+            onChange={(e) => setAltText(e.target.value)}
+            className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+            placeholder="Enter alt text (optional)"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-dark mb-2">Caption</label>
+          <input
+            type="text"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+            placeholder="Enter caption (optional)"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={!imageUrl.trim()}
+          className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Add to Carousel
+        </button>
+      </div>
+    )
+  }
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/admin/login')
+    } else if (status === 'authenticated') {
+      fetchHomePageData()
+    }
+  }, [status, router, fetchHomePageData])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -52,9 +154,10 @@ export default function HomeEditPage() {
     const updateData = {
       heroTitle: formData.get('heroTitle') as string,
       heroSubtitle: formData.get('heroSubtitle') as string,
-      heroImageUrl: formData.get('heroImageUrl') as string,
+      heroImageUrl: heroImageUrl,
       introHeading: formData.get('introHeading') as string,
-      introText: formData.get('introText') as string
+      introText: formData.get('introText') as string,
+      subHeading: formData.get('subHeading') as string
     }
 
     try {
@@ -162,15 +265,16 @@ export default function HomeEditPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Hero Image URL
+                    Hero Image
                   </label>
-                  <input
-                    type="url"
-                    name="heroImageUrl"
-                    defaultValue={homePageData?.heroImageUrl || ''}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter hero image URL"
+                  <FileUpload
+                    onUpload={handleHeroImageUpload}
+                    onError={(error) => setError(error)}
+                    type="image"
+                    currentUrl={heroImageUrl}
+                    label="Upload Hero Image"
                   />
+                  <input type="hidden" name="heroImageUrl" defaultValue={heroImageUrl} />
                 </div>
 
                 <div>
@@ -199,6 +303,58 @@ export default function HomeEditPage() {
                     placeholder="Enter intro text"
                     required
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Sub Heading
+                  </label>
+                  <input
+                    type="text"
+                    name="subHeading"
+                    defaultValue={homePageData?.subHeading || ''}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter sub heading (optional)"
+                  />
+                </div>
+
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold text-neutral-dark mb-4">Image Carousel Management</h3>
+                  <div className="mb-4">
+                    <h4 className="text-md font-medium text-neutral-dark mb-2">Add New Carousel Image</h4>
+                    <CarouselImageUploader onAdd={handleAddCarouselImage} />
+                  </div>
+                  {homePageData?.carouselImages && homePageData.carouselImages.length > 0 && (
+                    <div>
+                      <h4 className="text-md font-medium text-neutral-dark mb-2">
+                        Current Carousel Images ({homePageData.carouselImages.length})
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {homePageData.carouselImages.map((image) => (
+                          <div key={image.id} className="border rounded-lg p-4">
+                            <img 
+                              src={image.url} 
+                              alt={image.altText || 'Carousel image'} 
+                              className="w-full h-32 object-cover rounded mb-2"
+                            />
+                            <p className="text-sm text-neutral-dark mb-1">
+                              <strong>Alt Text:</strong> {image.altText || 'None'}
+                            </p>
+                            <p className="text-sm text-neutral-dark mb-2">
+                              <strong>Caption:</strong> {image.caption || 'None'}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveCarouselImage(image.id)}
+                              className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-4">

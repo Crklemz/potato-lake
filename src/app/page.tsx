@@ -1,44 +1,92 @@
-import { Suspense } from 'react'
-import { prisma } from '@/lib/prisma'
-import { notFound } from 'next/navigation'
+'use client'
+
+import { Suspense, useState, useEffect } from 'react'
+import Image from 'next/image'
 import type { HomePage } from '@/types/database'
 
-async function getHomePageData() {
-  try {
-    const homePage = await prisma.homePage.findFirst()
-    
-    if (!homePage) {
-      // Create default home page if none exists
-      const defaultHomePage = await prisma.homePage.create({
-        data: {
-          heroTitle: 'Welcome to Potato Lake',
-          heroSubtitle: 'A beautiful destination for fishing and recreation',
-          heroImageUrl: null,
-          introHeading: 'About Potato Lake',
-          introText: 'Potato Lake is a premier fishing and recreational destination located in northern Minnesota. Our association is dedicated to preserving the lake\'s natural beauty and promoting responsible use of this precious resource.'
-        }
-      })
-      return defaultHomePage
-    }
-    
-    return homePage
-  } catch (error) {
-    console.error('Error fetching home page data:', error)
-    throw new Error('Failed to load home page data')
-  }
-}
+function HomePageContent() {
+  const [homePage, setHomePage] = useState<HomePage | null>(null)
+  const [loading, setLoading] = useState(true)
 
-function HomePageContent({ homePage }: { homePage: HomePage }) {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/home-page')
+        if (!response.ok) {
+          throw new Error('Failed to fetch home page data')
+        }
+        const data = await response.json()
+        setHomePage(data)
+      } catch (error) {
+        console.error('Error fetching home page data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
+          <div className="container mx-auto px-4 text-center">
+            <div className="animate-pulse">
+              <div className="h-16 bg-white/20 rounded mb-6"></div>
+              <div className="h-8 bg-white/20 rounded mb-8"></div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="h-12 bg-white/20 rounded w-32"></div>
+                <div className="h-12 bg-white/20 rounded w-32"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="animate-pulse">
+                <div className="h-8 bg-neutral-light rounded mb-6"></div>
+                <div className="h-6 bg-neutral-light rounded mb-4"></div>
+                <div className="h-6 bg-neutral-light rounded mb-4"></div>
+                <div className="h-6 bg-neutral-light rounded"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
+
+  if (!homePage) {
+    return (
+      <div className="min-h-screen">
+        <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Welcome to Potato Lake
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-neutral-light">
+              Content loading...
+            </p>
+          </div>
+        </section>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
+      <section className="bg-gradient-to-br from-primary to-accent text-white py-20 relative">
         {homePage.heroImageUrl && (
           <div className="absolute inset-0 z-0">
-            <img 
+            <Image 
               src={homePage.heroImageUrl} 
               alt="Potato Lake"
-              className="w-full h-full object-cover opacity-20"
+              fill
+              className="object-cover opacity-20"
+              priority
             />
           </div>
         )}
@@ -69,9 +117,47 @@ function HomePageContent({ homePage }: { homePage: HomePage }) {
             <h2 className="text-3xl font-bold mb-6 text-neutral-dark">
               {homePage.introHeading}
             </h2>
-            <p className="text-lg text-neutral-dark leading-relaxed">
+            <p className="text-lg text-neutral-dark leading-relaxed mb-8">
               {homePage.introText}
             </p>
+            {homePage.subHeading && (
+              <h3 className="text-2xl font-semibold mb-8 text-primary">
+                {homePage.subHeading}
+              </h3>
+            )}
+            
+            {/* Image Grid */}
+            {homePage.carouselImages && homePage.carouselImages.length > 0 && (
+              <div className="mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                  {homePage.carouselImages.map((image) => (
+                    <div key={image.id} className="group relative overflow-hidden rounded-lg shadow-lg bg-white">
+                      <div className="aspect-square relative">
+                        <Image 
+                          src={image.url} 
+                          alt={image.altText || 'Potato Lake'}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
+                      </div>
+                      {image.caption && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                          <p className="text-sm">{image.caption}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Debug info - remove in production */}
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="mt-4 text-xs text-gray-500 text-center">
+                    Debug: {homePage.carouselImages.length} images loaded in grid
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -119,49 +205,38 @@ function HomePageContent({ homePage }: { homePage: HomePage }) {
   )
 }
 
-function LoadingHomePage() {
+export default function HomePage() {
   return (
-    <div className="min-h-screen">
-      <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <div className="animate-pulse">
-            <div className="h-16 bg-white/20 rounded mb-6"></div>
-            <div className="h-8 bg-white/20 rounded mb-8"></div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <div className="h-12 bg-white/20 rounded w-32"></div>
-              <div className="h-12 bg-white/20 rounded w-32"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
+    <Suspense fallback={
+      <div className="min-h-screen">
+        <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
+          <div className="container mx-auto px-4 text-center">
             <div className="animate-pulse">
-              <div className="h-8 bg-neutral-light rounded mb-6"></div>
-              <div className="h-6 bg-neutral-light rounded mb-4"></div>
-              <div className="h-6 bg-neutral-light rounded mb-4"></div>
-              <div className="h-6 bg-neutral-light rounded"></div>
+              <div className="h-16 bg-white/20 rounded mb-6"></div>
+              <div className="h-8 bg-white/20 rounded mb-8"></div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="h-12 bg-white/20 rounded w-32"></div>
+                <div className="h-12 bg-white/20 rounded w-32"></div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+        
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="animate-pulse">
+                <div className="h-8 bg-neutral-light rounded mb-6"></div>
+                <div className="h-6 bg-neutral-light rounded mb-4"></div>
+                <div className="h-6 bg-neutral-light rounded mb-4"></div>
+                <div className="h-6 bg-neutral-light rounded"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
   )
-}
-
-export default async function HomePage() {
-  try {
-    const homePage = await getHomePageData()
-    
-    return (
-      <Suspense fallback={<LoadingHomePage />}>
-        <HomePageContent homePage={homePage} />
-      </Suspense>
-    )
-  } catch (error) {
-    console.error('Error in HomePage:', error)
-    notFound()
-  }
 }
