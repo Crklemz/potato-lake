@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import FileUpload from '@/components/FileUpload'
 import AdminHeader from '@/components/AdminHeader'
 
@@ -41,7 +42,7 @@ export default function SponsorsEditPage() {
       const data = await response.json()
       setSponsors(data)
     } catch (err) {
-      setError('Failed to load sponsors')
+      setError('Failed to load sponsors: ' + err)
       console.error('Error fetching sponsors:', err)
     } finally {
       setIsLoading(false)
@@ -80,7 +81,7 @@ export default function SponsorsEditPage() {
       setEditingSponsor(null)
       setIsAdding(false)
     } catch (err) {
-      setError('Failed to save sponsor')
+      setError('Failed to save sponsor: ' + err)
       console.error('Error saving sponsor:', err)
     } finally {
       setIsLoading(false)
@@ -104,7 +105,7 @@ export default function SponsorsEditPage() {
       setSuccess('Sponsor deleted successfully!')
       await fetchSponsors()
     } catch (err) {
-      setError('Failed to delete sponsor')
+      setError('Failed to delete sponsor: ' + err)
       console.error('Error deleting sponsor:', err)
     } finally {
       setIsLoading(false)
@@ -168,11 +169,14 @@ export default function SponsorsEditPage() {
                   <div key={sponsor.id} className="border border-neutral-light rounded-lg p-4">
                     <div className="mb-4">
                       {sponsor.logoUrl ? (
-                        <img 
-                          src={sponsor.logoUrl} 
-                          alt={sponsor.name}
-                          className="w-full h-24 object-contain rounded-lg"
-                        />
+                        <div className="w-full h-24 relative rounded-lg">
+                          <Image 
+                            src={sponsor.logoUrl} 
+                            alt={sponsor.name}
+                            fill
+                            className="object-contain rounded-lg"
+                          />
+                        </div>
                       ) : (
                         <div className="w-full h-24 bg-accent flex items-center justify-center rounded-lg">
                           <span className="text-primary font-semibold">No Logo</span>

@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import AdminHeader from '@/components/AdminHeader'
 
 interface FishingPageData {
@@ -37,7 +38,7 @@ export default function FishingEditPage() {
       const data = await response.json()
       setFishingData(data)
     } catch (err) {
-      setError('Failed to load fishing page data')
+      setError('Failed to load fishing page data: ' + err)
       console.error('Error fetching fishing page data:', err)
     } finally {
       setIsLoading(false)
@@ -70,7 +71,7 @@ export default function FishingEditPage() {
       setSuccess('Fishing page updated successfully!')
       await fetchFishingData()
     } catch (err) {
-      setError('Failed to update fishing page')
+      setError('Failed to update fishing page: ' + err)
       console.error('Error updating fishing page:', err)
     } finally {
       setIsLoading(false)
@@ -159,11 +160,14 @@ export default function FishingEditPage() {
                   />
                   {fishingData?.imageUrl && (
                     <div className="mt-2">
-                      <img 
-                        src={fishingData.imageUrl} 
-                        alt="Fishing preview"
-                        className="w-32 h-24 object-cover rounded-lg border"
-                      />
+                      <div className="w-32 h-24 relative rounded-lg border">
+                        <Image 
+                          src={fishingData.imageUrl} 
+                          alt="Fishing preview"
+                          fill
+                          className="object-cover rounded-lg"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>

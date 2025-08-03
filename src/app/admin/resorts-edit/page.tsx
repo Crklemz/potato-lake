@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import FileUpload from '@/components/FileUpload'
 import AdminHeader from '@/components/AdminHeader'
 
@@ -44,7 +45,7 @@ export default function ResortsEditPage() {
       const data = await response.json()
       setResorts(data)
     } catch (err) {
-      setError('Failed to load resorts')
+      setError('Failed to load resorts: ' + err)
       console.error('Error fetching resorts:', err)
     } finally {
       setIsLoading(false)
@@ -86,7 +87,7 @@ export default function ResortsEditPage() {
       setEditingResort(null)
       setIsAdding(false)
     } catch (err) {
-      setError('Failed to save resort')
+      setError('Failed to save resort: ' + err)
       console.error('Error saving resort:', err)
     } finally {
       setIsLoading(false)
@@ -110,7 +111,7 @@ export default function ResortsEditPage() {
       setSuccess('Resort deleted successfully!')
       await fetchResorts()
     } catch (err) {
-      setError('Failed to delete resort')
+      setError('Failed to delete resort: ' + err)
       console.error('Error deleting resort:', err)
     } finally {
       setIsLoading(false)
@@ -174,11 +175,14 @@ export default function ResortsEditPage() {
                   <div key={resort.id} className="border border-neutral-light rounded-lg p-4">
                     <div className="mb-4">
                       {resort.imageUrl ? (
-                        <img 
-                          src={resort.imageUrl} 
-                          alt={resort.name}
-                          className="w-full h-32 object-cover rounded-lg"
-                        />
+                        <div className="w-full h-32 relative rounded-lg">
+                          <Image 
+                            src={resort.imageUrl} 
+                            alt={resort.name}
+                            fill
+                            className="object-cover rounded-lg"
+                          />
+                        </div>
                       ) : (
                         <div className="w-full h-32 bg-accent flex items-center justify-center rounded-lg">
                           <span className="text-primary font-semibold">No Image</span>

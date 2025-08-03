@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import Image from 'next/image'
 
 interface FileUploadProps {
   onUpload: (url: string) => void
@@ -187,11 +188,14 @@ export default function FileUpload({
           <div className="text-sm font-medium text-neutral-dark">Current File:</div>
           {type === 'image' ? (
             <div className="relative">
-              <img 
-                src={currentUrl} 
-                alt="Current upload"
-                className="w-32 h-24 object-cover rounded-lg border"
-              />
+              <div className="w-32 h-24 relative rounded-lg border">
+                <Image 
+                  src={currentUrl} 
+                  alt="Current upload"
+                  fill
+                  className="object-cover rounded-lg"
+                />
+              </div>
               <a 
                 href={currentUrl} 
                 target="_blank" 

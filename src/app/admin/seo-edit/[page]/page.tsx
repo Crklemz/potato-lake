@@ -38,7 +38,7 @@ export default function SeoEditPage({ params }: { params: Promise<{ page: string
       const data = await response.json()
       setSeoMeta(data)
     } catch (err) {
-      setError('Failed to load SEO metadata')
+      setError('Failed to load SEO metadata: ' + err)
       console.error('Error fetching SEO metadata:', err)
     } finally {
       setIsLoading(false)
@@ -94,7 +94,7 @@ export default function SeoEditPage({ params }: { params: Promise<{ page: string
 
       await fetchSeoMeta()
     } catch (err) {
-      setError('Failed to save SEO metadata')
+      setError('Failed to save SEO metadata: ' + err)
       console.error('Error saving SEO metadata:', err)
     } finally {
       setIsLoading(false)

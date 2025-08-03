@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import FileUpload from '@/components/FileUpload'
 import AdminHeader from '@/components/AdminHeader'
 
@@ -42,7 +43,7 @@ export default function EventsEditPage() {
       const data = await response.json()
       setEvents(data)
     } catch (err) {
-      setError('Failed to load events')
+      setError('Failed to load events: ' + err)
       console.error('Error fetching events:', err)
     } finally {
       setIsLoading(false)
@@ -82,7 +83,7 @@ export default function EventsEditPage() {
       setEditingEvent(null)
       setIsAdding(false)
     } catch (err) {
-      setError('Failed to save event')
+      setError('Failed to save event: ' + err)
       console.error('Error saving event:', err)
     } finally {
       setIsLoading(false)
@@ -106,7 +107,7 @@ export default function EventsEditPage() {
       setSuccess('Event deleted successfully!')
       await fetchEvents()
     } catch (err) {
-      setError('Failed to delete event')
+      setError('Failed to delete event: ' + err)
       console.error('Error deleting event:', err)
     } finally {
       setIsLoading(false)
@@ -178,11 +179,14 @@ export default function EventsEditPage() {
                   <div key={event.id} className="border border-neutral-light rounded-lg p-4">
                     <div className="mb-4">
                       {event.imageUrl ? (
-                        <img 
-                          src={event.imageUrl} 
-                          alt={event.title}
-                          className="w-full h-32 object-cover rounded-lg"
-                        />
+                        <div className="w-full h-32 relative rounded-lg">
+                          <Image 
+                            src={event.imageUrl} 
+                            alt={event.title}
+                            fill
+                            className="object-cover rounded-lg"
+                          />
+                        </div>
                       ) : (
                         <div className="w-full h-32 bg-accent flex items-center justify-center rounded-lg">
                           <span className="text-primary font-semibold">No Image</span>

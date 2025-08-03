@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import type { FishingPage } from '@/types/database'
 
 async function getFishingData() {
@@ -73,11 +74,14 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
             <div className="bg-white rounded-lg shadow-md p-8 mb-8">
               <h3 className="text-2xl font-semibold mb-4 text-primary">Fishing on Potato Lake</h3>
               <div className="mb-4">
-                <img 
-                  src={fishingPage.imageUrl} 
-                  alt="Fishing on Potato Lake"
-                  className="w-full h-64 object-cover rounded-lg"
-                />
+                <div className="w-full h-64 relative rounded-lg">
+                  <Image 
+                    src={fishingPage.imageUrl} 
+                    alt="Fishing on Potato Lake"
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                </div>
               </div>
             </div>
           )}

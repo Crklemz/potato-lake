@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import type { NewsPage } from '@/types/database'
 
 async function getNewsData() {
@@ -97,11 +98,14 @@ function NewsPageContent({ newsPage }: { newsPage: NewsPage }) {
                     <div className="md:w-1/3">
                       <div className="h-48 md:h-full bg-accent flex items-center justify-center">
                         {event.imageUrl ? (
-                          <img 
-                            src={event.imageUrl} 
-                            alt={event.title}
-                            className="w-full h-full object-cover"
-                          />
+                          <div className="w-full h-full relative">
+                            <Image 
+                              src={event.imageUrl} 
+                              alt={event.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
                         ) : (
                           <span className="text-primary font-semibold">Event Image</span>
                         )}

@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import type { ResortsPage } from '@/types/database'
 
 async function getResortsData() {
@@ -82,11 +83,14 @@ function ResortsPageContent({ resortsPage }: { resortsPage: ResortsPage }) {
                 <div key={resort.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                   <div className="h-48 bg-accent flex items-center justify-center">
                     {resort.imageUrl ? (
-                      <img 
-                        src={resort.imageUrl} 
-                        alt={resort.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <div className="w-full h-full relative">
+                        <Image 
+                          src={resort.imageUrl} 
+                          alt={resort.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
                     ) : (
                       <span className="text-primary font-semibold">Resort Image</span>
                     )}

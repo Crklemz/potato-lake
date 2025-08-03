@@ -37,7 +37,7 @@ export default function DnrEditPage() {
       const data = await response.json()
       setDnrData(data)
     } catch (err) {
-      setError('Failed to load DNR page data')
+      setError('Failed to load DNR page data: ' + err)
       console.error('Error fetching DNR page data:', err)
     } finally {
       setIsLoading(false)
@@ -70,7 +70,7 @@ export default function DnrEditPage() {
       setSuccess('DNR page updated successfully!')
       await fetchDnrData()
     } catch (err) {
-      setError('Failed to update DNR page')
+      setError('Failed to update DNR page: ' + err)
       console.error('Error updating DNR page:', err)
     } finally {
       setIsLoading(false)

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import FileUpload from '@/components/FileUpload'
 import AdminHeader from '@/components/AdminHeader'
 
@@ -68,8 +69,9 @@ export default function HomeEditPage() {
       } else {
         setError('Failed to load home page data')
       }
-    } catch (error) {
-      setError('Error loading home page data')
+    } catch (err) {
+      setError('Error loading home page data: ' + err)
+      console.error('Error loading home page data:', err)
     } finally {
       setIsLoading(false)
     }
@@ -97,14 +99,15 @@ export default function HomeEditPage() {
         const errorData = await response.json()
         setError(errorData.error || 'Failed to update home page')
       }
-    } catch (error) {
-      setError('Error updating home page')
+    } catch (err) {
+      setError('Error updating home page: ' + err)
+      console.error('Error updating home page:', err)
     } finally {
       setIsSaving(false)
     }
   }
 
-  const handleInputChange = (field: keyof HomePageData, value: any) => {
+  const handleInputChange = (field: keyof HomePageData, value: string | boolean) => {
     if (homePageData) {
       setHomePageData({
         ...homePageData,
@@ -138,8 +141,9 @@ export default function HomeEditPage() {
       } else {
         setError('Failed to add carousel image')
       }
-    } catch (error) {
-      setError('Error adding carousel image')
+    } catch (err) {
+      setError('Error adding carousel image: ' + err)
+      console.error('Error adding carousel image:', err)
     }
   }
 
@@ -156,8 +160,9 @@ export default function HomeEditPage() {
       } else {
         setError('Failed to remove carousel image')
       }
-    } catch (error) {
-      setError('Error removing carousel image')
+      } catch (err) {
+      setError('Error removing carousel image: ' + err)
+      console.error('Error removing carousel image:', err)
     }
   }
 
@@ -434,11 +439,14 @@ export default function HomeEditPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {homePageData.carouselImages.map((image) => (
                       <div key={image.id} className="border rounded-lg p-4">
-                        <img 
-                          src={image.url} 
-                          alt={image.altText || 'Carousel image'} 
-                          className="w-full h-32 object-cover rounded mb-2"
-                        />
+                        <div className="w-full h-32 relative rounded mb-2">
+                          <Image 
+                            src={image.url} 
+                            alt={image.altText || 'Carousel image'} 
+                            fill
+                            className="object-cover rounded"
+                          />
+                        </div>
                         <p className="text-sm text-neutral-dark mb-1">
                           <strong>Alt Text:</strong> {image.altText || 'None'}
                         </p>

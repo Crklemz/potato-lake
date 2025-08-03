@@ -37,7 +37,7 @@ export default function MembersEditPage() {
       const data = await response.json()
       setMembers(data)
     } catch (err) {
-      setError('Failed to load members')
+      setError('Failed to load members: ' + err)
       console.error('Error fetching members:', err)
     } finally {
       setIsLoading(false)
@@ -86,7 +86,7 @@ export default function MembersEditPage() {
       setEditingMember(null)
       setIsAdding(false)
     } catch (err) {
-      setError('Failed to save member')
+      setError('Failed to save member: ' + err)
       console.error('Error saving member:', err)
     } finally {
       setIsLoading(false)
@@ -108,7 +108,7 @@ export default function MembersEditPage() {
 
       await fetchMembers()
     } catch (err) {
-      setError('Failed to delete member')
+      setError('Failed to delete member: ' + err)
       console.error('Error deleting member:', err)
     } finally {
       setIsLoading(false)

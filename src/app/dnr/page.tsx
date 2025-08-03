@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import type { DnrPage } from '@/types/database'
 
 async function getDnrData() {
@@ -70,11 +71,14 @@ function DnrPageContent({ dnrPage }: { dnrPage: DnrPage }) {
             <h3 className="text-2xl font-semibold mb-4 text-primary">Lake Map</h3>
             {dnrPage.mapUrl ? (
               <div className="mb-4">
-                <img 
-                  src={dnrPage.mapUrl} 
-                  alt="Potato Lake Map"
-                  className="w-full h-64 object-cover rounded-lg"
-                />
+                <div className="w-full h-64 relative rounded-lg">
+                  <Image 
+                    src={dnrPage.mapUrl} 
+                    alt="Potato Lake Map"
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                </div>
               </div>
             ) : (
               <div className="h-64 bg-accent flex items-center justify-center rounded-lg">

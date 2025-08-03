@@ -39,7 +39,7 @@ export default function MembershipTiersEditPage() {
       const data = await response.json()
       setTiers(data)
     } catch (err) {
-      setError('Failed to load membership tiers')
+      setError('Failed to load membership tiers: ' + err)
       console.error('Error fetching tiers:', err)
     } finally {
       setIsLoading(false)
@@ -93,7 +93,7 @@ export default function MembershipTiersEditPage() {
       setEditingTier(null)
       setIsAdding(false)
     } catch (err) {
-      setError('Failed to save membership tier')
+      setError('Failed to save membership tier: ' + err)
       console.error('Error saving tier:', err)
     } finally {
       setIsLoading(false)
@@ -115,7 +115,7 @@ export default function MembershipTiersEditPage() {
 
       await fetchTiers()
     } catch (err) {
-      setError('Failed to delete membership tier')
+      setError('Failed to delete membership tier: ' + err)
       console.error('Error deleting tier:', err)
     } finally {
       setIsLoading(false)

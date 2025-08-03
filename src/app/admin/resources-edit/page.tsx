@@ -40,7 +40,7 @@ export default function ResourcesEditPage() {
       const data = await response.json()
       setResources(data)
     } catch (err) {
-      setError('Failed to load resources')
+      setError('Failed to load resources: ' + err)
       console.error('Error fetching resources:', err)
     } finally {
       setIsLoading(false)
@@ -90,7 +90,7 @@ export default function ResourcesEditPage() {
       setEditingResource(null)
       setIsAdding(false)
     } catch (err) {
-      setError('Failed to save resource')
+      setError('Failed to save resource: ' + err)
       console.error('Error saving resource:', err)
     } finally {
       setIsLoading(false)
@@ -112,7 +112,7 @@ export default function ResourcesEditPage() {
 
       await fetchResources()
     } catch (err) {
-      setError('Failed to delete resource')
+      setError('Failed to delete resource: ' + err)
       console.error('Error deleting resource:', err)
     } finally {
       setIsLoading(false)

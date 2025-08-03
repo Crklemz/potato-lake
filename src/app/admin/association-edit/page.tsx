@@ -37,7 +37,7 @@ export default function AssociationEditPage() {
       const data = await response.json()
       setAssociationData(data)
     } catch (err) {
-      setError('Failed to load association page data')
+      setError('Failed to load association page data: ' + err)
       console.error('Error fetching association page data:', err)
     } finally {
       setIsLoading(false)
@@ -70,7 +70,7 @@ export default function AssociationEditPage() {
       setSuccess('Association page updated successfully!')
       await fetchAssociationData()
     } catch (err) {
-      setError('Failed to update association page')
+      setError('Failed to update association page: ' + err)
       console.error('Error updating association page:', err)
     } finally {
       setIsLoading(false)

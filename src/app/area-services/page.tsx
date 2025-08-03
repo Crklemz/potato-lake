@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import type { AreaServicesPage } from '@/types/database'
 
 async function getAreaServicesData() {
@@ -113,11 +114,14 @@ function AreaServicesPageContent({ areaServicesPage }: { areaServicesPage: AreaS
                   <div key={sponsor.id} className="text-center">
                     <div className="h-32 bg-accent flex items-center justify-center mb-4 rounded-lg">
                       {sponsor.logoUrl ? (
-                        <img 
-                          src={sponsor.logoUrl} 
-                          alt={sponsor.name}
-                          className="max-w-full max-h-full object-contain"
-                        />
+                        <div className="w-full h-full relative">
+                          <Image 
+                            src={sponsor.logoUrl} 
+                            alt={sponsor.name}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
                       ) : (
                         <span className="text-primary font-semibold">Logo</span>
                       )}
