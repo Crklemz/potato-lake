@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import AdminHeader from '@/components/AdminHeader'
 
 interface Member {
   id: number
@@ -123,19 +124,7 @@ export default function MembersEditPage() {
 
   return (
     <div className="min-h-screen bg-neutral-light">
-      <div className="bg-primary text-white shadow-lg">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Manage Members</h1>
-            <button
-              onClick={() => router.push('/admin')}
-              className="bg-accent text-primary px-4 py-2 rounded-md font-semibold hover:bg-neutral-light transition-colors"
-            >
-              Back to Dashboard
-            </button>
-          </div>
-        </div>
-      </div>
+      <AdminHeader title="Manage Members" />
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">

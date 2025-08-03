@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import FileUpload from '@/components/FileUpload'
+import AdminHeader from '@/components/AdminHeader'
 
 interface HomePageData {
   id: number
@@ -190,12 +191,11 @@ export default function HomeEditPage() {
 
   return (
     <div className="min-h-screen bg-neutral-light">
+      {/* Admin Navigation Header */}
+      <AdminHeader title="Home Page Editor" />
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-neutral-dark mb-8">
-            Home Page Editor
-          </h1>
-
           {error && (
             <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
               {error}
