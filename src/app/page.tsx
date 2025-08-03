@@ -2,19 +2,21 @@
 
 import { Suspense, useState, useEffect } from 'react'
 import Image from 'next/image'
-import type { HomePage, Event } from '@/types/database'
+import type { HomePage, Event, CommunityStory } from '@/types/database'
 
 function HomePageContent() {
   const [homePage, setHomePage] = useState<HomePage | null>(null)
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
+  const [recentStories, setRecentStories] = useState<CommunityStory[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [homeResponse, eventsResponse] = await Promise.all([
+        const [homeResponse, eventsResponse, storiesResponse] = await Promise.all([
           fetch('/api/home-page'),
-          fetch('/api/upcoming-events')
+          fetch('/api/upcoming-events'),
+          fetch('/api/community-stories?limit=3')
         ])
         
         if (!homeResponse.ok) {
@@ -27,6 +29,11 @@ function HomePageContent() {
         if (eventsResponse.ok) {
           const eventsData = await eventsResponse.json()
           setUpcomingEvents(eventsData)
+        }
+        
+        if (storiesResponse.ok) {
+          const storiesData = await storiesResponse.json()
+          setRecentStories(storiesData)
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -289,24 +296,46 @@ function HomePageContent() {
             <p className="text-lg text-neutral-dark mb-8 leading-relaxed">
               {homePage.communityText || 'See what makes our lake community special through photos and stories from our members.'}
             </p>
-            <div className="bg-white rounded-lg shadow-md p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="text-center">
-                  <div className="text-4xl mb-4">📸</div>
-                  <h3 className="text-xl font-semibold mb-2 text-primary">Member Photos</h3>
-                  <p className="text-neutral-dark">Share your favorite lake moments with the community.</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl mb-4">💬</div>
-                  <h3 className="text-xl font-semibold mb-2 text-primary">Community Stories</h3>
-                  <p className="text-neutral-dark">Read and share stories from our lake community.</p>
-                </div>
+            
+            {/* Recent Stories */}
+            <div className="mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {recentStories.map((story) => (
+                  <div key={story.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                    {story.imageUrl && (
+                      <div className="aspect-[4/3] relative">
+                        <Image
+                          src={story.imageUrl}
+                          alt={story.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="font-semibold text-primary mb-2 line-clamp-2">
+                        {story.title}
+                      </h3>
+                      <p className="text-sm text-neutral-dark line-clamp-3">
+                        {story.content}
+                      </p>
+                      <div className="text-xs text-accent mt-2">
+                        By {story.authorName}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="mt-8">
-                <a href="/association" className="bg-accent text-primary px-6 py-3 rounded-full font-semibold hover:bg-primary hover:text-white transition-colors">
-                  Submit Your Story
-                </a>
-              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/submit-story" className="bg-accent text-primary px-6 py-3 rounded-full font-semibold hover:bg-primary hover:text-white transition-colors">
+                Submit Your Story
+              </a>
+              <a href="/stories" className="bg-transparent border-2 border-accent text-accent px-6 py-3 rounded-full font-semibold hover:bg-accent hover:text-primary transition-colors">
+                View All Stories
+              </a>
             </div>
           </div>
         </div>

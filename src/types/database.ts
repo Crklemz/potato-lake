@@ -104,4 +104,24 @@ export interface AssociationPage {
   meetingNotes: string | null
   contactEmail: string | null
   updatedAt: Date
+}
+
+export interface Member {
+  id: number
+  name: string
+  tier: string
+  isHighlighted: boolean
+  updatedAt: Date
+}
+
+export interface CommunityStory {
+  id: number
+  title: string
+  content: string
+  authorName: string
+  authorEmail: string
+  imageUrl?: string | null
+  isApproved: boolean
+  createdAt: Date
+  updatedAt: Date
 } 

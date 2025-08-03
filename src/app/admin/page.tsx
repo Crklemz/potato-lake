@@ -209,6 +209,20 @@ export default function AdminDashboard() {
                 Manage SEO
               </button>
             </div>
+
+            {/* Community Stories Management */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-semibold mb-4 text-primary">Community Stories</h3>
+              <p className="text-neutral-dark mb-4">
+                Review and approve user-submitted stories and photos.
+              </p>
+              <button 
+                onClick={() => router.push('/admin/community-stories-edit')}
+                className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
+                Manage Stories
+              </button>
+            </div>
           </div>
 
           <div className="mt-12 bg-white rounded-lg shadow-md p-8">
