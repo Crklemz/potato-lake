@@ -11,15 +11,24 @@ datasource db {
 }
 
 model HomePage {
-  id           Int      @id @default(autoincrement())
-  heroTitle    String
-  heroSubtitle String?
-  heroImageUrl String?
-  introHeading String
-  introText    String
-  subHeading   String?
-  carouselImages HomePageImage[]
-  updatedAt    DateTime @updatedAt
+  id                    Int              @id @default(autoincrement())
+  heroTitle             String
+  heroSubtitle          String?
+  heroImageUrl          String?
+  introHeading          String
+  introText             String
+  subHeading            String?
+  carouselImages        HomePageImage[]
+  alertBanner           String?
+  alertBannerActive     Boolean          @default(false)
+  latestNewsHeading     String?
+  upcomingEventsHeading String?
+  membershipHeading     String?
+  membershipText        String?
+  membershipButtonText  String?
+  communityHeading      String?
+  communityText         String?
+  updatedAt             DateTime         @updatedAt
 }
 
 model HomePageImage {

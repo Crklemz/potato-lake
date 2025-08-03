@@ -2,23 +2,34 @@
 
 import { Suspense, useState, useEffect } from 'react'
 import Image from 'next/image'
-import type { HomePage } from '@/types/database'
+import type { HomePage, Event } from '@/types/database'
 
 function HomePageContent() {
   const [homePage, setHomePage] = useState<HomePage | null>(null)
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/home-page')
-        if (!response.ok) {
+        const [homeResponse, eventsResponse] = await Promise.all([
+          fetch('/api/home-page'),
+          fetch('/api/upcoming-events')
+        ])
+        
+        if (!homeResponse.ok) {
           throw new Error('Failed to fetch home page data')
         }
-        const data = await response.json()
-        setHomePage(data)
+        
+        const homeData = await homeResponse.json()
+        setHomePage(homeData)
+        
+        if (eventsResponse.ok) {
+          const eventsData = await eventsResponse.json()
+          setUpcomingEvents(eventsData)
+        }
       } catch (error) {
-        console.error('Error fetching home page data:', error)
+        console.error('Error fetching data:', error)
       } finally {
         setLoading(false)
       }
@@ -26,10 +37,18 @@ function HomePageContent() {
     fetchData()
   }, [])
 
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    })
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen">
-        <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
+        <section className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white py-32 md:py-40 lg:py-48 relative overflow-hidden">
           <div className="container mx-auto px-4 text-center">
             <div className="animate-pulse">
               <div className="h-16 bg-white/20 rounded mb-6"></div>
@@ -61,7 +80,7 @@ function HomePageContent() {
   if (!homePage) {
     return (
       <div className="min-h-screen">
-        <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
+        <section className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white py-20">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Welcome to Potato Lake
@@ -125,7 +144,75 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* Intro Section */}
+      {/* Alert Banner */}
+      {homePage.alertBannerActive && homePage.alertBanner && (
+        <section className="bg-yellow-500 text-yellow-900 py-4">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-center text-center">
+              <span className="font-semibold">⚠️ {homePage.alertBanner}</span>
+            </div>
+          </div>
+        </section>
+      )}
+
+
+
+      {/* Latest News & Upcoming Events */}
+      <section className="py-16 bg-neutral-light">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            {/* Latest News */}
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <h2 className="text-2xl font-bold mb-6 text-primary">
+                {homePage.latestNewsHeading || 'Latest News & Updates'}
+              </h2>
+              <div className="space-y-4">
+                <div className="border-l-4 border-accent pl-4">
+                  <h3 className="font-semibold text-neutral-dark">Lake Association Meeting</h3>
+                  <p className="text-sm text-neutral-dark">Monthly meeting discussing water quality improvements and upcoming events.</p>
+                  <span className="text-xs text-accent">2 days ago</span>
+                </div>
+                <div className="border-l-4 border-accent pl-4">
+                  <h3 className="font-semibold text-neutral-dark">Fishing Tournament Results</h3>
+                  <p className="text-sm text-neutral-dark">Congratulations to all participants in our annual fishing tournament!</p>
+                  <span className="text-xs text-accent">1 week ago</span>
+                </div>
+              </div>
+              <a href="/news" className="inline-block mt-6 text-accent hover:text-primary font-semibold">
+                View All News →
+              </a>
+            </div>
+
+            {/* Upcoming Events */}
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <h2 className="text-2xl font-bold mb-6 text-primary">
+                {homePage.upcomingEventsHeading || 'Upcoming Events'}
+              </h2>
+              {upcomingEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-neutral-dark">No upcoming events scheduled.</p>
+                  <p className="text-sm text-accent mt-2">Check back soon for new events!</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {upcomingEvents.map((event) => (
+                    <div key={event.id} className="border-l-4 border-primary pl-4">
+                      <h3 className="font-semibold text-neutral-dark">{event.title}</h3>
+                      <p className="text-sm text-neutral-dark">{event.description.substring(0, 100)}...</p>
+                      <span className="text-xs text-accent">{formatDate(event.date)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <a href="/news" className="inline-block mt-6 text-accent hover:text-primary font-semibold">
+                View All Events →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Intro Section with Image Grid */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -177,14 +264,69 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* Quick Links Section */}
+      {/* Membership Call to Action */}
+      <section className="py-16 bg-gradient-to-r from-primary to-accent text-white">
+        <div className="container mx-auto px-4 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold mb-6">
+              {homePage.membershipHeading || 'Join Our Association'}
+            </h2>
+            <p className="text-lg mb-8 leading-relaxed">
+              {homePage.membershipText || 'Become a member to support lake preservation and get access to exclusive events and resources.'}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/association" className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-neutral-light transition-colors">
+                {homePage.membershipButtonText || 'Join Now'}
+              </a>
+              <a href="/association" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition-colors">
+                Learn More
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Community Highlights */}
       <section className="py-16 bg-neutral-light">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-6 text-neutral-dark">
+              {homePage.communityHeading || 'Community Highlights'}
+            </h2>
+            <p className="text-lg text-neutral-dark mb-8 leading-relaxed">
+              {homePage.communityText || 'See what makes our lake community special through photos and stories from our members.'}
+            </p>
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="text-center">
+                  <div className="text-4xl mb-4">📸</div>
+                  <h3 className="text-xl font-semibold mb-2 text-primary">Member Photos</h3>
+                  <p className="text-neutral-dark">Share your favorite lake moments with the community.</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-4">💬</div>
+                  <h3 className="text-xl font-semibold mb-2 text-primary">Community Stories</h3>
+                  <p className="text-neutral-dark">Read and share stories from our lake community.</p>
+                </div>
+              </div>
+              <div className="mt-8">
+                <a href="/association" className="bg-accent text-primary px-6 py-3 rounded-full font-semibold hover:bg-primary hover:text-white transition-colors">
+                  Submit Your Story
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Links Section */}
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12 text-neutral-dark">
             Explore Our Website
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-neutral-light p-6 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold mb-4 text-primary">Resorts</h3>
               <p className="text-neutral-dark mb-4">
                 Find the perfect place to stay during your visit to Potato Lake.
@@ -194,7 +336,7 @@ function HomePageContent() {
               </a>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-neutral-light p-6 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold mb-4 text-primary">Fishing</h3>
               <p className="text-neutral-dark mb-4">
                 Get the latest fishing reports and information about the lake.
@@ -204,7 +346,7 @@ function HomePageContent() {
               </a>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-neutral-light p-6 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold mb-4 text-primary">News & Events</h3>
               <p className="text-neutral-dark mb-4">
                 Stay updated with the latest news and upcoming events.
@@ -224,7 +366,7 @@ export default function HomePage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen">
-        <section className="bg-gradient-to-br from-primary to-accent text-white py-20">
+        <section className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white py-20">
           <div className="container mx-auto px-4 text-center">
             <div className="animate-pulse">
               <div className="h-16 bg-white/20 rounded mb-6"></div>

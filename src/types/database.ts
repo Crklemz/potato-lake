@@ -18,6 +18,15 @@ export interface HomePage {
   introText: string
   subHeading: string | null
   carouselImages: HomePageImage[]
+  alertBanner: string | null
+  alertBannerActive: boolean
+  latestNewsHeading: string | null
+  upcomingEventsHeading: string | null
+  membershipHeading: string | null
+  membershipText: string | null
+  membershipButtonText: string | null
+  communityHeading: string | null
+  communityText: string | null
   updatedAt: Date
 }
 

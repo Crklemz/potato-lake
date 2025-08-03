@@ -22,7 +22,16 @@ export async function GET() {
           heroImageUrl: null,
           introHeading: 'About Potato Lake',
           introText: 'Potato Lake is a premier fishing and recreational destination located in northern Minnesota. Our association is dedicated to preserving the lake\'s natural beauty and promoting responsible use of this precious resource.',
-          subHeading: 'Discover the Beauty of Our Lake'
+          subHeading: 'Discover the Beauty of Our Lake',
+          alertBanner: 'Important: Please check current water conditions before swimming or boating.',
+          alertBannerActive: true,
+          latestNewsHeading: 'Latest News & Updates',
+          upcomingEventsHeading: 'Upcoming Events',
+          membershipHeading: 'Join Our Association',
+          membershipText: 'Become a member to support lake preservation and get access to exclusive events and resources.',
+          membershipButtonText: 'Join Now',
+          communityHeading: 'Community Highlights',
+          communityText: 'See what makes our lake community special through photos and stories from our members.'
         },
         include: {
           carouselImages: {

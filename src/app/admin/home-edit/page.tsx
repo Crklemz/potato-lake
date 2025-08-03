@@ -1,251 +1,228 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
 import FileUpload from '@/components/FileUpload'
-import type { HomePage as HomePageData } from '@/types/database'
+
+interface HomePageData {
+  id: number
+  heroTitle: string
+  heroSubtitle: string | null
+  heroImageUrl: string | null
+  introHeading: string
+  introText: string
+  subHeading: string | null
+  carouselImages: Array<{
+    id: number
+    url: string
+    altText: string | null
+    caption: string | null
+    order: number
+  }>
+  alertBanner: string | null
+  alertBannerActive: boolean
+  latestNewsHeading: string | null
+  upcomingEventsHeading: string | null
+  membershipHeading: string | null
+  membershipText: string | null
+  membershipButtonText: string | null
+  communityHeading: string | null
+  communityText: string | null
+}
 
 export default function HomeEditPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [homePageData, setHomePageData] = useState<HomePageData | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [heroImageUrl, setHeroImageUrl] = useState<string>('')
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
-  const handleHeroImageUpload = (url: string) => {
-    setHeroImageUrl(url)
-  }
+  // Carousel image upload state
+  const [newCarouselImage, setNewCarouselImage] = useState({
+    url: '',
+    altText: '',
+    caption: ''
+  })
 
-  const fetchHomePageData = useCallback(async () => {
+  useEffect(() => {
+    if (status === 'loading') return
+
+    if (!session) {
+      router.push('/admin/login')
+      return
+    }
+
+    fetchHomePageData()
+  }, [session, status, router])
+
+  const fetchHomePageData = async () => {
     try {
-      setIsLoading(true)
-      setError(null)
       const response = await fetch('/api/admin/home-page')
-      if (!response.ok) throw new Error('Failed to fetch home page data')
-      const data = await response.json()
-      setHomePageData(data)
-      setHeroImageUrl(data.heroImageUrl || '')
-    } catch (err) {
-      setError('Failed to load home page data')
-      console.error('Error fetching home page data:', err)
+      if (response.ok) {
+        const data = await response.json()
+        setHomePageData(data)
+      } else {
+        setError('Failed to load home page data')
+      }
+    } catch (error) {
+      setError('Error loading home page data')
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }
 
-  const handleAddCarouselImage = async (imageUrl: string, altText: string, caption: string) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSaving(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const response = await fetch('/api/admin/home-page', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(homePageData),
+      })
+
+      if (response.ok) {
+        setSuccess('Home page updated successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        const errorData = await response.json()
+        setError(errorData.error || 'Failed to update home page')
+      }
+    } catch (error) {
+      setError('Error updating home page')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleInputChange = (field: keyof HomePageData, value: any) => {
+    if (homePageData) {
+      setHomePageData({
+        ...homePageData,
+        [field]: value,
+      })
+    }
+  }
+
+  const handleAddCarouselImage = async () => {
+    if (!newCarouselImage.url.trim()) return
+
     try {
       const response = await fetch('/api/admin/home-page/carousel', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          url: imageUrl,
-          altText,
-          caption,
-          order: homePageData?.carouselImages?.length || 0
-        })
+          url: newCarouselImage.url,
+          altText: newCarouselImage.altText,
+          caption: newCarouselImage.caption,
+          order: homePageData?.carouselImages.length || 0,
+        }),
       })
 
-      if (!response.ok) throw new Error('Failed to add carousel image')
-      
-      setSuccess('Carousel image added successfully!')
-      await fetchHomePageData()
-    } catch (err) {
-      setError('Failed to add carousel image')
-      console.error('Error adding carousel image:', err)
+      if (response.ok) {
+        await fetchHomePageData()
+        setNewCarouselImage({ url: '', altText: '', caption: '' })
+        setSuccess('Carousel image added successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError('Failed to add carousel image')
+      }
+    } catch (error) {
+      setError('Error adding carousel image')
     }
   }
 
   const handleRemoveCarouselImage = async (imageId: number) => {
-    if (!confirm('Are you sure you want to remove this image?')) return
-
     try {
       const response = await fetch(`/api/admin/home-page/carousel/${imageId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
 
-      if (!response.ok) throw new Error('Failed to remove carousel image')
-      
-      setSuccess('Carousel image removed successfully!')
-      await fetchHomePageData()
-    } catch (err) {
-      setError('Failed to remove carousel image')
-      console.error('Error removing carousel image:', err)
-    }
-  }
-
-  function CarouselImageUploader({ onAdd }: { onAdd: (url: string, altText: string, caption: string) => void }) {
-    const [imageUrl, setImageUrl] = useState('')
-    const [altText, setAltText] = useState('')
-    const [caption, setCaption] = useState('')
-
-    const handleImageUpload = (url: string) => {
-      setImageUrl(url)
-    }
-
-    const handleAdd = () => {
-      if (imageUrl.trim()) {
-        onAdd(imageUrl, altText, caption)
-        setImageUrl('')
-        setAltText('')
-        setCaption('')
+      if (response.ok) {
+        await fetchHomePageData()
+        setSuccess('Carousel image removed successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError('Failed to remove carousel image')
       }
+    } catch (error) {
+      setError('Error removing carousel image')
     }
+  }
 
+  if (status === 'loading' || isLoading) {
     return (
-      <div className="space-y-4 p-4 border rounded-lg bg-neutral-light">
-        <div>
-          <label className="block text-sm font-medium text-neutral-dark mb-2">Upload Image</label>
-          <FileUpload
-            onUpload={handleImageUpload}
-            onError={(error) => console.error('Upload error:', error)}
-            type="image"
-            currentUrl={imageUrl}
-            label="Upload Carousel Image"
-          />
+      <div className="min-h-screen bg-neutral-light">
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-300 rounded mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded mb-8"></div>
+            <div className="h-64 bg-gray-300 rounded mb-8"></div>
+            <div className="h-32 bg-gray-300 rounded"></div>
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-dark mb-2">Alt Text</label>
-          <input
-            type="text"
-            value={altText}
-            onChange={(e) => setAltText(e.target.value)}
-            className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-            placeholder="Enter alt text (optional)"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-dark mb-2">Caption</label>
-          <input
-            type="text"
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-            placeholder="Enter caption (optional)"
-          />
-        </div>
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={!imageUrl.trim()}
-          className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Add to Carousel
-        </button>
       </div>
     )
   }
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/admin/login')
-    } else if (status === 'authenticated') {
-      fetchHomePageData()
-    }
-  }, [status, router, fetchHomePageData])
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    
-    const updateData = {
-      heroTitle: formData.get('heroTitle') as string,
-      heroSubtitle: formData.get('heroSubtitle') as string,
-      heroImageUrl: heroImageUrl,
-      introHeading: formData.get('introHeading') as string,
-      introText: formData.get('introText') as string,
-      subHeading: formData.get('subHeading') as string
-    }
-
-    try {
-      setIsLoading(true)
-      setError(null)
-      setSuccess(null)
-
-      const response = await fetch('/api/admin/home-page', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
-      })
-
-      if (!response.ok) throw new Error('Failed to update home page')
-
-      setSuccess('Home page updated successfully!')
-      await fetchHomePageData()
-    } catch (err) {
-      setError('Failed to update home page')
-      console.error('Error updating home page:', err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  if (status === 'loading') {
+  if (!homePageData) {
     return (
-      <div className="min-h-screen bg-neutral-light flex items-center justify-center">
-        <div className="text-neutral-dark">Loading...</div>
+      <div className="min-h-screen bg-neutral-light">
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-2xl font-bold text-neutral-dark mb-4">
+            Home Page Editor
+          </h1>
+          <p className="text-neutral-dark">Loading...</p>
+        </div>
       </div>
     )
-  }
-
-  if (!session) {
-    return null
   }
 
   return (
     <div className="min-h-screen bg-neutral-light">
-      <div className="bg-primary text-white shadow-lg">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Edit Home Page</h1>
-            <button
-              onClick={() => router.push('/admin')}
-              className="bg-accent text-primary px-4 py-2 rounded-md font-semibold hover:bg-neutral-light transition-colors"
-            >
-              Back to Dashboard
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-semibold mb-6 text-neutral-dark">
-              Home Page Content Management
-            </h2>
+          <h1 className="text-3xl font-bold text-neutral-dark mb-8">
+            Home Page Editor
+          </h1>
 
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                {error}
-              </div>
-            )}
+          {error && (
+            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
 
-            {success && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                {success}
-              </div>
-            )}
+          {success && (
+            <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+              {success}
+            </div>
+          )}
 
-            {isLoading && !homePageData ? (
-              <div className="text-center py-8">
-                <div className="text-neutral-dark">Loading home page data...</div>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Hero Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-primary mb-4">Hero Section</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
                     Hero Title
                   </label>
                   <input
                     type="text"
-                    name="heroTitle"
-                    defaultValue={homePageData?.heroTitle || ''}
+                    value={homePageData.heroTitle}
+                    onChange={(e) => handleInputChange('heroTitle', e.target.value)}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter hero title"
                     required
                   />
                 </div>
@@ -256,37 +233,112 @@ export default function HomeEditPage() {
                   </label>
                   <input
                     type="text"
-                    name="heroSubtitle"
-                    defaultValue={homePageData?.heroSubtitle || ''}
+                    value={homePageData.heroSubtitle || ''}
+                    onChange={(e) => handleInputChange('heroSubtitle', e.target.value)}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter hero subtitle"
                   />
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-neutral-dark mb-2">
+                  Hero Image
+                </label>
+                <FileUpload
+                  currentUrl={homePageData.heroImageUrl}
+                  onUpload={(url: string) => handleInputChange('heroImageUrl', url)}
+                  onError={(error: string) => setError(error)}
+                  type="image"
+                  accept="image/jpeg,image/png,image/webp"
+                  maxSize={5 * 1024 * 1024}
+                  label="Upload Hero Image"
+                />
+              </div>
+            </div>
+
+            {/* Alert Banner */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-primary mb-4">Alert Banner</h2>
+              
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="alertBannerActive"
+                    checked={homePageData.alertBannerActive}
+                    onChange={(e) => handleInputChange('alertBannerActive', e.target.checked)}
+                    className="mr-2"
+                  />
+                  <label htmlFor="alertBannerActive" className="text-sm font-medium text-neutral-dark">
+                    Show Alert Banner
+                  </label>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Hero Image
+                    Alert Message
                   </label>
-                  <FileUpload
-                    onUpload={handleHeroImageUpload}
-                    onError={(error) => setError(error)}
-                    type="image"
-                    currentUrl={heroImageUrl}
-                    label="Upload Hero Image"
+                  <textarea
+                    value={homePageData.alertBanner || ''}
+                    onChange={(e) => handleInputChange('alertBanner', e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter alert message..."
                   />
-                  <input type="hidden" name="heroImageUrl" defaultValue={heroImageUrl} />
                 </div>
+              </div>
+            </div>
 
+            {/* Latest News Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-primary mb-4">Latest News Section</h2>
+              
+              <div>
+                <label className="block text-sm font-medium text-neutral-dark mb-2">
+                  Section Heading
+                </label>
+                <input
+                  type="text"
+                  value={homePageData.latestNewsHeading || ''}
+                  onChange={(e) => handleInputChange('latestNewsHeading', e.target.value)}
+                  className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                  placeholder="Latest News & Updates"
+                />
+              </div>
+            </div>
+
+            {/* Upcoming Events Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-primary mb-4">Upcoming Events Section</h2>
+              
+              <div>
+                <label className="block text-sm font-medium text-neutral-dark mb-2">
+                  Section Heading
+                </label>
+                <input
+                  type="text"
+                  value={homePageData.upcomingEventsHeading || ''}
+                  onChange={(e) => handleInputChange('upcomingEventsHeading', e.target.value)}
+                  className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                  placeholder="Upcoming Events"
+                />
+              </div>
+            </div>
+
+            {/* Intro Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-primary mb-4">Intro Section</h2>
+              
+              <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
                     Intro Heading
                   </label>
                   <input
                     type="text"
-                    name="introHeading"
-                    defaultValue={homePageData?.introHeading || ''}
+                    value={homePageData.introHeading}
+                    onChange={(e) => handleInputChange('introHeading', e.target.value)}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter intro heading"
                     required
                   />
                 </div>
@@ -296,11 +348,10 @@ export default function HomeEditPage() {
                     Intro Text
                   </label>
                   <textarea
-                    name="introText"
+                    value={homePageData.introText}
+                    onChange={(e) => handleInputChange('introText', e.target.value)}
                     rows={4}
-                    defaultValue={homePageData?.introText || ''}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter intro text"
                     required
                   />
                 </div>
@@ -311,71 +362,193 @@ export default function HomeEditPage() {
                   </label>
                   <input
                     type="text"
-                    name="subHeading"
-                    defaultValue={homePageData?.subHeading || ''}
+                    value={homePageData.subHeading || ''}
+                    onChange={(e) => handleInputChange('subHeading', e.target.value)}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter sub heading (optional)"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Image Carousel Management */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-primary mb-4">Image Carousel Management</h2>
+              
+              {/* Add New Carousel Image */}
+              <div className="mb-6 p-4 border rounded-lg bg-neutral-light">
+                <h3 className="text-lg font-medium text-neutral-dark mb-4">Add New Carousel Image</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-dark mb-2">Upload Image</label>
+                    <FileUpload
+                      currentUrl={newCarouselImage.url}
+                      onUpload={(url: string) => setNewCarouselImage(prev => ({ ...prev, url }))}
+                      onError={(error: string) => setError(error)}
+                      type="image"
+                      accept="image/jpeg,image/png,image/webp"
+                      maxSize={5 * 1024 * 1024}
+                      label="Upload Carousel Image"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-dark mb-2">Alt Text</label>
+                    <input
+                      type="text"
+                      value={newCarouselImage.altText}
+                      onChange={(e) => setNewCarouselImage(prev => ({ ...prev, altText: e.target.value }))}
+                      className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                      placeholder="Enter alt text (optional)"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-dark mb-2">Caption</label>
+                    <input
+                      type="text"
+                      value={newCarouselImage.caption}
+                      onChange={(e) => setNewCarouselImage(prev => ({ ...prev, caption: e.target.value }))}
+                      className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                      placeholder="Enter caption (optional)"
+                    />
+                  </div>
+                  
+                  <button
+                    type="button"
+                    onClick={handleAddCarouselImage}
+                    disabled={!newCarouselImage.url.trim()}
+                    className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Add to Carousel
+                  </button>
+                </div>
+              </div>
+
+              {/* Current Carousel Images */}
+              {homePageData.carouselImages && homePageData.carouselImages.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-medium text-neutral-dark mb-4">
+                    Current Carousel Images ({homePageData.carouselImages.length})
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {homePageData.carouselImages.map((image) => (
+                      <div key={image.id} className="border rounded-lg p-4">
+                        <img 
+                          src={image.url} 
+                          alt={image.altText || 'Carousel image'} 
+                          className="w-full h-32 object-cover rounded mb-2"
+                        />
+                        <p className="text-sm text-neutral-dark mb-1">
+                          <strong>Alt Text:</strong> {image.altText || 'None'}
+                        </p>
+                        <p className="text-sm text-neutral-dark mb-2">
+                          <strong>Caption:</strong> {image.caption || 'None'}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCarouselImage(image.id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Membership Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-primary mb-4">Membership Call to Action</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={homePageData.membershipHeading || ''}
+                    onChange={(e) => handleInputChange('membershipHeading', e.target.value)}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Join Our Association"
                   />
                 </div>
 
-                <div className="border-t pt-6">
-                  <h3 className="text-lg font-semibold text-neutral-dark mb-4">Image Carousel Management</h3>
-                  <div className="mb-4">
-                    <h4 className="text-md font-medium text-neutral-dark mb-2">Add New Carousel Image</h4>
-                    <CarouselImageUploader onAdd={handleAddCarouselImage} />
-                  </div>
-                  {homePageData?.carouselImages && homePageData.carouselImages.length > 0 && (
-                    <div>
-                      <h4 className="text-md font-medium text-neutral-dark mb-2">
-                        Current Carousel Images ({homePageData.carouselImages.length})
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {homePageData.carouselImages.map((image) => (
-                          <div key={image.id} className="border rounded-lg p-4">
-                            <img 
-                              src={image.url} 
-                              alt={image.altText || 'Carousel image'} 
-                              className="w-full h-32 object-cover rounded mb-2"
-                            />
-                            <p className="text-sm text-neutral-dark mb-1">
-                              <strong>Alt Text:</strong> {image.altText || 'None'}
-                            </p>
-                            <p className="text-sm text-neutral-dark mb-2">
-                              <strong>Caption:</strong> {image.caption || 'None'}
-                            </p>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveCarouselImage(image.id)}
-                              className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Section Text
+                  </label>
+                  <textarea
+                    value={homePageData.membershipText || ''}
+                    onChange={(e) => handleInputChange('membershipText', e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Become a member to support lake preservation..."
+                  />
                 </div>
 
-                <div className="flex gap-4">
-                  <button 
-                    type="submit"
-                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Saving...' : 'Save Changes'}
-                  </button>
-                  <button 
-                    type="button"
-                    onClick={() => router.push('/')}
-                    className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
-                  >
-                    Preview
-                  </button>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Button Text
+                  </label>
+                  <input
+                    type="text"
+                    value={homePageData.membershipButtonText || ''}
+                    onChange={(e) => handleInputChange('membershipButtonText', e.target.value)}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Join Now"
+                  />
                 </div>
-              </form>
-            )}
-          </div>
+              </div>
+            </div>
+
+            {/* Community Highlights Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-primary mb-4">Community Highlights</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={homePageData.communityHeading || ''}
+                    onChange={(e) => handleInputChange('communityHeading', e.target.value)}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Community Highlights"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Section Text
+                  </label>
+                  <textarea
+                    value={homePageData.communityText || ''}
+                    onChange={(e) => handleInputChange('communityText', e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="See what makes our lake community special..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
