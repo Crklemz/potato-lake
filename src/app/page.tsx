@@ -233,8 +233,8 @@ function HomePageContent() {
               <div className="mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                   {homePage.carouselImages.map((image) => (
-                    <div key={image.id} className="group relative overflow-hidden rounded-lg shadow-lg bg-white">
-                      <div className="aspect-square relative">
+                    <div key={image.id} className="group overflow-hidden rounded-lg shadow-lg bg-white">
+                      <div className="aspect-[4/3] relative">
                         <Image 
                           src={image.url} 
                           alt={image.altText || 'Potato Lake'}
@@ -244,20 +244,13 @@ function HomePageContent() {
                         />
                       </div>
                       {image.caption && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                          <p className="text-sm">{image.caption}</p>
+                        <div className="p-4 bg-white">
+                          <p className="text-sm text-neutral-dark font-medium leading-relaxed">{image.caption}</p>
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
-
-                {/* Debug info - remove in production */}
-                {process.env.NODE_ENV === 'development' && (
-                  <div className="mt-4 text-xs text-gray-500 text-center">
-                    Debug: {homePage.carouselImages.length} images loaded in grid
-                  </div>
-                )}
               </div>
             )}
           </div>
