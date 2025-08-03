@@ -43,6 +43,32 @@ export async function GET() {
       })
       return NextResponse.json(defaultHomePage)
     }
+
+    // Check if the home page has the new fields, if not update it
+    if (homePage.alertBanner === null) {
+      const updatedHomePage = await prisma.homePage.update({
+        where: { id: homePage.id },
+        data: {
+          alertBanner: 'Important: Please check current water conditions before swimming or boating.',
+          alertBannerActive: true,
+          latestNewsHeading: 'Latest News & Updates',
+          upcomingEventsHeading: 'Upcoming Events',
+          membershipHeading: 'Join Our Association',
+          membershipText: 'Become a member to support lake preservation and get access to exclusive events and resources.',
+          membershipButtonText: 'Join Now',
+          communityHeading: 'Community Highlights',
+          communityText: 'See what makes our lake community special through photos and stories from our members.'
+        },
+        include: {
+          carouselImages: {
+            orderBy: {
+              order: 'asc'
+            }
+          }
+        }
+      })
+      return NextResponse.json(updatedHomePage)
+    }
     
     return NextResponse.json(homePage)
   } catch (error) {
