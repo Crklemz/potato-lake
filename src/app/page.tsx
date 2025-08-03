@@ -268,7 +268,7 @@ function HomePageContent() {
               {homePage.membershipText || 'Become a member to support lake preservation and get access to exclusive events and resources.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/association" className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-neutral-light transition-colors">
+              <a href="/contact" className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-neutral-light transition-colors">
                 {homePage.membershipButtonText || 'Join Now'}
               </a>
               <a href="/association" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition-colors">

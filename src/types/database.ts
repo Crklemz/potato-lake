@@ -102,5 +102,6 @@ export interface AssociationPage {
   heading: string
   description: string
   meetingNotes: string | null
+  contactEmail: string | null
   updatedAt: Date
 } 

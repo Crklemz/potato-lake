@@ -116,7 +116,10 @@ function AssociationPageContent({ associationPage }: { associationPage: Associat
                 <p className="text-neutral-dark">Location: Community Center</p>
               </div>
             </div>
-            <div className="mt-6">
+            <div className="mt-6 flex gap-4">
+              <a href="/contact" className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-accent hover:text-primary transition-colors">
+                Contact Us
+              </a>
               <a href="/admin" className="text-accent hover:text-primary font-semibold">
                 Admin Login →
               </a>

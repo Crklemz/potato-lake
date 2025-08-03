@@ -20,7 +20,8 @@ export async function GET() {
         data: {
           heading: 'About the Association',
           description: 'The Potato Lake Association is dedicated to preserving and promoting the lake...',
-          meetingNotes: null
+          meetingNotes: null,
+          contactEmail: null
         }
       })
       return NextResponse.json(defaultAssociationPage)
@@ -43,7 +44,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { heading, description, meetingNotes } = body
+    const { heading, description, meetingNotes, contactEmail } = body
 
     const associationPage = await prisma.associationPage.findFirst()
     
@@ -56,7 +57,8 @@ export async function PUT(request: NextRequest) {
       data: {
         heading,
         description,
-        meetingNotes
+        meetingNotes,
+        contactEmail
       }
     })
 

@@ -117,6 +117,7 @@ model AssociationPage {
   heading      String
   description  String
   meetingNotes String?
+  contactEmail String?
   updatedAt    DateTime @updatedAt
 }
 

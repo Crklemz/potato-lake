@@ -10,6 +10,7 @@ interface AssociationPageData {
   heading: string
   description: string
   meetingNotes: string | null
+  contactEmail: string | null
 }
 
 export default function AssociationEditPage() {
@@ -51,7 +52,8 @@ export default function AssociationEditPage() {
     const updateData = {
       heading: formData.get('heading') as string,
       description: formData.get('description') as string,
-      meetingNotes: formData.get('meetingNotes') as string
+      meetingNotes: formData.get('meetingNotes') as string,
+      contactEmail: formData.get('contactEmail') as string
     }
 
     try {
@@ -159,6 +161,22 @@ export default function AssociationEditPage() {
                   />
                   <p className="text-sm text-neutral-dark mt-1">
                     This field is optional and can be used for meeting minutes, announcements, or other important information.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Contact Email
+                  </label>
+                  <input
+                    type="email"
+                    name="contactEmail"
+                    defaultValue={associationData?.contactEmail || ''}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="contact@potatolakeassociation.org"
+                  />
+                  <p className="text-sm text-neutral-dark mt-1">
+                    This email will receive contact form submissions from the website.
                   </p>
                 </div>
 
