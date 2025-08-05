@@ -650,6 +650,39 @@ export default function HomeEditPage() {
               )}
             </div>
 
+            {/* Community Highlights Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-primary mb-4">Community Highlights</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={homePageData.communityHeading || ''}
+                    onChange={(e) => handleInputChange('communityHeading', e.target.value)}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Community Highlights"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Section Text
+                  </label>
+                  <textarea
+                    value={homePageData.communityText || ''}
+                    onChange={(e) => handleInputChange('communityText', e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="See what makes our lake community special..."
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Membership Section */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold text-primary mb-4">Membership Call to Action</h2>
@@ -691,39 +724,6 @@ export default function HomeEditPage() {
                     onChange={(e) => handleInputChange('membershipButtonText', e.target.value)}
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Join Now"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Community Highlights Section */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-primary mb-4">Community Highlights</h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Section Heading
-                  </label>
-                  <input
-                    type="text"
-                    value={homePageData.communityHeading || ''}
-                    onChange={(e) => handleInputChange('communityHeading', e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Community Highlights"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Section Text
-                  </label>
-                  <textarea
-                    value={homePageData.communityText || ''}
-                    onChange={(e) => handleInputChange('communityText', e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="See what makes our lake community special..."
                   />
                 </div>
               </div>
