@@ -37,6 +37,7 @@ export default function EventsEditPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -108,6 +109,7 @@ export default function EventsEditPage() {
       await fetchEvents()
       setEditingEvent(null)
       setIsAddingEvent(false)
+      setUploadedImageUrl(null)
     } catch (err) {
       setError('Failed to save event: ' + err)
       console.error('Error saving event:', err)
@@ -148,6 +150,7 @@ export default function EventsEditPage() {
       await fetchNews()
       setEditingNews(null)
       setIsAddingNews(false)
+      setUploadedImageUrl(null)
     } catch (err) {
       setError('Failed to save news: ' + err)
       console.error('Error saving news:', err)
@@ -455,11 +458,7 @@ export default function EventsEditPage() {
                     type="image"
                     currentUrl={editingEvent?.imageUrl}
                     onUpload={(url) => {
-                      // Update the form field with the uploaded URL
-                      const imageUrlInput = document.querySelector('input[name="imageUrl"]') as HTMLInputElement
-                      if (imageUrlInput) {
-                        imageUrlInput.value = url
-                      }
+                      setUploadedImageUrl(url)
                       setUploadError(null)
                     }}
                     onError={(error) => {
@@ -472,10 +471,28 @@ export default function EventsEditPage() {
                   {uploadError && (
                     <div className="mt-2 text-sm text-red-600">{uploadError}</div>
                   )}
+                  
+                  {/* Image Preview */}
+                  {(uploadedImageUrl || editingEvent?.imageUrl) && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Image Preview
+                      </label>
+                      <div className="w-full max-w-md h-48 relative rounded-lg overflow-hidden border border-neutral-light">
+                        <Image 
+                          src={uploadedImageUrl || editingEvent?.imageUrl || ''} 
+                          alt="Event preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
                   <input
                     type="hidden"
                     name="imageUrl"
-                    defaultValue={editingEvent?.imageUrl || ''}
+                    value={uploadedImageUrl || editingEvent?.imageUrl || ''}
                   />
                 </div>
 
@@ -485,6 +502,7 @@ export default function EventsEditPage() {
                     onClick={() => {
                       setEditingEvent(null)
                       setIsAddingEvent(false)
+                      setUploadedImageUrl(null)
                     }}
                     className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
                     disabled={isLoading}
@@ -560,11 +578,7 @@ export default function EventsEditPage() {
                     type="image"
                     currentUrl={editingNews?.imageUrl}
                     onUpload={(url) => {
-                      // Update the form field with the uploaded URL
-                      const imageUrlInput = document.querySelector('input[name="imageUrl"]') as HTMLInputElement
-                      if (imageUrlInput) {
-                        imageUrlInput.value = url
-                      }
+                      setUploadedImageUrl(url)
                       setUploadError(null)
                     }}
                     onError={(error) => {
@@ -577,10 +591,28 @@ export default function EventsEditPage() {
                   {uploadError && (
                     <div className="mt-2 text-sm text-red-600">{uploadError}</div>
                   )}
+                  
+                  {/* Image Preview */}
+                  {(uploadedImageUrl || editingNews?.imageUrl) && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Image Preview
+                      </label>
+                      <div className="w-full max-w-md h-48 relative rounded-lg overflow-hidden border border-neutral-light">
+                        <Image 
+                          src={uploadedImageUrl || editingNews?.imageUrl || ''} 
+                          alt="News preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
                   <input
                     type="hidden"
                     name="imageUrl"
-                    defaultValue={editingNews?.imageUrl || ''}
+                    value={uploadedImageUrl || editingNews?.imageUrl || ''}
                   />
                 </div>
 
@@ -590,6 +622,7 @@ export default function EventsEditPage() {
                     onClick={() => {
                       setEditingNews(null)
                       setIsAddingNews(false)
+                      setUploadedImageUrl(null)
                     }}
                     className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
                     disabled={isLoading}
