@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import FileUpload from '@/components/FileUpload'
 
 export default function SubmitStoryPage() {
@@ -166,8 +167,25 @@ export default function SubmitStoryPage() {
                 maxSize={5 * 1024 * 1024} // 5MB
               />
               {formData.imageUrl && (
-                <div className="mt-2 p-2 bg-neutral-light rounded">
-                  <p className="text-sm text-accent">✓ Image uploaded successfully</p>
+                <div className="mt-4 p-4 bg-neutral-light rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium text-accent">✓ Image uploaded successfully</p>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
+                      className="text-xs text-red-600 hover:text-red-800"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div className="relative w-full h-48 rounded-lg overflow-hidden">
+                    <Image 
+                      src={formData.imageUrl} 
+                      alt="Uploaded image preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 </div>
               )}
             </div>
