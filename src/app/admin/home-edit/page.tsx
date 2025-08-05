@@ -49,6 +49,17 @@ export default function HomeEditPage() {
     caption: ''
   })
 
+  // Carousel image edit state
+  const [editingImage, setEditingImage] = useState<{
+    id: number
+    altText: string
+    caption: string
+    order: number
+  } | null>(null)
+
+  // Drag and drop state
+  const [draggedImage, setDraggedImage] = useState<number | null>(null)
+
   useEffect(() => {
     if (status === 'loading') return
 
@@ -163,6 +174,110 @@ export default function HomeEditPage() {
       } catch (err) {
       setError('Error removing carousel image: ' + err)
       console.error('Error removing carousel image:', err)
+    }
+  }
+
+  const handleUpdateCarouselImage = async () => {
+    if (!editingImage) return
+
+    try {
+      const response = await fetch(`/api/admin/home-page/carousel/${editingImage.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          altText: editingImage.altText,
+          caption: editingImage.caption,
+          order: editingImage.order,
+        }),
+      })
+
+      if (response.ok) {
+        await fetchHomePageData()
+        setEditingImage(null)
+        setSuccess('Carousel image updated successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError('Failed to update carousel image')
+      }
+    } catch (err) {
+      setError('Error updating carousel image: ' + err)
+      console.error('Error updating carousel image:', err)
+    }
+  }
+
+  const handleEditImage = (image: any) => {
+    setEditingImage({
+      id: image.id,
+      altText: image.altText || '',
+      caption: image.caption || '',
+      order: image.order
+    })
+  }
+
+  const handleCancelEdit = () => {
+    setEditingImage(null)
+  }
+
+  const handleDragStart = (e: React.DragEvent, imageId: number) => {
+    setDraggedImage(imageId)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleDrop = async (e: React.DragEvent, targetImageId: number) => {
+    e.preventDefault()
+    
+    if (!draggedImage || draggedImage === targetImageId) {
+      setDraggedImage(null)
+      return
+    }
+
+    try {
+      const currentImages = homePageData?.carouselImages || []
+      const draggedIndex = currentImages.findIndex(img => img.id === draggedImage)
+      const targetIndex = currentImages.findIndex(img => img.id === targetImageId)
+      
+      if (draggedIndex === -1 || targetIndex === -1) return
+      
+      // Create new order array
+      const newOrder = [...currentImages]
+      const [draggedItem] = newOrder.splice(draggedIndex, 1)
+      newOrder.splice(targetIndex, 0, draggedItem)
+      
+      // Update all images with new order values
+      const updatePromises = newOrder.map((image, index) => 
+        fetch(`/api/admin/home-page/carousel/${image.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            altText: image.altText,
+            caption: image.caption,
+            order: index
+          })
+        })
+      )
+      
+      const responses = await Promise.all(updatePromises)
+      const allSuccessful = responses.every(response => response.ok)
+      
+      if (allSuccessful) {
+        await fetchHomePageData()
+        setSuccess('Images reordered successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError('Failed to reorder images')
+      }
+    } catch (err) {
+      setError('Error reordering images: ' + err)
+      console.error('Error reordering images:', err)
+    } finally {
+      setDraggedImage(null)
     }
   }
 
@@ -436,9 +551,21 @@ export default function HomeEditPage() {
                   <h3 className="text-lg font-medium text-neutral-dark mb-4">
                     Current Carousel Images ({homePageData.carouselImages.length})
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <p className="text-sm text-neutral-dark mb-4">
+                    Drag and drop images to reorder them. The order will match the public view (3 columns wide).
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {homePageData.carouselImages.map((image) => (
-                      <div key={image.id} className="border rounded-lg p-4">
+                      <div 
+                        key={image.id} 
+                        className={`border rounded-lg p-4 cursor-move transition-all duration-200 ${
+                          draggedImage === image.id ? 'opacity-50 scale-95' : ''
+                        }`}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, image.id)}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, image.id)}
+                      >
                         <div className="w-full h-32 relative rounded mb-2">
                           <Image 
                             src={image.url} 
@@ -447,19 +574,75 @@ export default function HomeEditPage() {
                             className="object-cover rounded"
                           />
                         </div>
-                        <p className="text-sm text-neutral-dark mb-1">
-                          <strong>Alt Text:</strong> {image.altText || 'None'}
-                        </p>
-                        <p className="text-sm text-neutral-dark mb-2">
-                          <strong>Caption:</strong> {image.caption || 'None'}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveCarouselImage(image.id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                        >
-                          Remove
-                        </button>
+                        
+                        {editingImage?.id === image.id ? (
+                          // Edit mode
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-sm font-medium text-neutral-dark mb-1">Alt Text</label>
+                              <input
+                                type="text"
+                                value={editingImage.altText}
+                                onChange={(e) => setEditingImage(prev => prev ? { ...prev, altText: e.target.value } : null)}
+                                className="w-full px-2 py-1 border border-neutral-light rounded text-sm focus:outline-none focus:ring-primary focus:border-primary"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-neutral-dark mb-1">Caption</label>
+                              <input
+                                type="text"
+                                value={editingImage.caption}
+                                onChange={(e) => setEditingImage(prev => prev ? { ...prev, caption: e.target.value } : null)}
+                                className="w-full px-2 py-1 border border-neutral-light rounded text-sm focus:outline-none focus:ring-primary focus:border-primary"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={handleUpdateCarouselImage}
+                                className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                className="bg-neutral-dark text-white px-3 py-1 rounded text-sm hover:bg-neutral-light transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          // View mode
+                          <div>
+                            <p className="text-sm text-neutral-dark mb-1">
+                              <strong>Alt Text:</strong> {image.altText || 'None'}
+                            </p>
+                            <p className="text-sm text-neutral-dark mb-1">
+                              <strong>Caption:</strong> {image.caption || 'None'}
+                            </p>
+                            <p className="text-sm text-neutral-dark mb-2">
+                              <strong>Position:</strong> {image.order + 1} of {homePageData.carouselImages.length}
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleEditImage(image)}
+                                className="bg-accent text-primary px-3 py-1 rounded text-sm hover:bg-primary hover:text-white transition-colors"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveCarouselImage(image.id)}
+                                className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
