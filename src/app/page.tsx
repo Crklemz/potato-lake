@@ -2,21 +2,23 @@
 
 import { Suspense, useState, useEffect } from 'react'
 import Image from 'next/image'
-import type { HomePage, Event, CommunityStory } from '@/types/database'
+import type { HomePage, Event, CommunityStory, News } from '@/types/database'
 import StoryCarousel from '@/components/StoryCarousel'
 
 function HomePageContent() {
   const [homePage, setHomePage] = useState<HomePage | null>(null)
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
+  const [latestNews, setLatestNews] = useState<News[]>([])
   const [recentStories, setRecentStories] = useState<CommunityStory[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [homeResponse, eventsResponse, storiesResponse] = await Promise.all([
+        const [homeResponse, eventsResponse, newsResponse, storiesResponse] = await Promise.all([
           fetch('/api/home-page'),
           fetch('/api/upcoming-events'),
+          fetch('/api/latest-news'),
           fetch('/api/community-stories?limit=3')
         ])
         
@@ -30,6 +32,11 @@ function HomePageContent() {
         if (eventsResponse.ok) {
           const eventsData = await eventsResponse.json()
           setUpcomingEvents(eventsData)
+        }
+        
+        if (newsResponse.ok) {
+          const newsData = await newsResponse.json()
+          setLatestNews(newsData)
         }
         
         if (storiesResponse.ok) {
@@ -51,6 +58,18 @@ function HomePageContent() {
       day: 'numeric',
       year: 'numeric'
     })
+  }
+
+  const formatRelativeDate = (date: Date) => {
+    const now = new Date()
+    const newsDate = new Date(date)
+    const diffTime = Math.abs(now.getTime() - newsDate.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    if (diffDays === 1) return '1 day ago'
+    if (diffDays < 7) return `${diffDays} days ago`
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`
+    return formatDate(date)
   }
 
   if (loading) {
@@ -175,16 +194,20 @@ function HomePageContent() {
                 {homePage.latestNewsHeading || 'Latest News & Updates'}
               </h2>
               <div className="space-y-4">
-                <div className="border-l-4 border-accent pl-4">
-                  <h3 className="font-semibold text-neutral-dark">Lake Association Meeting</h3>
-                  <p className="text-sm text-neutral-dark">Monthly meeting discussing water quality improvements and upcoming events.</p>
-                  <span className="text-xs text-accent">2 days ago</span>
-                </div>
-                <div className="border-l-4 border-accent pl-4">
-                  <h3 className="font-semibold text-neutral-dark">Fishing Tournament Results</h3>
-                  <p className="text-sm text-neutral-dark">Congratulations to all participants in our annual fishing tournament!</p>
-                  <span className="text-xs text-accent">1 week ago</span>
-                </div>
+                {latestNews.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-neutral-dark">No news articles available.</p>
+                    <p className="text-sm text-accent mt-2">Check back soon for updates!</p>
+                  </div>
+                ) : (
+                  latestNews.map((news) => (
+                    <div key={news.id} className="border-l-4 border-accent pl-4">
+                      <h3 className="font-semibold text-neutral-dark">{news.title}</h3>
+                                             <p className="text-sm text-neutral-dark">{news.content.substring(0, 100)}...</p>
+                      <span className="text-xs text-accent">{formatRelativeDate(news.date)}</span>
+                    </div>
+                  ))
+                )}
               </div>
               <a href="/news" className="inline-block mt-6 text-accent hover:text-primary font-semibold">
                 View All News →

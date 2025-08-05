@@ -82,7 +82,18 @@ model NewsPage {
   id          Int     @id @default(autoincrement())
   mainHeading String
   events      Event[]
+  news        News[]
   updatedAt   DateTime @updatedAt
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  newsPageId  Int
+  title       String
+  content     String
+  date        DateTime @default(now())
+  imageUrl    String?
+  newsPage    NewsPage @relation(fields: [newsPageId], references: [id])
 }
 
 model Event {

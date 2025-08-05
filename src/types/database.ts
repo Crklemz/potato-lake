@@ -74,10 +74,20 @@ export interface Event {
   imageUrl: string | null
 }
 
+export interface News {
+  id: number
+  newsPageId: number
+  title: string
+  content: string
+  date: Date
+  imageUrl: string | null
+}
+
 export interface NewsPage {
   id: number
   mainHeading: string
   events: Event[]
+  news: News[]
   updatedAt: Date
 }
 

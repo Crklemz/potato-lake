@@ -15,12 +15,24 @@ interface Event {
   imageUrl: string | null
 }
 
+interface News {
+  id: number
+  title: string
+  date: string
+  content: string
+  imageUrl: string | null
+}
+
 export default function EventsEditPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [events, setEvents] = useState<Event[]>([])
+  const [news, setNews] = useState<News[]>([])
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
-  const [isAdding, setIsAdding] = useState(false)
+  const [editingNews, setEditingNews] = useState<News | null>(null)
+  const [isAddingEvent, setIsAddingEvent] = useState(false)
+  const [isAddingNews, setIsAddingNews] = useState(false)
+  const [activeTab, setActiveTab] = useState<'events' | 'news'>('events')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -31,6 +43,7 @@ export default function EventsEditPage() {
       router.push('/admin/login')
     } else if (status === 'authenticated') {
       fetchEvents()
+      fetchNews()
     }
   }, [status, router])
 
@@ -50,7 +63,20 @@ export default function EventsEditPage() {
     }
   }
 
-  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+  const fetchNews = async () => {
+    try {
+      setError(null)
+      const response = await fetch('/api/admin/news')
+      if (!response.ok) throw new Error('Failed to fetch news')
+      const data = await response.json()
+      setNews(data)
+    } catch (err) {
+      setError('Failed to load news: ' + err)
+      console.error('Error fetching news:', err)
+    }
+  }
+
+  const handleSaveEvent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     
@@ -81,7 +107,7 @@ export default function EventsEditPage() {
       setSuccess(editingEvent ? 'Event updated successfully!' : 'Event added successfully!')
       await fetchEvents()
       setEditingEvent(null)
-      setIsAdding(false)
+      setIsAddingEvent(false)
     } catch (err) {
       setError('Failed to save event: ' + err)
       console.error('Error saving event:', err)
@@ -90,7 +116,47 @@ export default function EventsEditPage() {
     }
   }
 
-  const handleDelete = async (id: number) => {
+  const handleSaveNews = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    
+    const newsData = {
+      title: formData.get('title') as string,
+      date: formData.get('date') as string,
+      content: formData.get('content') as string,
+      imageUrl: formData.get('imageUrl') as string
+    }
+
+    try {
+      setIsLoading(true)
+      setError(null)
+      setSuccess(null)
+
+      const url = '/api/admin/news'
+      const method = editingNews ? 'PUT' : 'POST'
+      const body = editingNews ? { ...newsData, id: editingNews.id } : newsData
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) throw new Error('Failed to save news')
+
+      setSuccess(editingNews ? 'News updated successfully!' : 'News added successfully!')
+      await fetchNews()
+      setEditingNews(null)
+      setIsAddingNews(false)
+    } catch (err) {
+      setError('Failed to save news: ' + err)
+      console.error('Error saving news:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleDeleteEvent = async (id: number) => {
     if (!confirm('Are you sure you want to delete this event?')) return
 
     try {
@@ -109,6 +175,30 @@ export default function EventsEditPage() {
     } catch (err) {
       setError('Failed to delete event: ' + err)
       console.error('Error deleting event:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleDeleteNews = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this news item?')) return
+
+    try {
+      setIsLoading(true)
+      setError(null)
+      setSuccess(null)
+
+      const response = await fetch(`/api/admin/news?id=${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) throw new Error('Failed to delete news')
+
+      setSuccess('News deleted successfully!')
+      await fetchNews()
+    } catch (err) {
+      setError('Failed to delete news: ' + err)
+      console.error('Error deleting news:', err)
     } finally {
       setIsLoading(false)
     }
@@ -143,13 +233,37 @@ export default function EventsEditPage() {
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-neutral-dark">
-                News & Events
+                News & Events Management
               </h2>
               <button
-                onClick={() => setIsAdding(true)}
+                onClick={() => activeTab === 'events' ? setIsAddingEvent(true) : setIsAddingNews(true)}
                 className="bg-accent text-primary px-4 py-2 rounded-md font-semibold hover:bg-neutral-light transition-colors"
               >
-                Add New Event
+                Add New {activeTab === 'events' ? 'Event' : 'News'}
+              </button>
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="flex border-b border-neutral-light mb-6">
+              <button
+                onClick={() => setActiveTab('events')}
+                className={`px-6 py-3 font-semibold transition-colors ${
+                  activeTab === 'events'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-neutral-dark hover:text-primary'
+                }`}
+              >
+                Events
+              </button>
+              <button
+                onClick={() => setActiveTab('news')}
+                className={`px-6 py-3 font-semibold transition-colors ${
+                  activeTab === 'news'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-neutral-dark hover:text-primary'
+                }`}
+              >
+                News
               </button>
             </div>
 
@@ -165,69 +279,133 @@ export default function EventsEditPage() {
               </div>
             )}
 
-            {isLoading && !events.length ? (
-              <div className="text-center py-8">
-                <div className="text-neutral-dark">Loading events...</div>
-              </div>
-            ) : events.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="text-neutral-dark">No events found. Add your first event!</div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {events.map((event) => (
-                  <div key={event.id} className="border border-neutral-light rounded-lg p-4">
-                    <div className="mb-4">
-                      {event.imageUrl ? (
-                        <div className="w-full h-32 relative rounded-lg">
-                          <Image 
-                            src={event.imageUrl} 
-                            alt={event.title}
-                            fill
-                            className="object-cover rounded-lg"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-full h-32 bg-accent flex items-center justify-center rounded-lg">
-                          <span className="text-primary font-semibold">No Image</span>
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="font-semibold text-neutral-dark mb-2">{event.title}</h3>
-                    <p className="text-accent text-sm mb-2 font-semibold">
-                      {formatDate(event.date)}
-                    </p>
-                    <p className="text-neutral-dark text-sm mb-3 line-clamp-3">{event.description}</p>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => setEditingEvent(event)}
-                        className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
-                        disabled={isLoading}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(event.id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                        disabled={isLoading}
-                      >
-                        Delete
-                      </button>
-                    </div>
+            {/* Events Tab Content */}
+            {activeTab === 'events' && (
+              <>
+                {isLoading && !events.length ? (
+                  <div className="text-center py-8">
+                    <div className="text-neutral-dark">Loading events...</div>
                   </div>
-                ))}
-              </div>
+                ) : events.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="text-neutral-dark">No events found. Add your first event!</div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {events.map((event) => (
+                      <div key={event.id} className="border border-neutral-light rounded-lg p-4">
+                        <div className="mb-4">
+                          {event.imageUrl ? (
+                            <div className="w-full h-32 relative rounded-lg">
+                              <Image 
+                                src={event.imageUrl} 
+                                alt={event.title}
+                                fill
+                                className="object-cover rounded-lg"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-full h-32 bg-accent flex items-center justify-center rounded-lg">
+                              <span className="text-primary font-semibold">No Image</span>
+                            </div>
+                          )}
+                        </div>
+                        <h3 className="font-semibold text-neutral-dark mb-2">{event.title}</h3>
+                        <p className="text-accent text-sm mb-2 font-semibold">
+                          {formatDate(event.date)}
+                        </p>
+                        <p className="text-neutral-dark text-sm mb-3 line-clamp-3">{event.description}</p>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => setEditingEvent(event)}
+                            className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
+                            disabled={isLoading}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteEvent(event.id)}
+                            className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                            disabled={isLoading}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* News Tab Content */}
+            {activeTab === 'news' && (
+              <>
+                {isLoading && !news.length ? (
+                  <div className="text-center py-8">
+                    <div className="text-neutral-dark">Loading news...</div>
+                  </div>
+                ) : news.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="text-neutral-dark">No news found. Add your first news item!</div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {news.map((newsItem) => (
+                      <div key={newsItem.id} className="border border-neutral-light rounded-lg p-4">
+                        <div className="mb-4">
+                          {newsItem.imageUrl ? (
+                            <div className="w-full h-32 relative rounded-lg">
+                              <Image 
+                                src={newsItem.imageUrl} 
+                                alt={newsItem.title}
+                                fill
+                                className="object-cover rounded-lg"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-full h-32 bg-accent flex items-center justify-center rounded-lg">
+                              <span className="text-primary font-semibold">No Image</span>
+                            </div>
+                          )}
+                        </div>
+                        <h3 className="font-semibold text-neutral-dark mb-2">{newsItem.title}</h3>
+                        <p className="text-accent text-sm mb-2 font-semibold">
+                          {formatDate(newsItem.date)}
+                        </p>
+                        <p className="text-neutral-dark text-sm mb-3 line-clamp-3">{newsItem.content}</p>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => setEditingNews(newsItem)}
+                            className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
+                            disabled={isLoading}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteNews(newsItem.id)}
+                            className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                            disabled={isLoading}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
           {/* Add/Edit Form */}
-          {(isAdding || editingEvent) && (
+          {(isAddingEvent || editingEvent) && (
             <div className="bg-white rounded-lg shadow-md p-8">
               <h3 className="text-xl font-semibold mb-6 text-neutral-dark">
                 {editingEvent ? 'Edit Event' : 'Add New Event'}
               </h3>
               
-              <form onSubmit={handleSave} className="space-y-6">
+              <form onSubmit={handleSaveEvent} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-dark mb-2">
                     Event Title
@@ -306,7 +484,7 @@ export default function EventsEditPage() {
                     type="button"
                     onClick={() => {
                       setEditingEvent(null)
-                      setIsAdding(false)
+                      setIsAddingEvent(false)
                     }}
                     className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
                     disabled={isLoading}
@@ -319,6 +497,111 @@ export default function EventsEditPage() {
                     disabled={isLoading}
                   >
                     {isLoading ? 'Saving...' : (editingEvent ? 'Update Event' : 'Add Event')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Add/Edit News Form */}
+          {(isAddingNews || editingNews) && (
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <h3 className="text-xl font-semibold mb-6 text-neutral-dark">
+                {editingNews ? 'Edit News' : 'Add New News'}
+              </h3>
+              
+              <form onSubmit={handleSaveNews} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    News Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    defaultValue={editingNews?.title || ''}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter news title"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    News Date
+                  </label>
+                  <input
+                    type="date"
+                    name="date"
+                    defaultValue={editingNews?.date ? editingNews.date.split('T')[0] : ''}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    News Content
+                  </label>
+                  <textarea
+                    name="content"
+                    rows={6}
+                    defaultValue={editingNews?.content || ''}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter news content"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    News Image
+                  </label>
+                  <FileUpload
+                    type="image"
+                    currentUrl={editingNews?.imageUrl}
+                    onUpload={(url) => {
+                      // Update the form field with the uploaded URL
+                      const imageUrlInput = document.querySelector('input[name="imageUrl"]') as HTMLInputElement
+                      if (imageUrlInput) {
+                        imageUrlInput.value = url
+                      }
+                      setUploadError(null)
+                    }}
+                    onError={(error) => {
+                      setUploadError(error)
+                    }}
+                    label="Upload News Image"
+                    accept="image/*"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                  />
+                  {uploadError && (
+                    <div className="mt-2 text-sm text-red-600">{uploadError}</div>
+                  )}
+                  <input
+                    type="hidden"
+                    name="imageUrl"
+                    defaultValue={editingNews?.imageUrl || ''}
+                  />
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingNews(null)
+                      setIsAddingNews(false)
+                    }}
+                    className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
+                    disabled={isLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Saving...' : (editingNews ? 'Update News' : 'Add News')}
                   </button>
                 </div>
               </form>
