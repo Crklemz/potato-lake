@@ -330,28 +330,6 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* Membership Call to Action */}
-      <section className="py-16 bg-gradient-to-r from-primary to-accent text-white">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold mb-6">
-              {homePage.membershipHeading || 'Join Our Association'}
-            </h2>
-            <p className="text-lg mb-8 leading-relaxed">
-              {homePage.membershipText || 'Become a member to support lake preservation and get access to exclusive events and resources.'}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/contact" className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-neutral-light transition-colors">
-                {homePage.membershipButtonText || 'Join Now'}
-              </a>
-              <a href="/association" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition-colors">
-                Learn More
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Community Highlights */}
       <section className="py-16 bg-neutral-light">
         <div className="container mx-auto px-4">
@@ -380,40 +358,22 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* Quick Links Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-neutral-dark">
-            Explore Our Website
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-neutral-light p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4 text-primary">Resorts</h3>
-              <p className="text-neutral-dark mb-4">
-                Find the perfect place to stay during your visit to Potato Lake.
-              </p>
-              <a href="/resorts" className="text-accent hover:text-primary font-semibold">
-                View Resorts →
+      {/* Membership Call to Action */}
+      <section className="py-16 bg-gradient-to-r from-primary to-accent text-white">
+        <div className="container mx-auto px-4 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold mb-6">
+              {homePage.membershipHeading || 'Join Our Association'}
+            </h2>
+            <p className="text-lg mb-8 leading-relaxed">
+              {homePage.membershipText || 'Become a member to support lake preservation and get access to exclusive events and resources.'}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/contact" className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-neutral-light transition-colors">
+                {homePage.membershipButtonText || 'Join Now'}
               </a>
-            </div>
-            
-            <div className="bg-neutral-light p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4 text-primary">Fishing</h3>
-              <p className="text-neutral-dark mb-4">
-                Get the latest fishing reports and information about the lake.
-              </p>
-              <a href="/fishing" className="text-accent hover:text-primary font-semibold">
-                Fishing Info →
-              </a>
-            </div>
-            
-            <div className="bg-neutral-light p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4 text-primary">News & Events</h3>
-              <p className="text-neutral-dark mb-4">
-                Stay updated with the latest news and upcoming events.
-              </p>
-              <a href="/news" className="text-accent hover:text-primary font-semibold">
-                View Events →
+              <a href="/association" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition-colors">
+                Learn More
               </a>
             </div>
           </div>
