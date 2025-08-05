@@ -377,12 +377,10 @@ function HomePageContent() {
               <StoryCarousel stories={recentStories} />
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/submit-story" className="bg-accent text-primary px-6 py-3 rounded-full font-semibold hover:bg-primary hover:text-white transition-colors">
-                Submit Your Story
-              </a>
-              <a href="/stories" className="bg-transparent border-2 border-accent text-accent px-6 py-3 rounded-full font-semibold hover:bg-accent hover:text-primary transition-colors">
-                View All Stories
+            {/* Call to Action Link */}
+            <div className="mt-4">
+              <a href="/stories" className="text-primary hover:text-accent underline text-sm font-medium text-center">
+                View All Stories →
               </a>
             </div>
           </div>

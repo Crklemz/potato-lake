@@ -94,7 +94,7 @@ export default function StoryCarousel({ stories }: StoryCarouselProps) {
               className={`w-3 h-3 rounded-full transition-all duration-200 ${
                 index === currentIndex 
                   ? 'bg-accent scale-125' 
-                  : 'bg-neutral-light hover:bg-neutral-dark'
+                  : 'bg-neutral-dark/30 hover:bg-neutral-dark'
               }`}
               aria-label={`Go to story ${index + 1}`}
             />
