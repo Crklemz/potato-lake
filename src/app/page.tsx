@@ -288,11 +288,11 @@ function HomePageContent() {
       {/* Intro Section with Image Grid */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-6 text-neutral-dark">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold mb-6 text-neutral-dark max-w-3xl mx-auto">
               {homePage.introHeading}
             </h2>
-            <p className="text-lg text-neutral-dark leading-relaxed mb-8">
+            <p className="text-lg text-neutral-dark leading-relaxed mb-8 max-w-5xl mx-auto">
               {homePage.introText}
             </p>
             {homePage.subHeading && (
