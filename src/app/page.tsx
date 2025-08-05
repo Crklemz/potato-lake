@@ -204,8 +204,8 @@ function HomePageContent() {
                 ) : (
                   latestNews.map((news) => (
                     <div key={news.id} className="border-l-4 border-accent pl-4">
-                      <h3 className="font-semibold text-neutral-dark">{news.title}</h3>
-                      <p className="text-sm text-neutral-dark">{news.content.substring(0, 100)}...</p>
+                      <h3 className="font-semibold text-neutral-dark truncate">{news.title}</h3>
+                      <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{news.content}</p>
                       <span className="text-xs text-accent">{formatRelativeDate(news.date)}</span>
                     </div>
                   ))
@@ -244,8 +244,8 @@ function HomePageContent() {
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs bg-accent text-primary px-2 py-1 rounded font-semibold">Past Event</span>
                         </div>
-                        <h3 className="font-semibold text-neutral-dark">{recentPastEvent.title}</h3>
-                        <p className="text-sm text-neutral-dark">{recentPastEvent.description.substring(0, 100)}...</p>
+                        <h3 className="font-semibold text-neutral-dark truncate">{recentPastEvent.title}</h3>
+                        <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{recentPastEvent.description}</p>
                         <span className="text-xs text-accent">{formatDate(recentPastEvent.date)}</span>
                       </div>
                     )}
@@ -254,8 +254,8 @@ function HomePageContent() {
                   <div className="space-y-4">
                     {upcomingEvents.slice(0, 3).map((event) => (
                       <div key={event.id} className="border-l-4 border-primary pl-4">
-                        <h3 className="font-semibold text-neutral-dark">{event.title}</h3>
-                        <p className="text-sm text-neutral-dark">{event.description.substring(0, 100)}...</p>
+                        <h3 className="font-semibold text-neutral-dark truncate">{event.title}</h3>
+                        <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{event.description}</p>
                         <span className="text-xs text-accent">{formatDate(event.date)}</span>
                       </div>
                     ))}
