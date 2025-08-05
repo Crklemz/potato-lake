@@ -243,9 +243,9 @@ function HomePageContent() {
                     {pastEvents.length > 0 && (
                       <div className="border-l-4 border-yellow-500 pl-4">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs bg-yellow-500 text-yellow-900 px-2 py-1 rounded font-semibold">Past Event</span>
+                          <h3 className="font-semibold text-neutral-dark truncate flex-1">{pastEvents[0].title}</h3>
+                          <span className="text-xs bg-yellow-500 text-yellow-900 px-2 py-1 rounded font-semibold flex-shrink-0">Past Event</span>
                         </div>
-                        <h3 className="font-semibold text-neutral-dark truncate">{pastEvents[0].title}</h3>
                         <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{pastEvents[0].description}</p>
                         <span className="text-xs text-yellow-700">{formatDate(pastEvents[0].date)}</span>
                       </div>
@@ -266,9 +266,9 @@ function HomePageContent() {
                     {pastEvents.map((event) => (
                       <div key={event.id} className="border-l-4 border-yellow-500 pl-4">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs bg-yellow-500 text-yellow-900 px-2 py-1 rounded font-semibold">Past Event</span>
+                          <h3 className="font-semibold text-neutral-dark truncate flex-1">{event.title}</h3>
+                          <span className="text-xs bg-yellow-500 text-yellow-900 px-2 py-1 rounded font-semibold flex-shrink-0">Past Event</span>
                         </div>
-                        <h3 className="font-semibold text-neutral-dark truncate">{event.title}</h3>
                         <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{event.description}</p>
                         <span className="text-xs text-yellow-700">{formatDate(event.date)}</span>
                       </div>
