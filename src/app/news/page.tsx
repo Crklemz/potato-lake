@@ -200,9 +200,15 @@ export default async function NewsPage() {
   try {
     const newsPage = await getNewsData()
     
+    // Ensure the newsPage has the required properties
+    const newsPageWithNews: NewsPage = {
+      ...newsPage,
+      news: []
+    }
+    
     return (
       <Suspense fallback={<LoadingNewsPage />}>
-        <NewsPageContent newsPage={newsPage} />
+        <NewsPageContent newsPage={newsPageWithNews} />
       </Suspense>
     )
   } catch (error) {

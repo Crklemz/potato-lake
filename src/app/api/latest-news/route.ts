@@ -8,7 +8,7 @@ export async function GET() {
       orderBy: {
         date: 'desc'
       },
-      take: 5 // Limit to 5 most recent news items
+      take: 4 // Limit to 4 most recent news items
     })
 
     return NextResponse.json(news)

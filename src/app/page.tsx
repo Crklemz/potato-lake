@@ -8,6 +8,7 @@ import StoryCarousel from '@/components/StoryCarousel'
 function HomePageContent() {
   const [homePage, setHomePage] = useState<HomePage | null>(null)
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
+  const [recentPastEvent, setRecentPastEvent] = useState<Event | null>(null)
   const [latestNews, setLatestNews] = useState<News[]>([])
   const [recentStories, setRecentStories] = useState<CommunityStory[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,7 +32,8 @@ function HomePageContent() {
         
         if (eventsResponse.ok) {
           const eventsData = await eventsResponse.json()
-          setUpcomingEvents(eventsData)
+          setUpcomingEvents(eventsData.upcomingEvents || [])
+          setRecentPastEvent(eventsData.recentPastEvent || null)
         }
         
         if (newsResponse.ok) {
@@ -188,12 +190,12 @@ function HomePageContent() {
       <section className="py-16 bg-neutral-light">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            {/* Latest News */}
-            <div className="bg-white rounded-lg shadow-md p-8">
+                        {/* Latest News */}
+            <div className="bg-white rounded-lg shadow-md p-8 flex flex-col h-full">
               <h2 className="text-2xl font-bold mb-6 text-primary">
                 {homePage.latestNewsHeading || 'Latest News & Updates'}
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-4 flex-grow">
                 {latestNews.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-neutral-dark">No news articles available.</p>
@@ -203,7 +205,7 @@ function HomePageContent() {
                   latestNews.map((news) => (
                     <div key={news.id} className="border-l-4 border-accent pl-4">
                       <h3 className="font-semibold text-neutral-dark">{news.title}</h3>
-                                             <p className="text-sm text-neutral-dark">{news.content.substring(0, 100)}...</p>
+                      <p className="text-sm text-neutral-dark">{news.content.substring(0, 100)}...</p>
                       <span className="text-xs text-accent">{formatRelativeDate(news.date)}</span>
                     </div>
                   ))
@@ -214,27 +216,52 @@ function HomePageContent() {
               </a>
             </div>
 
-            {/* Upcoming Events */}
-            <div className="bg-white rounded-lg shadow-md p-8">
+                        {/* Upcoming Events */}
+            <div className="bg-white rounded-lg shadow-md p-8 flex flex-col h-full">
               <h2 className="text-2xl font-bold mb-6 text-primary">
                 {homePage.upcomingEventsHeading || 'Upcoming Events'}
               </h2>
-              {upcomingEvents.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-neutral-dark">No upcoming events scheduled.</p>
-                  <p className="text-sm text-accent mt-2">Check back soon for new events!</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {upcomingEvents.map((event) => (
-                    <div key={event.id} className="border-l-4 border-primary pl-4">
-                      <h3 className="font-semibold text-neutral-dark">{event.title}</h3>
-                      <p className="text-sm text-neutral-dark">{event.description.substring(0, 100)}...</p>
-                      <span className="text-xs text-accent">{formatDate(event.date)}</span>
+              <div className="flex-grow">
+                {upcomingEvents.length === 0 ? (
+                  <div className="space-y-6">
+                    <div className="border border-neutral-light bg-neutral-light/30 rounded-lg p-6">
+                      <div className="text-center">
+                        <h3 className="text-lg font-semibold text-neutral-dark mb-2">No Upcoming Events</h3>
+                        <p className="text-sm text-neutral-dark">We're currently planning the next event — stay tuned or help plan the next one!</p>
+                        <div className="flex flex-col sm:flex-row gap-3 pt-4 justify-center">
+                        <a href="/join" className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors text-center">
+                          Join Now
+                        </a>
+                        <a href="/contact" className="bg-neutral-light text-neutral-dark px-4 py-2 rounded-md font-semibold hover:bg-accent transition-colors text-center">
+                          Contact Us
+                        </a>
+                      </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                    
+                    {recentPastEvent && (
+                      <div className="border-l-4 border-accent pl-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs bg-accent text-primary px-2 py-1 rounded font-semibold">Past Event</span>
+                        </div>
+                        <h3 className="font-semibold text-neutral-dark">{recentPastEvent.title}</h3>
+                        <p className="text-sm text-neutral-dark">{recentPastEvent.description.substring(0, 100)}...</p>
+                        <span className="text-xs text-accent">{formatDate(recentPastEvent.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {upcomingEvents.slice(0, 3).map((event) => (
+                      <div key={event.id} className="border-l-4 border-primary pl-4">
+                        <h3 className="font-semibold text-neutral-dark">{event.title}</h3>
+                        <p className="text-sm text-neutral-dark">{event.description.substring(0, 100)}...</p>
+                        <span className="text-xs text-accent">{formatDate(event.date)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               <a href="/news" className="inline-block mt-6 text-accent hover:text-primary font-semibold">
                 View All Events →
               </a>
