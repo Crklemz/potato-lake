@@ -15,6 +15,7 @@ interface Resort {
   imageUrl: string | null
   description: string | null
   websiteUrl: string | null
+  order: number
 }
 
 export default function ResortsEditPage() {
@@ -28,6 +29,7 @@ export default function ResortsEditPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null)
+  const [draggedResort, setDraggedResort] = useState<number | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -120,6 +122,72 @@ export default function ResortsEditPage() {
     }
   }
 
+  const handleDragStart = (e: React.DragEvent, resortId: number) => {
+    setDraggedResort(resortId)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleDrop = async (e: React.DragEvent, targetResortId: number) => {
+    e.preventDefault()
+    
+    if (!draggedResort || draggedResort === targetResortId) {
+      setDraggedResort(null)
+      return
+    }
+
+    try {
+      const currentResorts = [...resorts]
+      const draggedIndex = currentResorts.findIndex(resort => resort.id === draggedResort)
+      const targetIndex = currentResorts.findIndex(resort => resort.id === targetResortId)
+      
+      if (draggedIndex === -1 || targetIndex === -1) return
+      
+      // Create new order array
+      const newOrder = [...currentResorts]
+      const [draggedItem] = newOrder.splice(draggedIndex, 1)
+      newOrder.splice(targetIndex, 0, draggedItem)
+      
+      // Update all resorts with new order values
+      const updatePromises = newOrder.map((resort, index) => 
+        fetch('/api/admin/resorts', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: resort.id,
+            name: resort.name,
+            address: resort.address,
+            phone: resort.phone,
+            imageUrl: resort.imageUrl,
+            description: resort.description,
+            websiteUrl: resort.websiteUrl,
+            order: index
+          })
+        })
+      )
+      
+      const responses = await Promise.all(updatePromises)
+      const allSuccessful = responses.every(response => response.ok)
+      
+      if (allSuccessful) {
+        await fetchResorts()
+        setSuccess('Resorts reordered successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError('Failed to reorder resorts')
+      }
+    } catch (err) {
+      setError('Error reordering resorts: ' + err)
+      console.error('Error reordering resorts:', err)
+    } finally {
+      setDraggedResort(null)
+    }
+  }
+
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-neutral-light flex items-center justify-center">
@@ -175,52 +243,81 @@ export default function ResortsEditPage() {
                 <div className="text-neutral-dark">No resorts found. Add your first resort!</div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <p className="text-sm text-neutral-dark mb-4">
+                  Drag and drop resorts to change their display order. The order will match the public view (2 columns).
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {resorts.map((resort) => (
-                  <div key={resort.id} className="border border-neutral-light rounded-lg p-4">
-                    <div className="mb-4">
+                  <div 
+                    key={resort.id} 
+                    className={`bg-white rounded-lg shadow-md overflow-hidden cursor-move transition-all duration-200 ${
+                      draggedResort === resort.id ? 'opacity-50 scale-95' : ''
+                    }`}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, resort.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, resort.id)}
+                  >
+                    <div className="h-48 bg-accent flex items-center justify-center">
                       {resort.imageUrl ? (
-                        <div className="w-full h-32 relative rounded-lg">
+                        <div className="w-full h-full relative">
                           <Image 
                             src={resort.imageUrl} 
                             alt={resort.name}
                             fill
-                            className="object-cover rounded-lg"
+                            className="object-cover"
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-32 bg-accent flex items-center justify-center rounded-lg">
-                          <span className="text-primary font-semibold">No Image</span>
-                        </div>
+                        <span className="text-primary font-semibold">Resort Image</span>
                       )}
                     </div>
-                    <h3 className="font-semibold text-neutral-dark mb-2">{resort.name}</h3>
-                    <p className="text-neutral-dark text-sm mb-1">{resort.address}</p>
-                    <p className="text-neutral-dark text-sm mb-2">{resort.phone}</p>
-                    {resort.description && (
-                      <p className="text-neutral-dark text-sm mb-2 line-clamp-2">{resort.description}</p>
-                    )}
-                    <div className="flex gap-2 mt-3">
-                      <button 
-                        onClick={() => {
-                          setEditingResort(resort)
-                          setCurrentImageUrl(null)
-                        }}
-                        className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
-                        disabled={isLoading}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(resort.id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                        disabled={isLoading}
-                      >
-                        Delete
-                      </button>
+                    <div className="p-6">
+                      <h3 className="text-xl font-semibold mb-2 text-neutral-dark">{resort.name}</h3>
+                      <p className="text-neutral-dark mb-4">{resort.address}</p>
+                      <p className="text-neutral-dark mb-4">Phone: {resort.phone}</p>
+                      {resort.description && (
+                        <p className="text-neutral-dark mb-4 text-sm">{resort.description}</p>
+                      )}
+                      {resort.websiteUrl && (
+                        <a 
+                          href={resort.websiteUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-accent hover:text-primary font-semibold"
+                        >
+                          Visit Website →
+                        </a>
+                      )}
+                      <div className="mt-4 pt-4 border-t border-neutral-light">
+                        <p className="text-neutral-dark text-sm mb-3">
+                          <strong>Admin Position:</strong> {resort.order + 1} of {resorts.length}
+                        </p>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => {
+                              setEditingResort(resort)
+                              setCurrentImageUrl(null)
+                            }}
+                            className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
+                            disabled={isLoading}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(resort.id)}
+                            className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                            disabled={isLoading}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
+                </div>
               </div>
             )}
           </div>

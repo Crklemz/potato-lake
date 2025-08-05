@@ -207,7 +207,7 @@ export default function HomeEditPage() {
     }
   }
 
-  const handleEditImage = (image: any) => {
+  const handleEditImage = (image: { id: number; altText: string | null; caption: string | null; order: number }) => {
     setEditingImage({
       id: image.id,
       altText: image.altText || '',

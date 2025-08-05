@@ -59,6 +59,7 @@ model Resort {
   imageUrl      String?
   description   String?
   websiteUrl    String?
+  order         Int         @default(0)
   resortsPage   ResortsPage @relation(fields: [resortsPageId], references: [id])
 }
 

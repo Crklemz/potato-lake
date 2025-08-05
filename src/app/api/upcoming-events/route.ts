@@ -25,7 +25,14 @@ export async function GET() {
       neededPastEvents = Math.max(0, 4 - upcomingEvents.length)
     }
     
-    let pastEvents: any[] = []
+    let pastEvents: Array<{
+      id: number
+      newsPageId: number
+      title: string
+      date: Date
+      description: string
+      imageUrl: string | null
+    }> = []
     if (neededPastEvents > 0) {
       pastEvents = await prisma.event.findMany({
         where: {

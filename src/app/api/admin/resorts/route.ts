@@ -15,6 +15,9 @@ export async function GET() {
     const resorts = await prisma.resort.findMany({
       include: {
         resortsPage: true
+      },
+      orderBy: {
+        order: 'asc'
       }
     })
 
@@ -48,6 +51,13 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Get the highest order value and add 1 for the new resort
+    const maxOrder = await prisma.resort.aggregate({
+      where: { resortsPageId: resortsPage.id },
+      _max: { order: true }
+    })
+    const newOrder = (maxOrder._max.order || 0) + 1
+
     const resort = await prisma.resort.create({
       data: {
         name,
@@ -56,6 +66,7 @@ export async function POST(request: NextRequest) {
         imageUrl,
         description,
         websiteUrl,
+        order: newOrder,
         resortsPageId: resortsPage.id
       }
     })
@@ -77,7 +88,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { id, name, address, phone, imageUrl, description, websiteUrl } = body
+    const { id, name, address, phone, imageUrl, description, websiteUrl, order } = body
 
     const resort = await prisma.resort.update({
       where: { id: parseInt(id) },
@@ -87,7 +98,8 @@ export async function PUT(request: NextRequest) {
         phone,
         imageUrl,
         description,
-        websiteUrl
+        websiteUrl,
+        ...(order !== undefined && { order })
       }
     })
 

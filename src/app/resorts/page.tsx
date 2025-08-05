@@ -10,7 +10,7 @@ async function getResortsData() {
       include: {
         resorts: {
           orderBy: {
-            name: 'asc'
+            order: 'asc'
           }
         }
       }
@@ -30,7 +30,8 @@ async function getResortsData() {
                 phone: '(555) 123-4567',
                 description: 'A beautiful lakeside resort with modern amenities.',
                 websiteUrl: null,
-                imageUrl: null
+                imageUrl: null,
+                order: 0
               }
             ]
           }
@@ -38,7 +39,7 @@ async function getResortsData() {
         include: {
           resorts: {
             orderBy: {
-              name: 'asc'
+              order: 'asc'
             }
           }
         }
