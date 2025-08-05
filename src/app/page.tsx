@@ -12,6 +12,7 @@ function HomePageContent() {
   const [latestNews, setLatestNews] = useState<News[]>([])
   const [recentStories, setRecentStories] = useState<CommunityStory[]>([])
   const [loading, setLoading] = useState(true)
+  const [headerHeight, setHeaderHeight] = useState(0)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,6 +55,27 @@ function HomePageContent() {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    const measureHeaderHeight = () => {
+      const header = document.querySelector('header')
+      if (header) {
+        const height = header.offsetHeight
+        setHeaderHeight(height)
+      }
+    }
+
+    // Measure on mount
+    measureHeaderHeight()
+
+    // Measure on resize
+    const handleResize = () => {
+      measureHeaderHeight()
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short',
@@ -77,7 +99,10 @@ function HomePageContent() {
   if (loading) {
     return (
       <div className="min-h-screen">
-        <section className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white py-32 md:py-40 lg:py-48 relative overflow-hidden">
+        <section 
+          className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white relative overflow-hidden flex flex-col justify-center"
+          style={{ height: `calc(100vh - ${headerHeight}px)` }}
+        >
           <div className="container mx-auto px-4 text-center">
             <div className="animate-pulse">
               <div className="h-16 bg-white/20 rounded mb-6"></div>
@@ -109,7 +134,10 @@ function HomePageContent() {
   if (!homePage) {
     return (
       <div className="min-h-screen">
-        <section className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white py-20">
+        <section 
+          className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white flex flex-col justify-center"
+          style={{ height: `calc(100vh - ${headerHeight}px)` }}
+        >
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Welcome to Potato Lake
@@ -126,7 +154,10 @@ function HomePageContent() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white py-32 md:py-40 lg:py-48 relative overflow-hidden">
+      <section 
+        className="bg-gradient-to-br from-primary via-accent to-sand-accent text-white relative overflow-hidden flex flex-col justify-center"
+        style={{ height: `calc(100vh - ${headerHeight}px)` }}
+      >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
