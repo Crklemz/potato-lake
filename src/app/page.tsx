@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect } from 'react'
 import Image from 'next/image'
 import type { HomePage, Event, CommunityStory } from '@/types/database'
+import StoryCarousel from '@/components/StoryCarousel'
 
 function HomePageContent() {
   const [homePage, setHomePage] = useState<HomePage | null>(null)
@@ -297,36 +298,9 @@ function HomePageContent() {
               {homePage.communityText || 'See what makes our lake community special through photos and stories from our members.'}
             </p>
             
-            {/* Recent Stories */}
+            {/* Recent Stories Carousel */}
             <div className="mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {recentStories.map((story) => (
-                  <div key={story.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                    {story.imageUrl && (
-                      <div className="aspect-[4/3] relative">
-                        <Image
-                          src={story.imageUrl}
-                          alt={story.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                        />
-                      </div>
-                    )}
-                    <div className="p-4">
-                      <h3 className="font-semibold text-primary mb-2 line-clamp-2">
-                        {story.title}
-                      </h3>
-                      <p className="text-sm text-neutral-dark line-clamp-3">
-                        {story.content}
-                      </p>
-                      <div className="text-xs text-accent mt-2">
-                        By {story.authorName}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <StoryCarousel stories={recentStories} />
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
