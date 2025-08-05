@@ -27,6 +27,7 @@ export default function ResortsEditPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -60,7 +61,7 @@ export default function ResortsEditPage() {
       name: formData.get('name') as string,
       address: formData.get('address') as string,
       phone: formData.get('phone') as string,
-      imageUrl: formData.get('imageUrl') as string,
+      imageUrl: currentImageUrl || formData.get('imageUrl') as string,
       description: formData.get('description') as string,
       websiteUrl: formData.get('websiteUrl') as string
     }
@@ -86,6 +87,7 @@ export default function ResortsEditPage() {
       await fetchResorts()
       setEditingResort(null)
       setIsAdding(false)
+      setCurrentImageUrl(null)
     } catch (err) {
       setError('Failed to save resort: ' + err)
       console.error('Error saving resort:', err)
@@ -142,7 +144,10 @@ export default function ResortsEditPage() {
                 Resorts Directory
               </h2>
               <button
-                onClick={() => setIsAdding(true)}
+                onClick={() => {
+                  setIsAdding(true)
+                  setCurrentImageUrl(null)
+                }}
                 className="bg-accent text-primary px-4 py-2 rounded-md font-semibold hover:bg-neutral-light transition-colors"
               >
                 Add New Resort
@@ -197,7 +202,10 @@ export default function ResortsEditPage() {
                     )}
                     <div className="flex gap-2 mt-3">
                       <button 
-                        onClick={() => setEditingResort(resort)}
+                        onClick={() => {
+                          setEditingResort(resort)
+                          setCurrentImageUrl(null)
+                        }}
                         className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-accent hover:text-primary transition-colors"
                         disabled={isLoading}
                       >
@@ -288,13 +296,9 @@ export default function ResortsEditPage() {
                   </label>
                   <FileUpload
                     type="image"
-                    currentUrl={editingResort?.imageUrl}
+                    currentUrl={currentImageUrl || editingResort?.imageUrl}
                     onUpload={(url) => {
-                      // Update the form field with the uploaded URL
-                      const imageUrlInput = document.querySelector('input[name="imageUrl"]') as HTMLInputElement
-                      if (imageUrlInput) {
-                        imageUrlInput.value = url
-                      }
+                      setCurrentImageUrl(url)
                       setUploadError(null)
                     }}
                     onError={(error) => {
@@ -307,6 +311,7 @@ export default function ResortsEditPage() {
                   {uploadError && (
                     <div className="mt-2 text-sm text-red-600">{uploadError}</div>
                   )}
+                  
                   <input
                     type="hidden"
                     name="imageUrl"
@@ -333,6 +338,7 @@ export default function ResortsEditPage() {
                     onClick={() => {
                       setEditingResort(null)
                       setIsAdding(false)
+                      setCurrentImageUrl(null)
                     }}
                     className="bg-neutral-light text-neutral-dark px-6 py-2 rounded-md font-semibold hover:bg-accent transition-colors"
                     disabled={isLoading}
