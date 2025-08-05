@@ -12,13 +12,15 @@ export async function GET() {
       orderBy: {
         date: 'asc'
       },
-      take: 3 // Limit to 3 upcoming events
+      take: 4 // Get up to 4 upcoming events
     })
 
-    // If no upcoming events, get the most recent past event
-    let recentPastEvent = null
-    if (upcomingEvents.length === 0) {
-      recentPastEvent = await prisma.event.findFirst({
+    // Calculate how many past events we need to fill to 4 total
+    const neededPastEvents = Math.max(0, 4 - upcomingEvents.length)
+    
+    let pastEvents: any[] = []
+    if (neededPastEvents > 0) {
+      pastEvents = await prisma.event.findMany({
         where: {
           date: {
             lt: new Date()
@@ -26,13 +28,14 @@ export async function GET() {
         },
         orderBy: {
           date: 'desc'
-        }
+        },
+        take: neededPastEvents
       })
     }
     
     return NextResponse.json({
       upcomingEvents,
-      recentPastEvent
+      pastEvents
     })
   } catch (error) {
     console.error('Error fetching upcoming events:', error)

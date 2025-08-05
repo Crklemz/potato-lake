@@ -8,7 +8,7 @@ import StoryCarousel from '@/components/StoryCarousel'
 function HomePageContent() {
   const [homePage, setHomePage] = useState<HomePage | null>(null)
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
-  const [recentPastEvent, setRecentPastEvent] = useState<Event | null>(null)
+  const [pastEvents, setPastEvents] = useState<Event[]>([])
   const [latestNews, setLatestNews] = useState<News[]>([])
   const [recentStories, setRecentStories] = useState<CommunityStory[]>([])
   const [loading, setLoading] = useState(true)
@@ -33,7 +33,7 @@ function HomePageContent() {
         if (eventsResponse.ok) {
           const eventsData = await eventsResponse.json()
           setUpcomingEvents(eventsData.upcomingEvents || [])
-          setRecentPastEvent(eventsData.recentPastEvent || null)
+          setPastEvents(eventsData.pastEvents || [])
         }
         
         if (newsResponse.ok) {
@@ -239,24 +239,38 @@ function HomePageContent() {
                       </div>
                     </div>
                     
-                    {recentPastEvent && (
-                      <div className="border-l-4 border-accent pl-4">
+                    {/* Show most recent past event if available */}
+                    {pastEvents.length > 0 && (
+                      <div className="border-l-4 border-yellow-500 pl-4">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs bg-accent text-primary px-2 py-1 rounded font-semibold">Past Event</span>
+                          <span className="text-xs bg-yellow-500 text-yellow-900 px-2 py-1 rounded font-semibold">Past Event</span>
                         </div>
-                        <h3 className="font-semibold text-neutral-dark truncate">{recentPastEvent.title}</h3>
-                        <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{recentPastEvent.description}</p>
-                        <span className="text-xs text-accent">{formatDate(recentPastEvent.date)}</span>
+                        <h3 className="font-semibold text-neutral-dark truncate">{pastEvents[0].title}</h3>
+                        <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{pastEvents[0].description}</p>
+                        <span className="text-xs text-yellow-700">{formatDate(pastEvents[0].date)}</span>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {upcomingEvents.slice(0, 3).map((event) => (
+                    {/* Upcoming Events */}
+                    {upcomingEvents.map((event) => (
                       <div key={event.id} className="border-l-4 border-primary pl-4">
                         <h3 className="font-semibold text-neutral-dark truncate">{event.title}</h3>
                         <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{event.description}</p>
                         <span className="text-xs text-accent">{formatDate(event.date)}</span>
+                      </div>
+                    ))}
+                    
+                    {/* Past Events (only if we have upcoming events and need to fill to 4) */}
+                    {pastEvents.map((event) => (
+                      <div key={event.id} className="border-l-4 border-yellow-500 pl-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs bg-yellow-500 text-yellow-900 px-2 py-1 rounded font-semibold">Past Event</span>
+                        </div>
+                        <h3 className="font-semibold text-neutral-dark truncate">{event.title}</h3>
+                        <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{event.description}</p>
+                        <span className="text-xs text-yellow-700">{formatDate(event.date)}</span>
                       </div>
                     ))}
                   </div>
