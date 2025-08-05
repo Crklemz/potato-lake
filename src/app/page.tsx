@@ -258,7 +258,7 @@ function HomePageContent() {
                     <div className="border border-neutral-light bg-neutral-light/30 rounded-lg p-6">
                       <div className="text-center">
                         <h3 className="text-lg font-semibold text-neutral-dark mb-2">No Upcoming Events</h3>
-                        <p className="text-sm text-neutral-dark">We're currently planning the next event — stay tuned or help plan the next one!</p>
+                        <p className="text-sm text-neutral-dark">We&apos;re currently planning the next event — stay tuned or help plan the next one!</p>
                         <div className="flex flex-col sm:flex-row gap-3 pt-4 justify-center">
                         <a href="/contact" className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors text-center">
                           Contact Us
@@ -388,8 +388,10 @@ function HomePageContent() {
       </section>
 
       {/* Membership Call to Action */}
-      <section className="py-16 bg-gradient-to-r from-primary to-accent text-white">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-24 bg-gradient-to-r from-primary to-accent text-white relative">
+        {/* Dark overlay for better contrast */}
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold mb-6">
               {homePage.membershipHeading || 'Join Our Association'}
@@ -397,12 +399,12 @@ function HomePageContent() {
             <p className="text-lg mb-8 leading-relaxed">
               {homePage.membershipText || 'Become a member to support lake preservation and get access to exclusive events and resources.'}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col items-center gap-4">
               <a href="/contact" className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-neutral-light transition-colors">
                 {homePage.membershipButtonText || 'Join Now'}
               </a>
-              <a href="/association" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition-colors">
-                Learn More
+              <a href="/association" className="text-white/90 hover:text-white underline text-sm font-medium transition-colors">
+                Learn more about membership →
               </a>
             </div>
           </div>
@@ -421,9 +423,9 @@ export default function HomePage() {
             <div className="animate-pulse">
               <div className="h-16 bg-white/20 rounded mb-6"></div>
               <div className="h-8 bg-white/20 rounded mb-8"></div>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col items-center gap-4">
                 <div className="h-12 bg-white/20 rounded w-32"></div>
-                <div className="h-12 bg-white/20 rounded w-32"></div>
+                <div className="h-6 bg-white/20 rounded w-48"></div>
               </div>
             </div>
           </div>
