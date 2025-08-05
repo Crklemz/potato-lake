@@ -17,7 +17,7 @@ export default function Header() {
   ]
 
   return (
-    <header className="bg-primary text-white shadow-lg">
+    <header className="sticky top-0 z-50 bg-primary text-white shadow-lg">
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="mb-4 md:mb-0">
