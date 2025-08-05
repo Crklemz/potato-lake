@@ -15,8 +15,15 @@ export async function GET() {
       take: 4 // Get up to 4 upcoming events
     })
 
-    // Calculate how many past events we need to fill to 4 total
-    const neededPastEvents = Math.max(0, 4 - upcomingEvents.length)
+    // Calculate how many past events we need
+    let neededPastEvents = 0
+    if (upcomingEvents.length === 0) {
+      // If no upcoming events, get up to 2 past events for the fallback display
+      neededPastEvents = 2
+    } else {
+      // If we have upcoming events, fill remaining slots to reach 4 total
+      neededPastEvents = Math.max(0, 4 - upcomingEvents.length)
+    }
     
     let pastEvents: any[] = []
     if (neededPastEvents > 0) {

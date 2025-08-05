@@ -229,25 +229,26 @@ function HomePageContent() {
                         <h3 className="text-lg font-semibold text-neutral-dark mb-2">No Upcoming Events</h3>
                         <p className="text-sm text-neutral-dark">We're currently planning the next event — stay tuned or help plan the next one!</p>
                         <div className="flex flex-col sm:flex-row gap-3 pt-4 justify-center">
-                        <a href="/join" className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors text-center">
-                          Join Now
-                        </a>
-                        <a href="/contact" className="bg-neutral-light text-neutral-dark px-4 py-2 rounded-md font-semibold hover:bg-accent transition-colors text-center">
+                        <a href="/contact" className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors text-center">
                           Contact Us
                         </a>
                       </div>
                       </div>
                     </div>
                     
-                    {/* Show most recent past event if available */}
+                    {/* Show up to 2 most recent past events if available */}
                     {pastEvents.length > 0 && (
-                      <div className="border-l-4 border-yellow-500 pl-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-neutral-dark truncate flex-1">{pastEvents[0].title}</h3>
-                          <span className="text-xs bg-yellow-500 text-yellow-900 px-2 py-1 rounded font-semibold flex-shrink-0">Past Event</span>
-                        </div>
-                        <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{pastEvents[0].description}</p>
-                        <span className="text-xs text-yellow-700">{formatDate(pastEvents[0].date)}</span>
+                      <div className="space-y-4">
+                        {pastEvents.map((event) => (
+                          <div key={event.id} className="border-l-4 border-yellow-500 pl-4">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-neutral-dark truncate flex-1">{event.title}</h3>
+                              <span className="text-xs bg-yellow-500 text-yellow-900 px-2 py-1 rounded font-semibold flex-shrink-0">Past Event</span>
+                            </div>
+                            <p className="text-sm text-neutral-dark line-clamp-2 overflow-hidden">{event.description}</p>
+                            <span className="text-xs text-yellow-700">{formatDate(event.date)}</span>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
