@@ -983,6 +983,116 @@ export default function FishingEditPage() {
                   )}
                 </div>
 
+                {/* Fishing Regulations Section */}
+                <div className="border-b border-neutral-light pb-6">
+                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Fishing Regulations Section</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Regulations Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="regulationsHeading"
+                        defaultValue={fishingData?.regulationsHeading || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="Enter regulations heading"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Regulations Text
+                      </label>
+                      <textarea
+                        name="regulationsText"
+                        rows={4}
+                        defaultValue={fishingData?.regulationsText || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="Enter regulations text"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          CTA Button Text
+                        </label>
+                        <input
+                          type="text"
+                          name="regulationsCtaText"
+                          defaultValue={fishingData?.regulationsCtaText || ''}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                          placeholder="Enter CTA button text"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          CTA Button Link
+                        </label>
+                        <input
+                          type="url"
+                          name="regulationsCtaLink"
+                          defaultValue={fishingData?.regulationsCtaLink || ''}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                          placeholder="Enter CTA button link"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Latest Fishing Report Section */}
+                <div className="border-b border-neutral-light pb-6">
+                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Latest Fishing Report Section</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Report Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="fishingReportHeading"
+                        defaultValue={fishingData?.fishingReportHeading || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="Enter fishing report heading"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Report Text
+                      </label>
+                      <textarea
+                        name="fishingReportText"
+                        rows={6}
+                        defaultValue={fishingData?.fishingReportText || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="Enter fishing report text"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Report Date
+                      </label>
+                      <input
+                        type="date"
+                        name="fishingReportDate"
+                        defaultValue={fishingData?.fishingReportDate ? new Date(fishingData.fishingReportDate).toISOString().split('T')[0] : ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="Select report date"
+                      />
+                      <p className="text-sm text-neutral-dark mt-1">
+                        Optional: Leave empty to hide the &quot;Last updated on&quot; label
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Fishing Gallery Management */}
                 <div className="border-b border-neutral-light pb-6">
                   <div className="flex items-center justify-between mb-4">
@@ -1226,116 +1336,6 @@ export default function FishingEditPage() {
                       </div>
                     </>
                   )}
-                </div>
-
-                {/* Fishing Regulations Section */}
-                <div className="border-b border-neutral-light pb-6">
-                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Fishing Regulations Section</h3>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-dark mb-2">
-                        Regulations Heading
-                      </label>
-                      <input
-                        type="text"
-                        name="regulationsHeading"
-                        defaultValue={fishingData?.regulationsHeading || ''}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                        placeholder="Enter regulations heading"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-dark mb-2">
-                        Regulations Text
-                      </label>
-                      <textarea
-                        name="regulationsText"
-                        rows={4}
-                        defaultValue={fishingData?.regulationsText || ''}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                        placeholder="Enter regulations text"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-dark mb-2">
-                          CTA Button Text
-                        </label>
-                        <input
-                          type="text"
-                          name="regulationsCtaText"
-                          defaultValue={fishingData?.regulationsCtaText || ''}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                          placeholder="Enter CTA button text"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-dark mb-2">
-                          CTA Button Link
-                        </label>
-                        <input
-                          type="url"
-                          name="regulationsCtaLink"
-                          defaultValue={fishingData?.regulationsCtaLink || ''}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                          placeholder="Enter CTA button link"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Latest Fishing Report Section */}
-                <div className="border-b border-neutral-light pb-6">
-                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Latest Fishing Report Section</h3>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-dark mb-2">
-                        Report Heading
-                      </label>
-                      <input
-                        type="text"
-                        name="fishingReportHeading"
-                        defaultValue={fishingData?.fishingReportHeading || ''}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                        placeholder="Enter fishing report heading"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-dark mb-2">
-                        Report Text
-                      </label>
-                      <textarea
-                        name="fishingReportText"
-                        rows={6}
-                        defaultValue={fishingData?.fishingReportText || ''}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                        placeholder="Enter fishing report text"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-dark mb-2">
-                        Report Date
-                      </label>
-                      <input
-                        type="date"
-                        name="fishingReportDate"
-                        defaultValue={fishingData?.fishingReportDate ? new Date(fishingData.fishingReportDate).toISOString().split('T')[0] : ''}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                        placeholder="Select report date"
-                      />
-                      <p className="text-sm text-neutral-dark mt-1">
-                        Optional: Leave empty to hide the &quot;Last updated on&quot; label
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="flex gap-4">

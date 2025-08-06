@@ -19,10 +19,6 @@ export default function FishingGallery({ images }: FishingGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
-  if (!images || images.length === 0) {
-    return null
-  }
-
   // Create cloned array for infinite loop
   const extendedImages = [...images, ...images, ...images]
   const baseIndex = images.length
@@ -61,6 +57,10 @@ export default function FishingGallery({ images }: FishingGalleryProps) {
     setCurrentIndex(baseIndex)
   }, [baseIndex])
 
+  if (!images || images.length === 0) {
+    return null
+  }
+
   const getVisibleImages = () => {
     const visibleIndices = []
     for (let i = -1; i <= 1; i++) {
@@ -85,8 +85,8 @@ export default function FishingGallery({ images }: FishingGalleryProps) {
     // Z-index for layering
     const zIndex = distance === 0 ? 10 : 5
     
-    // Horizontal position
-    const translateX = (displayIndex - 1) * 320
+    // Horizontal position - adjusted for wider cards
+    const translateX = (displayIndex - 1) * 400
     
     return {
       transform: `translateX(${translateX}px) scale(${scale})`,
@@ -117,10 +117,10 @@ export default function FishingGallery({ images }: FishingGalleryProps) {
           {/* Left arrow */}
           <button
             onClick={() => handleArrowClick('left')}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white text-primary hover:text-accent rounded-full p-2 shadow-lg transition-all duration-200"
+            className="absolute left-24 top-1/2 transform -translate-y-1/2 z-20 text-primary hover:text-accent transition-all duration-200"
             aria-label="Previous image"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -128,10 +128,10 @@ export default function FishingGallery({ images }: FishingGalleryProps) {
           {/* Right arrow */}
           <button
             onClick={() => handleArrowClick('right')}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white text-primary hover:text-accent rounded-full p-2 shadow-lg transition-all duration-200"
+            className="absolute right-24 top-1/2 transform -translate-y-1/2 z-20 text-primary hover:text-accent transition-all duration-200"
             aria-label="Next image"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -149,18 +149,19 @@ export default function FishingGallery({ images }: FishingGalleryProps) {
                   className="absolute transition-all duration-500 ease-in-out"
                   style={styles}
                 >
-                  <div className="bg-white rounded-lg shadow-lg overflow-hidden w-80 h-80">
-                    <div className="relative h-56">
+                  <div className="bg-white rounded-lg shadow-lg overflow-hidden w-96">
+                    {/* 3:2 aspect ratio image container - wider than 4:3 */}
+                    <div className="relative w-full" style={{ aspectRatio: '3/2' }}>
                       <Image
                         src={image.imageUrl}
                         alt={image.altText}
                         fill
-                        className="object-contain"
+                        className="object-cover"
                         sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       />
                     </div>
                     {image.caption && (
-                      <div className="p-4 h-24 flex items-center justify-center">
+                      <div className="p-4">
                         <p className="text-sm text-neutral-dark font-medium text-center leading-relaxed">
                           {image.caption}
                         </p>
