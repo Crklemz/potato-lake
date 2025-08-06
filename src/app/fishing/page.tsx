@@ -67,6 +67,14 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
                 {fishingPage.ctaText}
               </a>
             )}
+            <div className="mt-4">
+              <a 
+                href="/dnr"
+                className="text-white underline hover:text-accent transition-colors"
+              >
+                Check DNR Info →
+              </a>
+            </div>
           </div>
         </div>
       </section>
