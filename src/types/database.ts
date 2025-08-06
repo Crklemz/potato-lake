@@ -63,6 +63,16 @@ export interface FishSpecies {
   updatedAt: Date
 }
 
+export interface FishingGalleryImage {
+  id: number
+  fishingPageId: number
+  imageUrl: string
+  altText: string
+  caption: string | null
+  order: number
+  createdAt: Date
+}
+
 export interface FishingPage {
   id: number
   fishHeading: string
@@ -80,6 +90,7 @@ export interface FishingPage {
   fishingReportText: string | null
   fishingReportDate: Date | null
   fishSpecies: FishSpecies[]
+  galleryImages: FishingGalleryImage[]
   updatedAt: Date
 }
 

@@ -80,6 +80,7 @@ model FishingPage {
   fishingReportText   String?
   fishingReportDate   DateTime?
   fishSpecies        FishSpecies[]
+  galleryImages      FishingGalleryImage[]
   updatedAt          DateTime     @updatedAt
 }
 
@@ -216,4 +217,15 @@ model CommunityStory {
   isApproved  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model FishingGalleryImage {
+  id           Int         @id @default(autoincrement())
+  fishingPageId Int
+  imageUrl     String
+  altText      String
+  caption      String?
+  order        Int         @default(0)
+  fishingPage  FishingPage @relation(fields: [fishingPageId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
 }

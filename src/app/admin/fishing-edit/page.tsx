@@ -39,15 +39,27 @@ interface FishSpecies {
   updatedAt: Date
 }
 
+interface FishingGalleryImage {
+  id: number
+  fishingPageId: number
+  imageUrl: string
+  altText: string
+  caption: string | null
+  order: number
+  createdAt: Date
+}
+
 export default function FishingEditPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [fishingData, setFishingData] = useState<FishingPageData | null>(null)
   const [fishSpecies, setFishSpecies] = useState<FishSpecies[]>([])
+  const [galleryImages, setGalleryImages] = useState<FishingGalleryImage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [editingSpecies, setEditingSpecies] = useState<FishSpecies | null>(null)
+  const [editingGalleryImage, setEditingGalleryImage] = useState<FishingGalleryImage | null>(null)
   const [newSpecies, setNewSpecies] = useState({ 
     name: '', 
     order: 0, 
@@ -57,8 +69,16 @@ export default function FishingEditPage() {
     weather: '', 
     imageUrl: '' 
   })
+  const [newGalleryImage, setNewGalleryImage] = useState({
+    imageUrl: '',
+    altText: '',
+    caption: '',
+    order: 0
+  })
   const [draggedSpecies, setDraggedSpecies] = useState<number | null>(null)
+  const [draggedGalleryImage, setDraggedGalleryImage] = useState<number | null>(null)
   const [isSpeciesSectionCollapsed, setIsSpeciesSectionCollapsed] = useState(true)
+  const [isGallerySectionCollapsed, setIsGallerySectionCollapsed] = useState(true)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -66,6 +86,7 @@ export default function FishingEditPage() {
     } else if (status === 'authenticated') {
       fetchFishingData()
       fetchFishSpecies()
+      fetchGalleryImages()
     }
   }, [status, router])
 
@@ -96,6 +117,20 @@ export default function FishingEditPage() {
     } catch (err) {
       setError('Failed to load fish species: ' + err)
       console.error('Error fetching fish species:', err)
+    }
+  }
+
+  const fetchGalleryImages = async () => {
+    try {
+      console.log('Fetching gallery images...')
+      const response = await fetch('/api/admin/fishing-gallery')
+      if (!response.ok) throw new Error('Failed to fetch gallery images')
+      const data = await response.json()
+      console.log('Gallery images fetched:', data)
+      setGalleryImages(data)
+    } catch (err) {
+      setError('Failed to load gallery images: ' + err)
+      console.error('Error fetching gallery images:', err)
     }
   }
 
@@ -269,6 +304,155 @@ export default function FishingEditPage() {
       console.error('Error reordering fish species:', err)
     } finally {
       setDraggedSpecies(null)
+    }
+  }
+
+  // Gallery Image Management Functions
+  const handleAddGalleryImage = async () => {
+    if (!newGalleryImage.imageUrl.trim() || !newGalleryImage.altText.trim()) {
+      setError('Image URL and alt text are required')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/admin/fishing-gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newGalleryImage)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(`Failed to add gallery image: ${errorData.error || response.statusText}`)
+      }
+
+      const result = await response.json()
+      console.log('Gallery image added successfully:', result)
+
+      setNewGalleryImage({
+        imageUrl: '',
+        altText: '',
+        caption: '',
+        order: 0
+      })
+      await fetchGalleryImages()
+      setSuccess('Gallery image added successfully!')
+    } catch (err) {
+      setError('Failed to add gallery image: ' + err)
+      console.error('Error adding gallery image:', err)
+    }
+  }
+
+  const handleUpdateGalleryImage = async () => {
+    if (!editingGalleryImage) return
+
+    try {
+      const response = await fetch('/api/admin/fishing-gallery', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingGalleryImage.id,
+          imageUrl: editingGalleryImage.imageUrl,
+          altText: editingGalleryImage.altText,
+          caption: editingGalleryImage.caption,
+          order: editingGalleryImage.order
+        })
+      })
+
+      if (response.ok) {
+        await fetchGalleryImages()
+        setEditingGalleryImage(null)
+        setSuccess('Gallery image updated successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError('Failed to update gallery image')
+      }
+    } catch (err) {
+      setError('Error updating gallery image: ' + err)
+      console.error('Error updating gallery image:', err)
+    }
+  }
+
+  const handleDeleteGalleryImage = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this gallery image?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/fishing-gallery?id=${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) throw new Error('Failed to delete gallery image')
+
+      await fetchGalleryImages()
+      setSuccess('Gallery image deleted successfully!')
+    } catch (err) {
+      setError('Failed to delete gallery image: ' + err)
+      console.error('Error deleting gallery image:', err)
+    }
+  }
+
+  const handleGalleryDragStart = (e: React.DragEvent, imageId: number) => {
+    setDraggedGalleryImage(imageId)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleGalleryDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleGalleryDrop = async (e: React.DragEvent, targetImageId: number) => {
+    e.preventDefault()
+    
+    if (!draggedGalleryImage || draggedGalleryImage === targetImageId) {
+      setDraggedGalleryImage(null)
+      return
+    }
+
+    try {
+      const currentImages = [...galleryImages]
+      const draggedIndex = currentImages.findIndex(image => image.id === draggedGalleryImage)
+      const targetIndex = currentImages.findIndex(image => image.id === targetImageId)
+      
+      if (draggedIndex === -1 || targetIndex === -1) return
+      
+      // Create new order array
+      const newOrder = [...currentImages]
+      const [draggedItem] = newOrder.splice(draggedIndex, 1)
+      newOrder.splice(targetIndex, 0, draggedItem)
+      
+      // Update all images with new order values
+      const updatePromises = newOrder.map((image, index) => 
+        fetch('/api/admin/fishing-gallery', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: image.id,
+            imageUrl: image.imageUrl,
+            altText: image.altText,
+            caption: image.caption,
+            order: index
+          })
+        })
+      )
+      
+      const responses = await Promise.all(updatePromises)
+      const allSuccessful = responses.every(response => response.ok)
+      
+      if (allSuccessful) {
+        await fetchGalleryImages()
+        setSuccess('Gallery images reordered successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError('Failed to reorder gallery images')
+      }
+    } catch (err) {
+      setError('Error reordering gallery images: ' + err)
+      console.error('Error reordering gallery images:', err)
+    } finally {
+      setDraggedGalleryImage(null)
     }
   }
 
@@ -788,6 +972,251 @@ export default function FishingEditPage() {
                                         </div>
                                       </div>
                                     )}
+                                  </>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Fishing Gallery Management */}
+                <div className="border-b border-neutral-light pb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <h3 className="text-xl font-semibold text-neutral-dark">Fishing Photo Gallery Management</h3>
+                      <span className="text-sm text-neutral-dark">
+                        {isGallerySectionCollapsed && 'Click expand to add, edit, or remove gallery images'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsGallerySectionCollapsed(!isGallerySectionCollapsed)}
+                      className="flex items-center gap-2 text-primary hover:text-accent transition-colors"
+                    >
+                      <span>{isGallerySectionCollapsed ? 'Expand' : 'Collapse'}</span>
+                      <svg 
+                        className={`w-5 h-5 transition-transform ${isGallerySectionCollapsed ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  {!isGallerySectionCollapsed && (
+                    <>
+                      {/* Add New Gallery Image */}
+                      <div className="bg-neutral-light p-4 rounded-lg mb-6">
+                        <h4 className="text-lg font-medium mb-4 text-neutral-dark">Add New Gallery Image</h4>
+                        <p className="text-sm text-neutral-dark mb-4">
+                          Upload an image and provide details to add it to the fishing photo gallery.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Image <span className="text-red-500">*</span>
+                            </label>
+                            <div className="border border-gray-200 rounded-md p-3">
+                              <FileUpload
+                                type="image"
+                                currentUrl={newGalleryImage.imageUrl || undefined}
+                                onUpload={(url) => setNewGalleryImage({ ...newGalleryImage, imageUrl: url })}
+                                onError={(error) => setError('Image upload failed: ' + error)}
+                                label="Upload Gallery Image"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Alt Text <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={newGalleryImage.altText}
+                              onChange={(e) => setNewGalleryImage({ ...newGalleryImage, altText: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="Describe the image for accessibility"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Caption (Optional)
+                            </label>
+                            <input
+                              type="text"
+                              value={newGalleryImage.caption}
+                              onChange={(e) => setNewGalleryImage({ ...newGalleryImage, caption: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="Optional caption for the image"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Order
+                            </label>
+                            <input
+                              type="number"
+                              value={newGalleryImage.order}
+                              onChange={(e) => setNewGalleryImage({ ...newGalleryImage, order: parseInt(e.target.value) || 0 })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="0"
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAddGalleryImage}
+                          disabled={!newGalleryImage.imageUrl.trim() || !newGalleryImage.altText.trim()}
+                          className="mt-4 bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {newGalleryImage.imageUrl.trim() && newGalleryImage.altText.trim() ? 'Add Image' : 'Upload image and enter alt text first'}
+                        </button>
+                      </div>
+
+                      {/* Existing Gallery Images */}
+                      <div>
+                        <h4 className="text-lg font-medium mb-4 text-neutral-dark">Existing Gallery Images</h4>
+                        {galleryImages.length === 0 ? (
+                          <p className="text-neutral-dark italic">No gallery images added yet.</p>
+                        ) : (
+                          <div className="space-y-4">
+                            <p className="text-sm text-neutral-dark mb-4">
+                              Drag and drop images to change their display order. The order will match the public view.
+                            </p>
+                            {galleryImages.map((image) => (
+                              <div
+                                key={image.id}
+                                className={`bg-neutral-light p-4 rounded-lg cursor-move transition-all duration-200 ${
+                                  draggedGalleryImage === image.id ? 'opacity-50 scale-95' : ''
+                                }`}
+                                draggable
+                                onDragStart={(e) => handleGalleryDragStart(e, image.id)}
+                                onDragOver={handleGalleryDragOver}
+                                onDrop={(e) => handleGalleryDrop(e, image.id)}
+                              >
+                                {editingGalleryImage?.id === image.id ? (
+                                  <>
+                                    <div className="flex items-center justify-between mb-4">
+                                      <h4 className="font-semibold text-neutral-dark">Edit Gallery Image</h4>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={handleUpdateGalleryImage}
+                                          className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
+                                        >
+                                          Save
+                                        </button>
+                                        <button
+                                          onClick={() => setEditingGalleryImage(null)}
+                                          className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Image
+                                        </label>
+                                        <div className="border border-gray-200 rounded-md p-3">
+                                          <FileUpload
+                                            type="image"
+                                            currentUrl={editingGalleryImage.imageUrl}
+                                            onUpload={(url) => setEditingGalleryImage({...editingGalleryImage, imageUrl: url})}
+                                            onError={(error) => setError('Image upload failed: ' + error)}
+                                            label="Update Image"
+                                          />
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Alt Text *
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={editingGalleryImage.altText}
+                                          onChange={(e) => setEditingGalleryImage({...editingGalleryImage, altText: e.target.value})}
+                                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                          required
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Caption
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={editingGalleryImage.caption || ''}
+                                          onChange={(e) => setEditingGalleryImage({...editingGalleryImage, caption: e.target.value})}
+                                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Order
+                                        </label>
+                                        <input
+                                          type="number"
+                                          value={editingGalleryImage.order}
+                                          onChange={(e) => setEditingGalleryImage({...editingGalleryImage, order: parseInt(e.target.value) || 0})}
+                                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                      </div>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <div className="text-gray-400 cursor-move">
+                                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zm6-8a2 2 0 1 1-.001-4.001A2 2 0 0 1 13 6zm0 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
+                                          </svg>
+                                        </div>
+                                        <div>
+                                          <h4 className="font-semibold text-neutral-dark">{image.altText}</h4>
+                                          <p className="text-sm text-neutral-dark">Order: {image.order}</p>
+                                          {image.caption && (
+                                            <p className="text-sm text-neutral-dark italic">{image.caption}</p>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => setEditingGalleryImage(image)}
+                                          className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteGalleryImage(image.id)}
+                                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                                        >
+                                          Delete
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div className="mt-3">
+                                      <div className="w-20 h-15 bg-gray-100 rounded overflow-hidden">
+                                        <Image 
+                                          src={image.imageUrl} 
+                                          alt={image.altText}
+                                          width={80}
+                                          height={60}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                    </div>
                                   </>
                                 )}
                               </div>
