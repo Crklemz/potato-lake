@@ -13,18 +13,24 @@ async function main() {
         regulationsHeading: 'Fishing Regulations',
         regulationsText: 'Please be sure to check current Wisconsin DNR fishing regulations before your trip.',
         regulationsCtaText: 'View DNR Information →',
-        regulationsCtaLink: 'https://apps.dnr.wi.gov/lakes/lakepages/LakeDetail.aspx?wbic=2355300'
+        regulationsCtaLink: 'https://apps.dnr.wi.gov/lakes/lakepages/LakeDetail.aspx?wbic=2355300',
+        fishingReportHeading: 'Latest Fishing Report',
+        fishingReportText: 'Fishing has been excellent this season! Anglers are reporting good catches of walleye in the early morning and evening hours. Northern pike are active throughout the day, and panfish are biting well in the shallower areas of the lake.',
+        fishingReportDate: new Date('2025-08-01')
       }
     })
   } else {
-    // Update existing fishing page with regulations fields if they don't exist
+    // Update existing fishing page with regulations and fishing report fields if they don't exist
     await prisma.fishingPage.update({
       where: { id: fishingPage.id },
       data: {
         regulationsHeading: fishingPage.regulationsHeading || 'Fishing Regulations',
         regulationsText: fishingPage.regulationsText || 'Please be sure to check current Wisconsin DNR fishing regulations before your trip.',
         regulationsCtaText: fishingPage.regulationsCtaText || 'View DNR Information →',
-        regulationsCtaLink: fishingPage.regulationsCtaLink || 'https://apps.dnr.wi.gov/lakes/lakepages/LakeDetail.aspx?wbic=2355300'
+        regulationsCtaLink: fishingPage.regulationsCtaLink || 'https://apps.dnr.wi.gov/lakes/lakepages/LakeDetail.aspx?wbic=2355300',
+        fishingReportHeading: fishingPage.fishingReportHeading || 'Latest Fishing Report',
+        fishingReportText: fishingPage.fishingReportText || 'Fishing has been excellent this season! Anglers are reporting good catches of walleye in the early morning and evening hours. Northern pike are active throughout the day, and panfish are biting well in the shallower areas of the lake.',
+        fishingReportDate: fishingPage.fishingReportDate || new Date('2025-08-01')
       }
     })
   }

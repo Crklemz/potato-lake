@@ -76,6 +76,9 @@ export interface FishingPage {
   regulationsText: string | null
   regulationsCtaText: string | null
   regulationsCtaLink: string | null
+  fishingReportHeading: string | null
+  fishingReportText: string | null
+  fishingReportDate: Date | null
   fishSpecies: FishSpecies[]
   updatedAt: Date
 }

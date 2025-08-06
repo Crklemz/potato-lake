@@ -20,6 +20,9 @@ interface FishingPageData {
   regulationsText: string | null
   regulationsCtaText: string | null
   regulationsCtaLink: string | null
+  fishingReportHeading: string | null
+  fishingReportText: string | null
+  fishingReportDate: string | null
 }
 
 interface FishSpecies {
@@ -283,7 +286,10 @@ export default function FishingEditPage() {
       regulationsHeading: formData.get('regulationsHeading') as string,
       regulationsText: formData.get('regulationsText') as string,
       regulationsCtaText: formData.get('regulationsCtaText') as string,
-      regulationsCtaLink: formData.get('regulationsCtaLink') as string
+      regulationsCtaLink: formData.get('regulationsCtaLink') as string,
+      fishingReportHeading: formData.get('fishingReportHeading') as string,
+      fishingReportText: formData.get('fishingReportText') as string,
+      fishingReportDate: formData.get('fishingReportDate') as string
     }
 
     try {
@@ -532,6 +538,55 @@ export default function FishingEditPage() {
                           placeholder="Enter CTA button link"
                         />
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Latest Fishing Report Section */}
+                <div className="border-b border-neutral-light pb-6">
+                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Latest Fishing Report Section</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Report Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="fishingReportHeading"
+                        defaultValue={fishingData?.fishingReportHeading || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="Enter fishing report heading"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Report Text
+                      </label>
+                      <textarea
+                        name="fishingReportText"
+                        rows={6}
+                        defaultValue={fishingData?.fishingReportText || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="Enter fishing report text"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Report Date
+                      </label>
+                      <input
+                        type="date"
+                        name="fishingReportDate"
+                        defaultValue={fishingData?.fishingReportDate || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="Select report date"
+                      />
+                      <p className="text-sm text-neutral-dark mt-1">
+                        Optional: Leave empty to hide the &quot;Last updated on&quot; label
+                      </p>
                     </div>
                   </div>
                 </div>

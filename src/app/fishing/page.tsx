@@ -34,9 +34,7 @@ async function getFishingData() {
         order: 'asc'
       }
     })
-    
-    console.log('Fishing page data:', { fishingPage, fishSpecies })
-    
+        
     return {
       ...fishingPage,
       fishSpecies
@@ -165,20 +163,27 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
       )}
 
       {/* Latest Fishing Report */}
-      <section className="py-12 bg-neutral-light">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-md p-8">
-              <h3 className="text-2xl font-semibold mb-4 text-primary">Latest Fishing Report</h3>
-              <p className="text-neutral-dark leading-relaxed">
-                Fishing has been excellent this season! Anglers are reporting good catches of walleye 
-                in the early morning and evening hours. Northern pike are active throughout the day, 
-                and panfish are biting well in the shallower areas of the lake.
-              </p>
+      {fishingPage.fishingReportHeading && fishingPage.fishingReportText && (
+        <section className="py-12 bg-neutral-light">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white rounded-lg shadow-md p-8">
+                <h3 className="text-2xl font-semibold mb-4 text-primary">
+                  {fishingPage.fishingReportHeading}
+                </h3>
+                <p className="text-neutral-dark leading-relaxed mb-4">
+                  {fishingPage.fishingReportText}
+                </p>
+                {fishingPage.fishingReportDate && (
+                  <p className="text-sm text-neutral-dark italic">
+                    Last updated on {new Date(fishingPage.fishingReportDate).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   )
 }

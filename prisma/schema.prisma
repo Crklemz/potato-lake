@@ -76,6 +76,9 @@ model FishingPage {
   regulationsText    String?
   regulationsCtaText String?
   regulationsCtaLink String?
+  fishingReportHeading String?
+  fishingReportText   String?
+  fishingReportDate   DateTime?
   fishSpecies        FishSpecies[]
   updatedAt          DateTime     @updatedAt
 }
