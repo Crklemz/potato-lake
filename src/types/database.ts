@@ -54,6 +54,11 @@ export interface FishingPage {
   fishHeading: string
   fishText: string
   imageUrl: string | null
+  heroTitle: string
+  heroSubtitle: string | null
+  heroImageUrl: string | null
+  ctaText: string | null
+  ctaLink: string | null
   updatedAt: Date
 }
 

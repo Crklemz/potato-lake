@@ -64,11 +64,16 @@ model Resort {
 }
 
 model FishingPage {
-  id          Int      @id @default(autoincrement())
-  fishHeading String
-  fishText    String
-  imageUrl    String?
-  updatedAt   DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  fishHeading  String
+  fishText     String
+  imageUrl     String?
+  heroTitle    String   @default("Fishing on Potato Lake")
+  heroSubtitle String?
+  heroImageUrl String?
+  ctaText      String?
+  ctaLink      String?
+  updatedAt    DateTime @updatedAt
 }
 
 model DnrPage {

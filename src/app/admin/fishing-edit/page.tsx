@@ -5,12 +5,18 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import AdminHeader from '@/components/AdminHeader'
+import FileUpload from '@/components/FileUpload'
 
 interface FishingPageData {
   id: number
   fishHeading: string
   fishText: string
   imageUrl: string | null
+  heroTitle: string
+  heroSubtitle: string | null
+  heroImageUrl: string | null
+  ctaText: string | null
+  ctaLink: string | null
 }
 
 export default function FishingEditPage() {
@@ -52,7 +58,12 @@ export default function FishingEditPage() {
     const updateData = {
       fishHeading: formData.get('fishHeading') as string,
       fishText: formData.get('fishText') as string,
-      imageUrl: formData.get('imageUrl') as string
+      imageUrl: formData.get('imageUrl') as string,
+      heroTitle: formData.get('heroTitle') as string,
+      heroSubtitle: formData.get('heroSubtitle') as string,
+      heroImageUrl: formData.get('heroImageUrl') as string,
+      ctaText: formData.get('ctaText') as string,
+      ctaLink: formData.get('ctaLink') as string
     }
 
     try {
@@ -76,6 +87,16 @@ export default function FishingEditPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleHeroImageUpload = (url: string) => {
+    if (fishingData) {
+      setFishingData({ ...fishingData, heroImageUrl: url })
+    }
+  }
+
+  const handleHeroImageError = (error: string) => {
+    setError('Hero image upload failed: ' + error)
   }
 
   if (status === 'loading') {
@@ -118,58 +139,145 @@ export default function FishingEditPage() {
                 <div className="text-neutral-dark">Loading fishing page data...</div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Fishing Heading
-                  </label>
-                  <input
-                    type="text"
-                    name="fishHeading"
-                    defaultValue={fishingData?.fishHeading || ''}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter fishing heading"
-                    required
-                  />
-                </div>
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Hero Section */}
+                <div className="border-b border-neutral-light pb-6">
+                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Hero Section</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Hero Title <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="heroTitle"
+                        defaultValue={fishingData?.heroTitle || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter hero title"
+                        required
+                      />
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Fishing Description
-                  </label>
-                  <textarea
-                    name="fishText"
-                    rows={6}
-                    defaultValue={fishingData?.fishText || ''}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter fishing description and information"
-                    required
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Hero Subtitle
+                      </label>
+                      <input
+                        type="text"
+                        name="heroSubtitle"
+                        defaultValue={fishingData?.heroSubtitle || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter hero subtitle (optional)"
+                      />
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Fishing Image URL
-                  </label>
-                  <input
-                    type="url"
-                    name="imageUrl"
-                    defaultValue={fishingData?.imageUrl || ''}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter fishing image URL"
-                  />
-                  {fishingData?.imageUrl && (
-                    <div className="mt-2">
-                      <div className="w-32 h-24 relative rounded-lg border">
-                        <Image 
-                          src={fishingData.imageUrl} 
-                          alt="Fishing preview"
-                          fill
-                          className="object-cover rounded-lg"
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Hero Image
+                      </label>
+                      <FileUpload
+                        type="image"
+                        currentUrl={fishingData?.heroImageUrl}
+                        onUpload={handleHeroImageUpload}
+                        onError={handleHeroImageError}
+                        label="Upload Hero Image"
+                      />
+                      <input
+                        type="hidden"
+                        name="heroImageUrl"
+                        value={fishingData?.heroImageUrl || ''}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          CTA Button Text
+                        </label>
+                        <input
+                          type="text"
+                          name="ctaText"
+                          defaultValue={fishingData?.ctaText || ''}
+                          className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                          placeholder="Enter CTA button text"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          CTA Button Link
+                        </label>
+                        <input
+                          type="url"
+                          name="ctaLink"
+                          defaultValue={fishingData?.ctaLink || ''}
+                          className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                          placeholder="Enter CTA button link"
                         />
                       </div>
                     </div>
-                  )}
+                  </div>
+                </div>
+
+                {/* Main Content */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Main Content</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Fishing Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="fishHeading"
+                        defaultValue={fishingData?.fishHeading || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter fishing heading"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Fishing Description
+                      </label>
+                      <textarea
+                        name="fishText"
+                        rows={6}
+                        defaultValue={fishingData?.fishText || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter fishing description and information"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Fishing Image URL
+                      </label>
+                      <input
+                        type="url"
+                        name="imageUrl"
+                        defaultValue={fishingData?.imageUrl || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter fishing image URL"
+                      />
+                      {fishingData?.imageUrl && (
+                        <div className="mt-2">
+                          <div className="w-32 h-24 relative rounded-lg border">
+                            <Image 
+                              src={fishingData.imageUrl} 
+                              alt="Fishing preview"
+                              fill
+                              className="object-cover rounded-lg"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex gap-4">

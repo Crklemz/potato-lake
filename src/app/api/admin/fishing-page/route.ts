@@ -20,7 +20,12 @@ export async function GET() {
         data: {
           fishHeading: 'Fishing at Potato Lake',
           fishText: 'Potato Lake offers excellent fishing opportunities throughout the year...',
-          imageUrl: null
+          imageUrl: null,
+          heroTitle: 'Fishing on Potato Lake',
+          heroSubtitle: null,
+          heroImageUrl: null,
+          ctaText: null,
+          ctaLink: null
         }
       })
       return NextResponse.json(defaultFishingPage)
@@ -43,7 +48,16 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { fishHeading, fishText, imageUrl } = body
+    const { 
+      fishHeading, 
+      fishText, 
+      imageUrl, 
+      heroTitle, 
+      heroSubtitle, 
+      heroImageUrl, 
+      ctaText, 
+      ctaLink 
+    } = body
 
     const fishingPage = await prisma.fishingPage.findFirst()
     
@@ -56,7 +70,12 @@ export async function PUT(request: NextRequest) {
       data: {
         fishHeading,
         fishText,
-        imageUrl
+        imageUrl,
+        heroTitle,
+        heroSubtitle,
+        heroImageUrl,
+        ctaText,
+        ctaLink
       }
     })
 
