@@ -58,6 +58,7 @@ export default function FishingEditPage() {
     imageUrl: '' 
   })
   const [draggedSpecies, setDraggedSpecies] = useState<number | null>(null)
+  const [isSpeciesSectionCollapsed, setIsSpeciesSectionCollapsed] = useState(true)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -389,13 +390,13 @@ export default function FishingEditPage() {
                       <label className="block text-sm font-medium text-neutral-dark mb-2">
                         Hero Subtitle
                       </label>
-                                                                                             <input
-                           type="text"
-                           name="heroSubtitle"
-                           defaultValue={fishingData?.heroSubtitle || ''}
-                           className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                           placeholder="Enter hero subtitle (optional)"
-                         />
+                      <input
+                        type="text"
+                        name="heroSubtitle"
+                        defaultValue={fishingData?.heroSubtitle || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="Enter hero subtitle (optional)"
+                      />
                     </div>
 
                     <div>
@@ -479,6 +480,323 @@ export default function FishingEditPage() {
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* Fish Species Management */}
+                <div className="border-b border-neutral-light pb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <h3 className="text-xl font-semibold text-neutral-dark">Fish Species Management</h3>
+                      <span className="text-sm text-neutral-dark">
+                        {isSpeciesSectionCollapsed && 'Click expand to add, edit, or remove fish species'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsSpeciesSectionCollapsed(!isSpeciesSectionCollapsed)}
+                      className="flex items-center gap-2 text-primary hover:text-accent transition-colors"
+                    >
+                      <span>{isSpeciesSectionCollapsed ? 'Expand' : 'Collapse'}</span>
+                      <svg 
+                        className={`w-5 h-5 transition-transform ${isSpeciesSectionCollapsed ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  {!isSpeciesSectionCollapsed && (
+                    <>
+                      {/* Add New Species */}
+                      <div className="bg-neutral-light p-4 rounded-lg mb-6">
+                        <h4 className="text-lg font-medium mb-4 text-neutral-dark">Add New Fish Species</h4>
+                        <p className="text-sm text-neutral-dark mb-4">
+                          Fill in the details below and click &quot;Add Species&quot; to create a new fish species that will appear on the fishing page.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Species Name <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={newSpecies.name}
+                              onChange={(e) => setNewSpecies({ ...newSpecies, name: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="e.g., Walleye"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Order
+                            </label>
+                            <input
+                              type="number"
+                              value={newSpecies.order}
+                              onChange={(e) => setNewSpecies({ ...newSpecies, order: parseInt(e.target.value) || 0 })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Fish Image
+                            </label>
+                            <div className="border border-gray-200 rounded-md p-3">
+                              <FileUpload
+                                type="image"
+                                currentUrl={newSpecies.imageUrl || undefined}
+                                onUpload={(url) => setNewSpecies({ ...newSpecies, imageUrl: url })}
+                                onError={(error) => setError('Image upload failed: ' + error)}
+                                label="Upload Fish Image"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Description
+                            </label>
+                            <textarea
+                              value={newSpecies.description}
+                              onChange={(e) => setNewSpecies({ ...newSpecies, description: e.target.value })}
+                              rows={3}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="Brief description of the fish..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Recommended Bait
+                            </label>
+                            <textarea
+                              value={newSpecies.bait}
+                              onChange={(e) => setNewSpecies({ ...newSpecies, bait: e.target.value })}
+                              rows={3}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="e.g., Jigs with minnows, crankbaits..."
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Best Time of Day
+                            </label>
+                            <input
+                              type="text"
+                              value={newSpecies.timeOfDay}
+                              onChange={(e) => setNewSpecies({ ...newSpecies, timeOfDay: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="e.g., Early morning or late evening"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Ideal Weather Conditions
+                            </label>
+                            <input
+                              type="text"
+                              value={newSpecies.weather}
+                              onChange={(e) => setNewSpecies({ ...newSpecies, weather: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="e.g., Overcast days or after a cold front"
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            console.log('Button clicked!')
+                            handleAddSpecies()
+                          }}
+                          disabled={!newSpecies.name.trim()}
+                          className="mt-4 bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {newSpecies.name.trim() ? 'Add Species' : 'Enter species name first'}
+                        </button>
+                      </div>
+
+                      {/* Existing Species */}
+                      <div>
+                        <h4 className="text-lg font-medium mb-4 text-neutral-dark">Existing Fish Species</h4>
+                        {fishSpecies.length === 0 ? (
+                          <p className="text-neutral-dark italic">No fish species added yet.</p>
+                        ) : (
+                          <div className="space-y-4">
+                            <p className="text-sm text-neutral-dark mb-4">
+                              Drag and drop fish species to change their display order. The order will match the public view.
+                            </p>
+                            {fishSpecies.map((species) => (
+                              <div
+                                key={species.id}
+                                className={`bg-neutral-light p-4 rounded-lg cursor-move transition-all duration-200 ${
+                                  draggedSpecies === species.id ? 'opacity-50 scale-95' : ''
+                                }`}
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, species.id)}
+                                onDragOver={handleDragOver}
+                                onDrop={(e) => handleDrop(e, species.id)}
+                              >
+                                {editingSpecies?.id === species.id ? (
+                                  <>
+                                    <div className="flex items-center justify-between mb-4">
+                                      <h4 className="font-semibold text-neutral-dark">Edit {species.name}</h4>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={handleUpdateSpecies}
+                                          className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
+                                        >
+                                          Save
+                                        </button>
+                                        <button
+                                          onClick={() => setEditingSpecies(null)}
+                                          className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Name *
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={editingSpecies.name}
+                                          onChange={(e) => setEditingSpecies({...editingSpecies, name: e.target.value})}
+                                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                          required
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Order
+                                        </label>
+                                        <input
+                                          type="number"
+                                          value={editingSpecies.order}
+                                          onChange={(e) => setEditingSpecies({...editingSpecies, order: parseInt(e.target.value) || 0})}
+                                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="mt-4">
+                                      <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                        Description
+                                      </label>
+                                      <textarea
+                                        value={editingSpecies.description || ''}
+                                        onChange={(e) => setEditingSpecies({...editingSpecies, description: e.target.value})}
+                                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                        rows={3}
+                                      />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Recommended Bait
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={editingSpecies.bait || ''}
+                                          onChange={(e) => setEditingSpecies({...editingSpecies, bait: e.target.value})}
+                                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Best Time of Day
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={editingSpecies.timeOfDay || ''}
+                                          onChange={(e) => setEditingSpecies({...editingSpecies, timeOfDay: e.target.value})}
+                                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="mt-4">
+                                      <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                        Ideal Weather Conditions
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={editingSpecies.weather || ''}
+                                        onChange={(e) => setEditingSpecies({...editingSpecies, weather: e.target.value})}
+                                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                      />
+                                    </div>
+                                    <div className="mt-4">
+                                      <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                        Fish Image
+                                      </label>
+                                      <div className="border border-gray-200 rounded-md p-3">
+                                        <FileUpload
+                                          onUpload={(url: string) => setEditingSpecies({...editingSpecies, imageUrl: url})}
+                                          onError={(error: string) => setError('Image upload failed: ' + error)}
+                                          type="image"
+                                          currentUrl={editingSpecies.imageUrl}
+                                        />
+                                      </div>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <div className="text-gray-400 cursor-move">
+                                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zm6-8a2 2 0 1 1-.001-4.001A2 2 0 0 1 13 6zm0 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
+                                          </svg>
+                                        </div>
+                                        <div>
+                                          <h4 className="font-semibold text-neutral-dark">{species.name}</h4>
+                                          <p className="text-sm text-neutral-dark">Order: {species.order}</p>
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => setEditingSpecies(species)}
+                                          className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteSpecies(species.id)}
+                                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                                        >
+                                          Delete
+                                        </button>
+                                      </div>
+                                    </div>
+                                    {species.imageUrl && (
+                                      <div className="mt-3">
+                                        <div className="w-20 h-15 bg-gray-100 rounded overflow-hidden">
+                                          <Image 
+                                            src={species.imageUrl} 
+                                            alt={species.name}
+                                            width={80}
+                                            height={60}
+                                            className="w-full h-full object-cover"
+                                          />
+                                        </div>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Fishing Regulations Section */}
@@ -588,299 +906,6 @@ export default function FishingEditPage() {
                         Optional: Leave empty to hide the &quot;Last updated on&quot; label
                       </p>
                     </div>
-                  </div>
-                </div>
-
-
-
-                {/* Fish Species Management */}
-                <div className="border-b border-neutral-light pb-6">
-                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Fish Species Management</h3>
-                  
-                  {/* Add New Species */}
-                  <div className="bg-neutral-light p-4 rounded-lg mb-6">
-                    <h4 className="text-lg font-medium mb-4 text-neutral-dark">Add New Fish Species</h4>
-                    <p className="text-sm text-neutral-dark mb-4">
-                      Fill in the details below and click &quot;Add Species&quot; to create a new fish species that will appear on the fishing page.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-dark mb-2">
-                          Species Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={newSpecies.name}
-                          onChange={(e) => setNewSpecies({ ...newSpecies, name: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                          placeholder="e.g., Walleye"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-dark mb-2">
-                          Order
-                        </label>
-                        <input
-                          type="number"
-                          value={newSpecies.order}
-                          onChange={(e) => setNewSpecies({ ...newSpecies, order: parseInt(e.target.value) || 0 })}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                          placeholder="0"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-dark mb-2">
-                          Fish Image
-                        </label>
-                        <div className="border border-gray-200 rounded-md p-3">
-                          <FileUpload
-                            type="image"
-                            currentUrl={newSpecies.imageUrl || undefined}
-                            onUpload={(url) => setNewSpecies({ ...newSpecies, imageUrl: url })}
-                            onError={(error) => setError('Image upload failed: ' + error)}
-                            label="Upload Fish Image"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-dark mb-2">
-                          Description
-                        </label>
-                        <textarea
-                          value={newSpecies.description}
-                          onChange={(e) => setNewSpecies({ ...newSpecies, description: e.target.value })}
-                          rows={3}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                          placeholder="Brief description of the fish..."
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-dark mb-2">
-                          Recommended Bait
-                        </label>
-                        <textarea
-                          value={newSpecies.bait}
-                          onChange={(e) => setNewSpecies({ ...newSpecies, bait: e.target.value })}
-                          rows={3}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                          placeholder="e.g., Jigs with minnows, crankbaits..."
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-dark mb-2">
-                          Best Time of Day
-                        </label>
-                        <input
-                          type="text"
-                          value={newSpecies.timeOfDay}
-                          onChange={(e) => setNewSpecies({ ...newSpecies, timeOfDay: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                          placeholder="e.g., Early morning or late evening"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-dark mb-2">
-                          Ideal Weather Conditions
-                        </label>
-                        <input
-                          type="text"
-                          value={newSpecies.weather}
-                          onChange={(e) => setNewSpecies({ ...newSpecies, weather: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                          placeholder="e.g., Overcast days or after a cold front"
-                        />
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        console.log('Button clicked!')
-                        handleAddSpecies()
-                      }}
-                      disabled={!newSpecies.name.trim()}
-                      className="mt-4 bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {newSpecies.name.trim() ? 'Add Species' : 'Enter species name first'}
-                    </button>
-                  </div>
-
-                  {/* Existing Species */}
-                  <div>
-                    <h4 className="text-lg font-medium mb-4 text-neutral-dark">Existing Fish Species</h4>
-                    {fishSpecies.length === 0 ? (
-                      <p className="text-neutral-dark italic">No fish species added yet.</p>
-                    ) : (
-                      <div className="space-y-4">
-                        <p className="text-sm text-neutral-dark mb-4">
-                          Drag and drop fish species to change their display order. The order will match the public view.
-                        </p>
-                        {fishSpecies.map((species) => (
-                          <div
-                            key={species.id}
-                            className={`bg-neutral-light p-4 rounded-lg cursor-move transition-all duration-200 ${
-                              draggedSpecies === species.id ? 'opacity-50 scale-95' : ''
-                            }`}
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, species.id)}
-                            onDragOver={handleDragOver}
-                            onDrop={(e) => handleDrop(e, species.id)}
-                          >
-                            {editingSpecies?.id === species.id ? (
-                              <>
-                                <div className="flex items-center justify-between mb-4">
-                                  <h4 className="font-semibold text-neutral-dark">Edit {species.name}</h4>
-                                  <div className="flex gap-2">
-                                    <button
-                                      onClick={handleUpdateSpecies}
-                                      className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
-                                    >
-                                      Save
-                                    </button>
-                                    <button
-                                      onClick={() => setEditingSpecies(null)}
-                                      className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="block text-sm font-medium text-neutral-dark mb-1">
-                                      Name *
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={editingSpecies.name}
-                                      onChange={(e) => setEditingSpecies({...editingSpecies, name: e.target.value})}
-                                      className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                      required
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="block text-sm font-medium text-neutral-dark mb-1">
-                                      Order
-                                    </label>
-                                    <input
-                                      type="number"
-                                      value={editingSpecies.order}
-                                      onChange={(e) => setEditingSpecies({...editingSpecies, order: parseInt(e.target.value) || 0})}
-                                      className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="mt-4">
-                                  <label className="block text-sm font-medium text-neutral-dark mb-1">
-                                    Description
-                                  </label>
-                                  <textarea
-                                    value={editingSpecies.description || ''}
-                                    onChange={(e) => setEditingSpecies({...editingSpecies, description: e.target.value})}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                    rows={3}
-                                  />
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                  <div>
-                                    <label className="block text-sm font-medium text-neutral-dark mb-1">
-                                      Recommended Bait
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={editingSpecies.bait || ''}
-                                      onChange={(e) => setEditingSpecies({...editingSpecies, bait: e.target.value})}
-                                      className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="block text-sm font-medium text-neutral-dark mb-1">
-                                      Best Time of Day
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={editingSpecies.timeOfDay || ''}
-                                      onChange={(e) => setEditingSpecies({...editingSpecies, timeOfDay: e.target.value})}
-                                      className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="mt-4">
-                                  <label className="block text-sm font-medium text-neutral-dark mb-1">
-                                    Ideal Weather Conditions
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={editingSpecies.weather || ''}
-                                    onChange={(e) => setEditingSpecies({...editingSpecies, weather: e.target.value})}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                  />
-                                </div>
-                                <div className="mt-4">
-                                  <label className="block text-sm font-medium text-neutral-dark mb-1">
-                                    Fish Image
-                                  </label>
-                                                                     <div className="border border-gray-200 rounded-md p-3">
-                                     <FileUpload
-                                       onUpload={(url: string) => setEditingSpecies({...editingSpecies, imageUrl: url})}
-                                       onError={(error: string) => setError('Image upload failed: ' + error)}
-                                       type="image"
-                                       currentUrl={editingSpecies.imageUrl}
-                                     />
-                                   </div>
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <div className="text-gray-400 cursor-move">
-                                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zm6-8a2 2 0 1 1-.001-4.001A2 2 0 0 1 13 6zm0 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
-                                      </svg>
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-neutral-dark">{species.name}</h4>
-                                      <p className="text-sm text-neutral-dark">Order: {species.order}</p>
-                                    </div>
-                                  </div>
-                                  <div className="flex gap-2">
-                                    <button
-                                      onClick={() => setEditingSpecies(species)}
-                                      className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
-                                    >
-                                      Edit
-                                    </button>
-                                    <button
-                                      onClick={() => handleDeleteSpecies(species.id)}
-                                      className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                                    >
-                                      Delete
-                                    </button>
-                                  </div>
-                                </div>
-                                {species.imageUrl && (
-                                  <div className="mt-3">
-                                    <div className="w-20 h-15 bg-gray-100 rounded overflow-hidden">
-                                      <Image 
-                                        src={species.imageUrl} 
-                                        alt={species.name}
-                                        width={80}
-                                        height={60}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
 
