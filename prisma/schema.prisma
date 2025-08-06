@@ -81,6 +81,7 @@ model FishingPage {
   fishingReportDate   DateTime?
   fishSpecies        FishSpecies[]
   galleryImages      FishingGalleryImage[]
+  fishingTips        FishingTip[]
   updatedAt          DateTime     @updatedAt
 }
 
@@ -228,4 +229,15 @@ model FishingGalleryImage {
   order        Int         @default(0)
   fishingPage  FishingPage @relation(fields: [fishingPageId], references: [id], onDelete: Cascade)
   createdAt    DateTime    @default(now())
+}
+
+model FishingTip {
+  id           Int         @id @default(autoincrement())
+  text         String
+  submittedBy  String?
+  order        Int         @default(0)
+  fishingPageId Int
+  fishingPage  FishingPage @relation(fields: [fishingPageId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }

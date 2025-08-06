@@ -5,6 +5,7 @@ import Image from 'next/image'
 import type { FishingPage } from '@/types/database'
 import FishSpeciesList from '@/components/FishSpeciesList'
 import FishingGallery from '@/components/FishingGallery'
+import FishingTips from '@/components/FishingTips'
 
 async function getFishingData() {
   try {
@@ -19,11 +20,12 @@ async function getFishingData() {
         }
       })
       
-      // Return with empty fish species and gallery images arrays
+      // Return with empty fish species, gallery images, and fishing tips arrays
       return {
         ...defaultFishingPage,
         fishSpecies: [],
-        galleryImages: []
+        galleryImages: [],
+        fishingTips: []
       }
     }
     
@@ -46,11 +48,22 @@ async function getFishingData() {
         order: 'asc'
       }
     })
+
+    // Fetch fishing tips separately
+    const fishingTips = await prisma.fishingTip.findMany({
+      where: {
+        fishingPageId: fishingPage.id
+      },
+      orderBy: {
+        order: 'asc'
+      }
+    })
         
     return {
       ...fishingPage,
       fishSpecies,
-      galleryImages
+      galleryImages,
+      fishingTips
     }
   } catch (error) {
     console.error('Error fetching fishing data:', error)
@@ -200,6 +213,9 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
 
       {/* Fishing Photo Gallery */}
       <FishingGallery images={fishingPage.galleryImages || []} />
+
+      {/* Fishing Tips Section */}
+      <FishingTips tips={fishingPage.fishingTips || []} />
     </div>
   )
 }

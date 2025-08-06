@@ -155,6 +155,54 @@ async function main() {
   }
 
   console.log('Fish species seeded successfully!')
+
+  // Add sample fishing tips
+  const fishingTipsData = [
+    {
+      text: "Early morning and late evening are the best times to catch walleye. They prefer low-light conditions and are most active during these periods.",
+      submittedBy: "John Smith",
+      order: 0
+    },
+    {
+      text: "When fishing for northern pike, use a steel leader to prevent them from biting through your line. Their sharp teeth can easily cut through regular fishing line.",
+      submittedBy: "Mike Johnson",
+      order: 1
+    },
+    {
+      text: "For the best panfish action, try fishing near weed beds and submerged structure. Bluegill and crappie love to hang out in these areas.",
+      submittedBy: "Sarah Wilson",
+      order: 2
+    },
+    {
+      text: "Always check the weather before heading out. Fish are more active before a storm and during overcast conditions.",
+      submittedBy: "Lake Association",
+      order: 3
+    },
+    {
+      text: "Use live bait when possible, especially for walleye and panfish. Minnows, worms, and leeches are all excellent choices for Potato Lake.",
+      submittedBy: "Tom Davis",
+      order: 4
+    }
+  ]
+
+  // Clear existing fishing tips
+  await prisma.fishingTip.deleteMany({
+    where: {
+      fishingPageId: fishingPage.id
+    }
+  })
+
+  // Create fishing tips
+  for (const tipData of fishingTipsData) {
+    await prisma.fishingTip.create({
+      data: {
+        ...tipData,
+        fishingPageId: fishingPage.id
+      }
+    })
+  }
+
+  console.log('Fishing tips seeded successfully!')
 }
 
 main()

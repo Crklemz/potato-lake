@@ -49,17 +49,26 @@ interface FishingGalleryImage {
   createdAt: Date
 }
 
+interface FishingTip {
+  id: number
+  text: string
+  submittedBy: string | null
+  order: number
+}
+
 export default function FishingEditPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [fishingData, setFishingData] = useState<FishingPageData | null>(null)
   const [fishSpecies, setFishSpecies] = useState<FishSpecies[]>([])
   const [galleryImages, setGalleryImages] = useState<FishingGalleryImage[]>([])
+  const [fishingTips, setFishingTips] = useState<FishingTip[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [editingSpecies, setEditingSpecies] = useState<FishSpecies | null>(null)
   const [editingGalleryImage, setEditingGalleryImage] = useState<FishingGalleryImage | null>(null)
+  const [editingTip, setEditingTip] = useState<FishingTip | null>(null)
   const [newSpecies, setNewSpecies] = useState({ 
     name: '', 
     order: 0, 
@@ -75,10 +84,13 @@ export default function FishingEditPage() {
     caption: '',
     order: 0
   })
+  const [newTip, setNewTip] = useState({ text: '', submittedBy: '' })
   const [draggedSpecies, setDraggedSpecies] = useState<number | null>(null)
   const [draggedGalleryImage, setDraggedGalleryImage] = useState<number | null>(null)
+  const [draggedTip, setDraggedTip] = useState<number | null>(null)
   const [isSpeciesSectionCollapsed, setIsSpeciesSectionCollapsed] = useState(true)
   const [isGallerySectionCollapsed, setIsGallerySectionCollapsed] = useState(true)
+  const [isTipsSectionCollapsed, setIsTipsSectionCollapsed] = useState(true)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -87,6 +99,7 @@ export default function FishingEditPage() {
       fetchFishingData()
       fetchFishSpecies()
       fetchGalleryImages()
+      fetchFishingTips()
     }
   }, [status, router])
 
@@ -131,6 +144,20 @@ export default function FishingEditPage() {
     } catch (err) {
       setError('Failed to load gallery images: ' + err)
       console.error('Error fetching gallery images:', err)
+    }
+  }
+
+  const fetchFishingTips = async () => {
+    try {
+      console.log('Fetching fishing tips...')
+      const response = await fetch('/api/admin/fishing-tips')
+      if (!response.ok) throw new Error('Failed to fetch fishing tips')
+      const data = await response.json()
+      console.log('Fishing tips fetched:', data)
+      setFishingTips(data)
+    } catch (err) {
+      setError('Failed to load fishing tips: ' + err)
+      console.error('Error fetching fishing tips:', err)
     }
   }
 
@@ -453,6 +480,146 @@ export default function FishingEditPage() {
       console.error('Error reordering gallery images:', err)
     } finally {
       setDraggedGalleryImage(null)
+    }
+  }
+
+  // Fishing Tips Management Functions
+  const handleAddTip = async () => {
+    if (!newTip.text.trim()) {
+      setError('Tip text is required')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/admin/fishing-tips', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: newTip.text,
+          submittedBy: newTip.submittedBy || null,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(`Failed to add fishing tip: ${errorData.error || response.statusText}`)
+      }
+
+      const result = await response.json()
+      console.log('Fishing tip added successfully:', result)
+
+      setNewTip({ text: '', submittedBy: '' })
+      await fetchFishingTips()
+      setSuccess('Fishing tip added successfully!')
+    } catch (err) {
+      setError('Failed to add fishing tip: ' + err)
+      console.error('Error adding fishing tip:', err)
+    }
+  }
+
+  const handleUpdateTip = async () => {
+    if (!editingTip) return
+
+    try {
+      const response = await fetch(`/api/admin/fishing-tips/${editingTip.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: editingTip.text,
+          submittedBy: editingTip.submittedBy || null,
+        }),
+      })
+
+      if (response.ok) {
+        await fetchFishingTips()
+        setEditingTip(null)
+        setSuccess('Fishing tip updated successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError('Failed to update fishing tip')
+      }
+    } catch (err) {
+      setError('Error updating fishing tip: ' + err)
+      console.error('Error updating fishing tip:', err)
+    }
+  }
+
+  const handleDeleteTip = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this fishing tip?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/fishing-tips/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) throw new Error('Failed to delete fishing tip')
+
+      await fetchFishingTips()
+      setSuccess('Fishing tip deleted successfully!')
+    } catch (err) {
+      setError('Failed to delete fishing tip: ' + err)
+      console.error('Error deleting fishing tip:', err)
+    }
+  }
+
+  const handleTipDragStart = (e: React.DragEvent, tipId: number) => {
+    setDraggedTip(tipId)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleTipDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleTipDrop = async (e: React.DragEvent, targetTipId: number) => {
+    e.preventDefault()
+    
+    if (!draggedTip || draggedTip === targetTipId) {
+      setDraggedTip(null)
+      return
+    }
+
+    try {
+      const currentTips = [...fishingTips]
+      const draggedIndex = currentTips.findIndex(tip => tip.id === draggedTip)
+      const targetIndex = currentTips.findIndex(tip => tip.id === targetTipId)
+      
+      if (draggedIndex === -1 || targetIndex === -1) return
+      
+      // Create new order array
+      const newOrder = [...currentTips]
+      const [draggedItem] = newOrder.splice(draggedIndex, 1)
+      newOrder.splice(targetIndex, 0, draggedItem)
+      
+      // Update all tips with new order values
+      const updatePromises = newOrder.map(() => 
+        fetch('/api/admin/fishing-tips/reorder', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tipIds: newOrder.map(t => t.id)
+          })
+        })
+      )
+      
+      const responses = await Promise.all(updatePromises)
+      const allSuccessful = responses.every(response => response.ok)
+      
+      if (allSuccessful) {
+        await fetchFishingTips()
+        setSuccess('Fishing tips reordered successfully!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError('Failed to reorder fishing tips')
+      }
+    } catch (err) {
+      setError('Error reordering fishing tips: ' + err)
+      console.error('Error reordering fishing tips:', err)
+    } finally {
+      setDraggedTip(null)
     }
   }
 
@@ -1325,6 +1492,187 @@ export default function FishingEditPage() {
                                           height={60}
                                           className="w-full h-full object-cover"
                                         />
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Fishing Tips Management */}
+                <div className="border-b border-neutral-light pb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <h3 className="text-xl font-semibold text-neutral-dark">Fishing Tips Management</h3>
+                      <span className="text-sm text-neutral-dark">
+                        {isTipsSectionCollapsed && 'Click expand to add, edit, or remove fishing tips'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsTipsSectionCollapsed(!isTipsSectionCollapsed)}
+                      className="flex items-center gap-2 text-primary hover:text-accent transition-colors"
+                    >
+                      <span>{isTipsSectionCollapsed ? 'Expand' : 'Collapse'}</span>
+                      <svg 
+                        className={`w-5 h-5 transition-transform ${isTipsSectionCollapsed ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  {!isTipsSectionCollapsed && (
+                    <>
+                      {/* Add New Tip */}
+                      <div className="bg-neutral-light p-4 rounded-lg mb-6">
+                        <h4 className="text-lg font-medium mb-4 text-neutral-dark">Add New Fishing Tip</h4>
+                        <p className="text-sm text-neutral-dark mb-4">
+                          Add a new fishing tip that will appear on the fishing page. Tips are displayed in a responsive grid layout.
+                        </p>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Tip Text <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                              value={newTip.text}
+                              onChange={(e) => setNewTip({ ...newTip, text: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              rows={3}
+                              placeholder="Enter the fishing tip..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Submitted By (optional)
+                            </label>
+                            <input
+                              type="text"
+                              value={newTip.submittedBy}
+                              onChange={(e) => setNewTip({ ...newTip, submittedBy: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="Enter the submitter's name..."
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleAddTip}
+                            disabled={!newTip.text.trim()}
+                            className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {newTip.text.trim() ? 'Add Tip' : 'Enter tip text first'}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Existing Tips */}
+                      <div>
+                        <h4 className="text-lg font-medium mb-4 text-neutral-dark">Existing Fishing Tips</h4>
+                        {fishingTips.length === 0 ? (
+                          <p className="text-neutral-dark italic">No fishing tips added yet.</p>
+                        ) : (
+                          <div className="space-y-4">
+                            <p className="text-sm text-neutral-dark mb-4">
+                              Drag and drop tips to change their display order. The order will match the public view.
+                            </p>
+                            {fishingTips.map((tip) => (
+                              <div
+                                key={tip.id}
+                                className={`bg-neutral-light p-4 rounded-lg cursor-move transition-all duration-200 ${
+                                  draggedTip === tip.id ? 'opacity-50 scale-95' : ''
+                                }`}
+                                draggable
+                                onDragStart={(e) => handleTipDragStart(e, tip.id)}
+                                onDragOver={handleTipDragOver}
+                                onDrop={(e) => handleTipDrop(e, tip.id)}
+                              >
+                                {editingTip?.id === tip.id ? (
+                                  <>
+                                    <div className="flex items-center justify-between mb-4">
+                                      <h4 className="font-semibold text-neutral-dark">Edit Fishing Tip</h4>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={handleUpdateTip}
+                                          className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
+                                        >
+                                          Save
+                                        </button>
+                                        <button
+                                          onClick={() => setEditingTip(null)}
+                                          className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Tip Text *
+                                        </label>
+                                        <textarea
+                                          value={editingTip.text}
+                                          onChange={(e) => setEditingTip({ ...editingTip, text: e.target.value })}
+                                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                          rows={3}
+                                          required
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-neutral-dark mb-1">
+                                          Submitted By (optional)
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={editingTip.submittedBy || ''}
+                                          onChange={(e) => setEditingTip({ ...editingTip, submittedBy: e.target.value })}
+                                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                      </div>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <div className="text-gray-400 cursor-move">
+                                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zm6-8a2 2 0 1 1-.001-4.001A2 2 0 0 1 13 6zm0 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
+                                          </svg>
+                                        </div>
+                                        <div className="flex-1">
+                                          <p className="text-neutral-dark leading-relaxed mb-2">{tip.text}</p>
+                                          {tip.submittedBy && (
+                                            <p className="text-sm text-neutral-dark italic">
+                                              — {tip.submittedBy}
+                                            </p>
+                                          )}
+                                          <p className="text-xs text-neutral-dark">Order: {tip.order + 1}</p>
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => setEditingTip(tip)}
+                                          className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteTip(tip.id)}
+                                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                                        >
+                                          Delete
+                                        </button>
                                       </div>
                                     </div>
                                   </>
