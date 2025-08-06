@@ -220,39 +220,46 @@ export default function FishingEditPage() {
                   </div>
                 </div>
 
-                {/* Main Content */}
-                <div>
-                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Main Content</h3>
+                {/* Fishing Overview Section */}
+                <div className="border-b border-neutral-light pb-6">
+                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Fishing Overview Section</h3>
                   
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-neutral-dark mb-2">
-                        Fishing Heading
+                        Overview Heading <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="fishHeading"
                         defaultValue={fishingData?.fishHeading || ''}
                         className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                        placeholder="Enter fishing heading"
+                        placeholder="Enter overview heading"
                         required
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-neutral-dark mb-2">
-                        Fishing Description
+                        Overview Text <span className="text-red-500">*</span>
                       </label>
                       <textarea
                         name="fishText"
                         rows={6}
                         defaultValue={fishingData?.fishText || ''}
                         className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                        placeholder="Enter fishing description and information"
+                        placeholder="Enter overview text paragraph"
                         required
                       />
                     </div>
+                  </div>
+                </div>
 
+                {/* Additional Content */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Additional Content</h3>
+                  
+                  <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-neutral-dark mb-2">
                         Fishing Image URL

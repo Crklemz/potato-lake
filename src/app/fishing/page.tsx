@@ -79,17 +79,21 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
         </div>
       </section>
 
+      {/* Fishing Overview Section */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4 text-center">
+            {fishingPage.fishHeading}
+          </h2>
+          <p className="text-neutral-dark text-center max-w-3xl mx-auto mb-8 leading-relaxed">
+            {fishingPage.fishText}
+          </p>
+        </div>
+      </section>
+
       {/* Main content */}
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-primary">
-              {fishingPage.fishHeading}
-            </h2>
-            <p className="text-lg text-neutral-dark leading-relaxed">
-              {fishingPage.fishText}
-            </p>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div className="bg-white rounded-lg shadow-md p-6">
