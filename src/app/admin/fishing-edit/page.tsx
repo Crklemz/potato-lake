@@ -22,7 +22,7 @@ interface FishingPageData {
   regulationsCtaLink: string | null
   fishingReportHeading: string | null
   fishingReportText: string | null
-  fishingReportDate: string | null
+  fishingReportDate: Date | null
 }
 
 interface FishSpecies {
@@ -898,7 +898,7 @@ export default function FishingEditPage() {
                       <input
                         type="date"
                         name="fishingReportDate"
-                        defaultValue={fishingData?.fishingReportDate || ''}
+                        defaultValue={fishingData?.fishingReportDate ? new Date(fishingData.fishingReportDate).toISOString().split('T')[0] : ''}
                         className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                         placeholder="Select report date"
                       />

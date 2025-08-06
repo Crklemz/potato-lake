@@ -176,7 +176,7 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
                 </p>
                 {fishingPage.fishingReportDate && (
                   <p className="text-sm text-neutral-dark italic">
-                    Last updated on {new Date(fishingPage.fishingReportDate).toLocaleDateString()}
+                    Last updated on {new Date(fishingPage.fishingReportDate).toLocaleDateString('en-US', { timeZone: 'UTC' })}
                   </p>
                 )}
               </div>
