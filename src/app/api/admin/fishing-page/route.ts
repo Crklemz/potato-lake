@@ -20,7 +20,6 @@ export async function GET() {
         data: {
           fishHeading: 'Fishing at Potato Lake',
           fishText: 'Potato Lake offers excellent fishing opportunities throughout the year...',
-          imageUrl: null,
           heroTitle: 'Fishing on Potato Lake',
           heroSubtitle: null,
           heroImageUrl: null,
@@ -51,7 +50,6 @@ export async function PUT(request: NextRequest) {
     const { 
       fishHeading, 
       fishText, 
-      imageUrl, 
       heroTitle, 
       heroSubtitle, 
       heroImageUrl, 
@@ -70,7 +68,6 @@ export async function PUT(request: NextRequest) {
       data: {
         fishHeading,
         fishText,
-        imageUrl,
         heroTitle,
         heroSubtitle,
         heroImageUrl,

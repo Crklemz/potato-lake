@@ -67,7 +67,6 @@ model FishingPage {
   id           Int          @id @default(autoincrement())
   fishHeading  String
   fishText     String
-  imageUrl     String?
   heroTitle    String       @default("Fishing on Potato Lake")
   heroSubtitle String?
   heroImageUrl String?

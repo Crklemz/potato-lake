@@ -9,8 +9,7 @@ async function main() {
     fishingPage = await prisma.fishingPage.create({
       data: {
         fishHeading: 'Excellent Fishing Opportunities',
-        fishText: 'Potato Lake is renowned for its excellent fishing opportunities. The lake is home to a variety of fish species including walleye, northern pike, bass, and panfish. Whether you\'re an experienced angler or just starting out, you\'ll find plenty of great spots to cast your line.',
-        imageUrl: null
+        fishText: 'Potato Lake is renowned for its excellent fishing opportunities. The lake is home to a variety of fish species including walleye, northern pike, bass, and panfish. Whether you\'re an experienced angler or just starting out, you\'ll find plenty of great spots to cast your line.'
       }
     })
   }

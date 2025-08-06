@@ -11,7 +11,6 @@ interface FishingPageData {
   id: number
   fishHeading: string
   fishText: string
-  imageUrl: string | null
   heroTitle: string
   heroSubtitle: string | null
   heroImageUrl: string | null
@@ -272,7 +271,6 @@ export default function FishingEditPage() {
     const updateData = {
       fishHeading: formData.get('fishHeading') as string,
       fishText: formData.get('fishText') as string,
-      imageUrl: formData.get('imageUrl') as string,
       heroTitle: formData.get('heroTitle') as string,
       heroSubtitle: formData.get('heroSubtitle') as string,
       heroImageUrl: formData.get('heroImageUrl') as string,
@@ -469,37 +467,7 @@ export default function FishingEditPage() {
                   </div>
                 </div>
 
-                {/* Additional Content */}
-                <div>
-                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Additional Content</h3>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-dark mb-2">
-                        Fishing Image URL
-                      </label>
-                      <input
-                        type="url"
-                        name="imageUrl"
-                        defaultValue={fishingData?.imageUrl || ''}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                        placeholder="Enter fishing image URL"
-                      />
-                      {fishingData?.imageUrl && (
-                        <div className="mt-2">
-                          <div className="w-32 h-24 relative rounded-lg border">
-                            <Image 
-                              src={fishingData.imageUrl} 
-                              alt="Fishing preview"
-                              fill
-                              className="object-cover rounded-lg"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+
 
                 {/* Fish Species Management */}
                 <div className="border-b border-neutral-light pb-6">
@@ -509,7 +477,7 @@ export default function FishingEditPage() {
                   <div className="bg-neutral-light p-4 rounded-lg mb-6">
                     <h4 className="text-lg font-medium mb-4 text-neutral-dark">Add New Fish Species</h4>
                     <p className="text-sm text-neutral-dark mb-4">
-                      Fill in the details below and click "Add Species" to create a new fish species that will appear on the fishing page.
+                      Fill in the details below and click &quot;Add Species&quot; to create a new fish species that will appear on the fishing page.
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                       <div>

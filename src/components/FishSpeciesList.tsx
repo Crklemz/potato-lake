@@ -10,18 +10,6 @@ interface FishSpeciesListProps {
 
 export default function FishSpeciesList({ fishSpecies }: FishSpeciesListProps) {
   const [selectedSpecies, setSelectedSpecies] = useState<FishSpecies | null>(null)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768)
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   // Set the first fish as selected by default
   useEffect(() => {

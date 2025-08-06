@@ -14,8 +14,7 @@ async function getFishingData() {
       const defaultFishingPage = await prisma.fishingPage.create({
         data: {
           fishHeading: 'Excellent Fishing Opportunities',
-          fishText: 'Potato Lake is renowned for its excellent fishing opportunities. The lake is home to a variety of fish species including walleye, northern pike, bass, and panfish. Whether you\'re an experienced angler or just starting out, you\'ll find plenty of great spots to cast your line.',
-          imageUrl: null
+          fishText: 'Potato Lake is renowned for its excellent fishing opportunities. The lake is home to a variety of fish species including walleye, northern pike, bass, and panfish. Whether you\'re an experienced angler or just starting out, you\'ll find plenty of great spots to cast your line.'
         }
       })
       
@@ -152,26 +151,10 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
         </div>
       </section>
 
-      {/* Additional Fishing Content */}
+      {/* Latest Fishing Report */}
       <section className="py-12 bg-neutral-light">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            {fishingPage.imageUrl && (
-              <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-                <h3 className="text-2xl font-semibold mb-4 text-primary">Fishing on Potato Lake</h3>
-                <div className="mb-4">
-                  <div className="w-full h-64 relative rounded-lg">
-                    <Image 
-                      src={fishingPage.imageUrl} 
-                      alt="Fishing on Potato Lake"
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div className="bg-white rounded-lg shadow-md p-8">
               <h3 className="text-2xl font-semibold mb-4 text-primary">Latest Fishing Report</h3>
               <p className="text-neutral-dark leading-relaxed">

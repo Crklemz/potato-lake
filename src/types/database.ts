@@ -67,7 +67,6 @@ export interface FishingPage {
   id: number
   fishHeading: string
   fishText: string
-  imageUrl: string | null
   heroTitle: string
   heroSubtitle: string | null
   heroImageUrl: string | null
