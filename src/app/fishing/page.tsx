@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import type { FishingPage } from '@/types/database'
+import FishSpeciesList from '@/components/FishSpeciesList'
 
 async function getFishingData() {
   try {
@@ -17,10 +18,30 @@ async function getFishingData() {
           imageUrl: null
         }
       })
-      return defaultFishingPage
+      
+      // Return with empty fish species array
+      return {
+        ...defaultFishingPage,
+        fishSpecies: []
+      }
     }
     
-    return fishingPage
+    // Fetch fish species separately
+    const fishSpecies = await prisma.fishSpecies.findMany({
+      where: {
+        fishingPageId: fishingPage.id
+      },
+      orderBy: {
+        order: 'asc'
+      }
+    })
+    
+    console.log('Fishing page data:', { fishingPage, fishSpecies })
+    
+    return {
+      ...fishingPage,
+      fishSpecies
+    }
   } catch (error) {
     console.error('Error fetching fishing data:', error)
     throw new Error('Failed to load fishing data')
@@ -91,24 +112,33 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
         </div>
       </section>
 
-      {/* Main content */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
+      {/* Fish Species Section */}
+      {fishingPage.fishSpecies && fishingPage.fishSpecies.length > 0 ? (
+        <section className="py-12 bg-neutral-light">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-8 text-center">
+              What You Can Catch
+            </h2>
+            <FishSpeciesList fishSpecies={fishingPage.fishSpecies} />
+          </div>
+        </section>
+      ) : (
+        <section className="py-12 bg-neutral-light">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-8 text-center">
+              What You Can Catch
+            </h2>
+            <p className="text-center text-neutral-dark">
+              No fish species have been added yet. Check back soon!
+            </p>
+          </div>
+        </section>
+      )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4 text-primary">Fish Species</h3>
-              <ul className="space-y-2 text-neutral-dark">
-                <li>• Walleye</li>
-                <li>• Northern Pike</li>
-                <li>• Largemouth Bass</li>
-                <li>• Smallmouth Bass</li>
-                <li>• Bluegill</li>
-                <li>• Crappie</li>
-                <li>• Perch</li>
-              </ul>
-            </div>
-
+      {/* Fishing Regulations Section */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-xl font-semibold mb-4 text-primary">Fishing Regulations</h3>
               <p className="text-neutral-dark mb-4">
@@ -119,33 +149,40 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
               </a>
             </div>
           </div>
+        </div>
+      </section>
 
-          {fishingPage.imageUrl && (
-            <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-              <h3 className="text-2xl font-semibold mb-4 text-primary">Fishing on Potato Lake</h3>
-              <div className="mb-4">
-                <div className="w-full h-64 relative rounded-lg">
-                  <Image 
-                    src={fishingPage.imageUrl} 
-                    alt="Fishing on Potato Lake"
-                    fill
-                    className="object-cover rounded-lg"
-                  />
+      {/* Additional Fishing Content */}
+      <section className="py-12 bg-neutral-light">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            {fishingPage.imageUrl && (
+              <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+                <h3 className="text-2xl font-semibold mb-4 text-primary">Fishing on Potato Lake</h3>
+                <div className="mb-4">
+                  <div className="w-full h-64 relative rounded-lg">
+                    <Image 
+                      src={fishingPage.imageUrl} 
+                      alt="Fishing on Potato Lake"
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h3 className="text-2xl font-semibold mb-4 text-primary">Latest Fishing Report</h3>
-            <p className="text-neutral-dark leading-relaxed">
-              Fishing has been excellent this season! Anglers are reporting good catches of walleye 
-              in the early morning and evening hours. Northern pike are active throughout the day, 
-              and panfish are biting well in the shallower areas of the lake.
-            </p>
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <h3 className="text-2xl font-semibold mb-4 text-primary">Latest Fishing Report</h3>
+              <p className="text-neutral-dark leading-relaxed">
+                Fishing has been excellent this season! Anglers are reporting good catches of walleye 
+                in the early morning and evening hours. Northern pike are active throughout the day, 
+                and panfish are biting well in the shallower areas of the lake.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }

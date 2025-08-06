@@ -49,6 +49,20 @@ export interface ResortsPage {
   updatedAt: Date
 }
 
+export interface FishSpecies {
+  id: number
+  name: string
+  order: number
+  fishingPageId: number | null
+  description: string | null
+  bait: string | null
+  timeOfDay: string | null
+  weather: string | null
+  imageUrl: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface FishingPage {
   id: number
   fishHeading: string
@@ -59,6 +73,7 @@ export interface FishingPage {
   heroImageUrl: string | null
   ctaText: string | null
   ctaLink: string | null
+  fishSpecies: FishSpecies[]
   updatedAt: Date
 }
 

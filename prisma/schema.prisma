@@ -64,16 +64,32 @@ model Resort {
 }
 
 model FishingPage {
-  id           Int      @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   fishHeading  String
   fishText     String
   imageUrl     String?
-  heroTitle    String   @default("Fishing on Potato Lake")
+  heroTitle    String       @default("Fishing on Potato Lake")
   heroSubtitle String?
   heroImageUrl String?
   ctaText      String?
   ctaLink      String?
-  updatedAt    DateTime @updatedAt
+  fishSpecies  FishSpecies[]
+  updatedAt    DateTime     @updatedAt
+}
+
+model FishSpecies {
+  id           Int         @id @default(autoincrement())
+  name         String
+  order        Int         @default(0)
+  fishingPageId Int?
+  description  String?
+  bait         String?
+  timeOfDay    String?
+  weather      String?
+  imageUrl     String?
+  fishingPage  FishingPage? @relation(fields: [fishingPageId], references: [id], onDelete: SetNull)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 model DnrPage {
