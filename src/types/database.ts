@@ -72,6 +72,10 @@ export interface FishingPage {
   heroImageUrl: string | null
   ctaText: string | null
   ctaLink: string | null
+  regulationsHeading: string | null
+  regulationsText: string | null
+  regulationsCtaText: string | null
+  regulationsCtaLink: string | null
   fishSpecies: FishSpecies[]
   updatedAt: Date
 }

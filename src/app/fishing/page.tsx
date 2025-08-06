@@ -135,21 +135,34 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
       )}
 
       {/* Fishing Regulations Section */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4 text-primary">Fishing Regulations</h3>
-              <p className="text-neutral-dark mb-4">
-                Please be sure to check current Minnesota DNR fishing regulations before your trip.
-              </p>
-              <a href="/dnr" className="text-accent hover:text-primary font-semibold">
-                View DNR Information →
-              </a>
+      {fishingPage.regulationsHeading && (
+        <section className="py-12 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary">
+                <h3 className="text-xl font-semibold mb-4 text-primary">
+                  {fishingPage.regulationsHeading}
+                </h3>
+                {fishingPage.regulationsText && (
+                  <p className="text-neutral-dark mb-4 leading-relaxed">
+                    {fishingPage.regulationsText}
+                  </p>
+                )}
+                {fishingPage.regulationsCtaText && fishingPage.regulationsCtaLink && (
+                  <a 
+                    href={fishingPage.regulationsCtaLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-accent hover:text-primary font-semibold transition-colors underline decoration-2 underline-offset-2 hover:decoration-primary"
+                  >
+                    {fishingPage.regulationsCtaText}
+                  </a>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Latest Fishing Report */}
       <section className="py-12 bg-neutral-light">

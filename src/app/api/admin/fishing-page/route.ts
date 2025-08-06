@@ -54,7 +54,11 @@ export async function PUT(request: NextRequest) {
       heroSubtitle, 
       heroImageUrl, 
       ctaText, 
-      ctaLink 
+      ctaLink,
+      regulationsHeading,
+      regulationsText,
+      regulationsCtaText,
+      regulationsCtaLink
     } = body
 
     const fishingPage = await prisma.fishingPage.findFirst()
@@ -72,7 +76,11 @@ export async function PUT(request: NextRequest) {
         heroSubtitle,
         heroImageUrl,
         ctaText,
-        ctaLink
+        ctaLink,
+        regulationsHeading,
+        regulationsText,
+        regulationsCtaText,
+        regulationsCtaLink
       }
     })
 

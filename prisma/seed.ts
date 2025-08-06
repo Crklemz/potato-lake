@@ -9,7 +9,22 @@ async function main() {
     fishingPage = await prisma.fishingPage.create({
       data: {
         fishHeading: 'Excellent Fishing Opportunities',
-        fishText: 'Potato Lake is renowned for its excellent fishing opportunities. The lake is home to a variety of fish species including walleye, northern pike, bass, and panfish. Whether you\'re an experienced angler or just starting out, you\'ll find plenty of great spots to cast your line.'
+        fishText: 'Potato Lake is renowned for its excellent fishing opportunities. The lake is home to a variety of fish species including walleye, northern pike, bass, and panfish. Whether you\'re an experienced angler or just starting out, you\'ll find plenty of great spots to cast your line.',
+        regulationsHeading: 'Fishing Regulations',
+        regulationsText: 'Please be sure to check current Wisconsin DNR fishing regulations before your trip.',
+        regulationsCtaText: 'View DNR Information →',
+        regulationsCtaLink: 'https://apps.dnr.wi.gov/lakes/lakepages/LakeDetail.aspx?wbic=2355300'
+      }
+    })
+  } else {
+    // Update existing fishing page with regulations fields if they don't exist
+    await prisma.fishingPage.update({
+      where: { id: fishingPage.id },
+      data: {
+        regulationsHeading: fishingPage.regulationsHeading || 'Fishing Regulations',
+        regulationsText: fishingPage.regulationsText || 'Please be sure to check current Wisconsin DNR fishing regulations before your trip.',
+        regulationsCtaText: fishingPage.regulationsCtaText || 'View DNR Information →',
+        regulationsCtaLink: fishingPage.regulationsCtaLink || 'https://apps.dnr.wi.gov/lakes/lakepages/LakeDetail.aspx?wbic=2355300'
       }
     })
   }
@@ -17,7 +32,6 @@ async function main() {
   const fishSpeciesData = [
     {
       name: 'Muskellunge (Musky)',
-      icon: '🐟',
       order: 1,
       description: 'A large, elusive predator prized by sport anglers.',
       bait: 'Large crankbaits, live suckers, jerkbaits',
@@ -27,7 +41,6 @@ async function main() {
     },
     {
       name: 'Northern Pike',
-      icon: '🐟',
       order: 2,
       description: 'Aggressive ambush predators with sharp teeth.',
       bait: 'Spinnerbaits, spoons, live bait',
@@ -37,7 +50,6 @@ async function main() {
     },
     {
       name: 'Walleye',
-      icon: '🐟',
       order: 3,
       description: 'Popular eating fish known for being finicky biters.',
       bait: 'Jigs with minnows, crankbaits, nightcrawlers',
@@ -47,7 +59,6 @@ async function main() {
     },
     {
       name: 'Largemouth Bass',
-      icon: '🐟',
       order: 4,
       description: 'Hard-fighting fish often found near cover.',
       bait: 'Plastic worms, topwater lures, crankbaits',
@@ -57,7 +68,6 @@ async function main() {
     },
     {
       name: 'Smallmouth Bass',
-      icon: '🐟',
       order: 5,
       description: 'Pound for pound, one of the strongest fighters.',
       bait: 'Tube baits, jigs, spinnerbaits',
@@ -67,7 +77,6 @@ async function main() {
     },
     {
       name: 'Bluegill',
-      icon: '🐟',
       order: 6,
       description: 'Abundant and easy to catch—great for kids.',
       bait: 'Worms, crickets, small jigs',
@@ -77,7 +86,6 @@ async function main() {
     },
     {
       name: 'Crappie',
-      icon: '🐟',
       order: 7,
       description: 'Schooling panfish known for great taste.',
       bait: 'Minnows, small jigs',
@@ -87,7 +95,6 @@ async function main() {
     },
     {
       name: 'Pumpkinseed Sunfish',
-      icon: '🐟',
       order: 8,
       description: 'Colorful, aggressive fish found near shore.',
       bait: 'Worms, small flies, beetle spins',
@@ -97,7 +104,6 @@ async function main() {
     },
     {
       name: 'Yellow Perch',
-      icon: '🐟',
       order: 9,
       description: 'Tasty schooling fish often found near structure.',
       bait: 'Minnows, worms, ice jigs',
@@ -107,7 +113,6 @@ async function main() {
     },
     {
       name: 'Catfish',
-      icon: '🐟',
       order: 10,
       description: 'Bottom dwellers with a keen sense of smell.',
       bait: 'Stink bait, cut bait, chicken liver',
@@ -117,7 +122,6 @@ async function main() {
     },
     {
       name: 'Bullheads',
-      icon: '🐟',
       order: 11,
       description: 'Small catfish species, great for beginners.',
       bait: 'Worms, doughballs, cut bait',
