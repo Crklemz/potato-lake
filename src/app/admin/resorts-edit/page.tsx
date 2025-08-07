@@ -27,6 +27,10 @@ interface ResortsPageData {
   ctaLink: string | null
   introHeading: string
   introText: string
+  footerHeading: string | null
+  footerSubheading: string | null
+  footerLinkText: string | null
+  footerLinkUrl: string | null
 }
 
 export default function ResortsEditPage() {
@@ -159,7 +163,11 @@ export default function ResortsEditPage() {
       ctaText: formData.get('ctaText') as string,
       ctaLink: formData.get('ctaLink') as string,
       introHeading: formData.get('introHeading') as string,
-      introText: formData.get('introText') as string
+      introText: formData.get('introText') as string,
+      footerHeading: formData.get('footerHeading') as string,
+      footerSubheading: formData.get('footerSubheading') as string,
+      footerLinkText: formData.get('footerLinkText') as string,
+      footerLinkUrl: formData.get('footerLinkUrl') as string
     }
 
     try {
@@ -385,7 +393,63 @@ export default function ResortsEditPage() {
                   />
                 </div>
 
+                <div className="border-t border-neutral-light pt-6 mt-6">
+                  <h3 className="text-lg font-semibold text-neutral-dark mb-4">Footer Section</h3>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-dark mb-2">
+                      Footer Heading
+                    </label>
+                    <input
+                      type="text"
+                      name="footerHeading"
+                      defaultValue={pageData.footerHeading || ''}
+                      className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                      placeholder="Enter footer heading (optional)"
+                    />
+                  </div>
 
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-dark mb-2">
+                      Footer Subheading
+                    </label>
+                    <textarea
+                      name="footerSubheading"
+                      rows={3}
+                      defaultValue={pageData.footerSubheading || ''}
+                      className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                      placeholder="Enter footer subheading (optional)"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Footer Link Text
+                      </label>
+                      <input
+                        type="text"
+                        name="footerLinkText"
+                        defaultValue={pageData.footerLinkText || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter footer link text (optional)"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Footer Link URL
+                      </label>
+                      <input
+                        type="text"
+                        name="footerLinkUrl"
+                        defaultValue={pageData.footerLinkUrl || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter footer link URL (optional)"
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 <div className="flex justify-end">
                   <button

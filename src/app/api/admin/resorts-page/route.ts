@@ -50,7 +50,11 @@ export async function PUT(request: NextRequest) {
       ctaText, 
       ctaLink, 
       introHeading,
-      introText
+      introText,
+      footerHeading,
+      footerSubheading,
+      footerLinkText,
+      footerLinkUrl
     } = body
 
     let resortsPage = await prisma.resortsPage.findFirst()
@@ -65,7 +69,11 @@ export async function PUT(request: NextRequest) {
           ctaText: ctaText || 'Book Your Stay',
           ctaLink: ctaLink || '/contact',
           introHeading: introHeading || 'Welcome to Our Resorts',
-          introText: introText || 'Discover the perfect accommodations for your Potato Lake getaway. Our resorts offer comfortable lodging, beautiful lake views, and easy access to all the activities that make Potato Lake special.'
+          introText: introText || 'Discover the perfect accommodations for your Potato Lake getaway. Our resorts offer comfortable lodging, beautiful lake views, and easy access to all the activities that make Potato Lake special.',
+          footerHeading: footerHeading || null,
+          footerSubheading: footerSubheading || null,
+          footerLinkText: footerLinkText || null,
+          footerLinkUrl: footerLinkUrl || null
         }
       })
     } else {
@@ -79,7 +87,11 @@ export async function PUT(request: NextRequest) {
           ctaText,
           ctaLink,
           introHeading,
-          introText
+          introText,
+          footerHeading,
+          footerSubheading,
+          footerLinkText,
+          footerLinkUrl
         }
       })
     }

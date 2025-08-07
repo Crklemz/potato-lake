@@ -51,6 +51,10 @@ model ResortsPage {
   ctaLink        String?
   introHeading   String   @default("Welcome to Our Resorts")
   introText      String   @default("Discover the perfect accommodations for your Potato Lake getaway. Our resorts offer comfortable lodging, beautiful lake views, and easy access to all the activities that make Potato Lake special.")
+  footerHeading  String?
+  footerSubheading String?
+  footerLinkText String?
+  footerLinkUrl  String?
   resorts        Resort[]
   updatedAt      DateTime @updatedAt
 }

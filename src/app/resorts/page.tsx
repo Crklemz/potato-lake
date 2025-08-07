@@ -27,6 +27,10 @@ async function getResortsData() {
           ctaLink: '/contact',
           introHeading: 'Welcome to Our Resorts',
           introText: 'Discover the perfect accommodations for your Potato Lake getaway. Our resorts offer comfortable lodging, beautiful lake views, and easy access to all the activities that make Potato Lake special.',
+          footerHeading: null,
+          footerSubheading: 'Find essentials like dining, shopping, fuel, and services to make your stay even better.',
+          footerLinkText: null,
+          footerLinkUrl: null,
           resorts: {
             create: [
               {
@@ -168,6 +172,34 @@ function ResortsPageContent({ resortsPage }: { resortsPage: ResortsPage }) {
           )}
         </div>
       </div>
+
+      {/* Footer Section */}
+      {(resortsPage.footerHeading || resortsPage.footerSubheading || resortsPage.footerLinkText) && (
+        <section className="py-16 bg-gradient-to-br from-primary to-accent">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              {resortsPage.footerHeading && (
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                  {resortsPage.footerHeading}
+                </h2>
+              )}
+              {resortsPage.footerSubheading && (
+                <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-2xl mx-auto">
+                  {resortsPage.footerSubheading}
+                </p>
+              )}
+              {resortsPage.footerLinkText && resortsPage.footerLinkUrl && (
+                <a 
+                  href={resortsPage.footerLinkUrl}
+                  className="inline-block bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-neutral-light transition-colors"
+                >
+                  {resortsPage.footerLinkText}
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
