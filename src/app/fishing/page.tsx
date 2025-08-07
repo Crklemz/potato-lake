@@ -181,51 +181,49 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
                 </div>
               )}
 
-              <div className="bg-neutral-light rounded-lg shadow-lg p-8 border-l-4 border-primary">
-                <div className="space-y-8">
-                  {/* Fishing Regulations */}
-                  {(fishingPage.regulationsTextNew || fishingPage.regulationsLinkText) && (
-                    <div className="border-b border-neutral-dark/20 pb-6">
-                      <h3 className="text-xl font-semibold mb-4 text-primary">
-                        {fishingPage.regulationsLabel || 'Fishing Regulations'}
-                      </h3>
-                      {fishingPage.regulationsTextNew && (
-                        <p className="text-neutral-dark mb-4 leading-relaxed">
-                          {fishingPage.regulationsTextNew}
-                        </p>
-                      )}
-                      {fishingPage.regulationsLinkText && fishingPage.regulationsLinkUrl && (
-                        <a 
-                          href={fishingPage.regulationsLinkUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-accent hover:text-primary font-semibold transition-colors underline decoration-2 underline-offset-2 hover:decoration-primary"
-                        >
-                          {fishingPage.regulationsLinkText}
-                        </a>
-                      )}
-                    </div>
-                  )}
+              <div className="space-y-8">
+                {/* Fishing Regulations */}
+                {(fishingPage.regulationsTextNew || fishingPage.regulationsLinkText) && (
+                  <div className="border-b border-neutral-light pb-8">
+                    <h3 className="text-xl font-semibold mb-4 text-primary">
+                      {fishingPage.regulationsLabel || 'Fishing Regulations'}
+                    </h3>
+                    {fishingPage.regulationsTextNew && (
+                      <p className="text-neutral-dark mb-4 leading-relaxed">
+                        {fishingPage.regulationsTextNew}
+                      </p>
+                    )}
+                    {fishingPage.regulationsLinkText && fishingPage.regulationsLinkUrl && (
+                      <a 
+                        href={fishingPage.regulationsLinkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-accent hover:text-primary font-semibold transition-colors underline decoration-2 underline-offset-2 hover:decoration-primary"
+                      >
+                        {fishingPage.regulationsLinkText}
+                      </a>
+                    )}
+                  </div>
+                )}
 
-                  {/* Latest Fishing Report */}
-                  {(fishingPage.reportTextNew || fishingPage.reportLastUpdated) && (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-4 text-primary">
-                        {fishingPage.reportLabel || 'Latest Fishing Report'}
-                      </h3>
-                      {fishingPage.reportTextNew && (
-                        <p className="text-neutral-dark leading-relaxed mb-4">
-                          {fishingPage.reportTextNew}
-                        </p>
-                      )}
-                      {fishingPage.reportLastUpdated && (
-                        <p className="text-sm text-neutral-dark italic">
-                          Last updated on {new Date(fishingPage.reportLastUpdated).toLocaleDateString('en-US', { timeZone: 'UTC' })}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
+                {/* Latest Fishing Report */}
+                {(fishingPage.reportTextNew || fishingPage.reportLastUpdated) && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-4 text-primary">
+                      {fishingPage.reportLabel || 'Latest Fishing Report'}
+                    </h3>
+                    {fishingPage.reportTextNew && (
+                      <p className="text-neutral-dark leading-relaxed mb-4">
+                        {fishingPage.reportTextNew}
+                      </p>
+                    )}
+                    {fishingPage.reportLastUpdated && (
+                      <p className="text-sm text-neutral-dark italic">
+                        Last updated on {new Date(fishingPage.reportLastUpdated).toLocaleDateString('en-US', { timeZone: 'UTC' })}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

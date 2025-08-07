@@ -17,7 +17,7 @@ export default function FishingTips({ tips }: FishingTipsProps) {
   }
 
   return (
-    <section className="py-12 bg-white">
+    <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
         <h2 className="text-2xl md:text-3xl font-bold text-primary mb-8 text-center">
           Fishing Tips from the Lake Association
@@ -27,7 +27,7 @@ export default function FishingTips({ tips }: FishingTipsProps) {
           {tips.map((tip) => (
             <div
               key={tip.id}
-              className="bg-neutral-light rounded-lg shadow-lg p-6 border-l-4 border-accent hover:shadow-xl transition-all duration-200 hover:scale-105"
+              className="bg-white rounded-lg shadow-md p-6 border-l-4 border-accent hover:shadow-lg transition-all duration-200 hover:scale-105"
             >
               <div className="flex items-start space-x-3">
                 {/* Quote icon */}
