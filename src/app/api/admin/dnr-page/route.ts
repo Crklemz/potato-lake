@@ -57,7 +57,17 @@ export async function PUT(request: NextRequest) {
       dnrStewardshipHeading,
       dnrStewardshipText,
       dnrStewardshipCtaText,
-      dnrStewardshipCtaUrl
+      dnrStewardshipCtaUrl,
+      dnrFishingCardHeading,
+      dnrFishingCardItems,
+      dnrFishingCardCtaText,
+      dnrFishingCardCtaUrl,
+      dnrBoatingCardHeading,
+      dnrBoatingCardItems,
+      dnrBoatingCardCtaText,
+      dnrBoatingCardCtaUrl,
+      regulationsHeading,
+      regulationsSubheading
     } = body
 
     const dnrPage = await prisma.dnrPage.findFirst()
@@ -78,7 +88,17 @@ export async function PUT(request: NextRequest) {
         dnrStewardshipHeading,
         dnrStewardshipText,
         dnrStewardshipCtaText,
-        dnrStewardshipCtaUrl
+        dnrStewardshipCtaUrl,
+        dnrFishingCardHeading,
+        dnrFishingCardItems,
+        dnrFishingCardCtaText,
+        dnrFishingCardCtaUrl,
+        dnrBoatingCardHeading,
+        dnrBoatingCardItems,
+        dnrBoatingCardCtaText,
+        dnrBoatingCardCtaUrl,
+        regulationsHeading,
+        regulationsSubheading
       }
     })
 

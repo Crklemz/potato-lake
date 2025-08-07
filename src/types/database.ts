@@ -145,6 +145,16 @@ export interface DnrPage {
   dnrStewardshipText: string | null
   dnrStewardshipCtaText: string | null
   dnrStewardshipCtaUrl: string | null
+  dnrFishingCardHeading: string | null
+  dnrFishingCardItems: string[] | null
+  dnrFishingCardCtaText: string | null
+  dnrFishingCardCtaUrl: string | null
+  dnrBoatingCardHeading: string | null
+  dnrBoatingCardItems: string[] | null
+  dnrBoatingCardCtaText: string | null
+  dnrBoatingCardCtaUrl: string | null
+  regulationsHeading: string | null
+  regulationsSubheading: string | null
   updatedAt: Date
 }
 

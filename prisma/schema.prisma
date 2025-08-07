@@ -135,6 +135,16 @@ model DnrPage {
   dnrStewardshipText String? @default("The Wisconsin Department of Natural Resources works in partnership with local organizations like the Potato Lake Association to protect lake health and encourage responsible use. These efforts include water quality monitoring, shoreline protection, aquatic habitat restoration, and invasive species prevention.")
   dnrStewardshipCtaText String?
   dnrStewardshipCtaUrl String?
+  dnrFishingCardHeading String? @default("Fishing Regulations")
+  dnrFishingCardItems Json? @default("[\"License requirements\", \"Size and possession limits\", \"Seasonal restrictions\", \"Special lake-specific rules\"]")
+  dnrFishingCardCtaText String? @default("Full Fishing Regulations")
+  dnrFishingCardCtaUrl String? @default("https://dnr.wisconsin.gov/topic/Fishing/regulations")
+  dnrBoatingCardHeading String? @default("Boating Safety")
+  dnrBoatingCardItems Json? @default("[\"Boat registration rules\", \"Speed limit areas\", \"Required safety equipment\", \"Invasive species prevention steps\"]")
+  dnrBoatingCardCtaText String? @default("Boating Laws & Safety")
+  dnrBoatingCardCtaUrl String? @default("https://dnr.wisconsin.gov/topic/Boat")
+  regulationsHeading String? @default("Fishing & Boating Regulations")
+  regulationsSubheading String? @default("Stay safe and informed with key rules for enjoying Potato Lake. These summaries highlight important DNR guidelines for fishing and boating.")
   updatedAt DateTime @updatedAt
 }
 

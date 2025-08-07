@@ -21,10 +21,18 @@ async function getDnrData() {
           dnrStewardshipCtaUrl: 'https://www.uwsp.edu/cnr-ap/UWEXLakes/Pages/partnership.aspx'
         }
       })
-      return defaultDnrPage
+      return {
+        ...defaultDnrPage,
+        dnrFishingCardItems: defaultDnrPage.dnrFishingCardItems as string[],
+        dnrBoatingCardItems: defaultDnrPage.dnrBoatingCardItems as string[]
+      }
     }
     
-    return dnrPage
+    return {
+      ...dnrPage,
+      dnrFishingCardItems: dnrPage.dnrFishingCardItems as string[],
+      dnrBoatingCardItems: dnrPage.dnrBoatingCardItems as string[]
+    }
   } catch (error) {
     console.error('Error fetching DNR data:', error)
     throw new Error('Failed to load DNR data')
@@ -101,30 +109,73 @@ function DnrPageContent({ dnrPage }: { dnrPage: DnrPage }) {
         </section>
       )}
 
+      {/* Cards Section */}
+      <section className="py-12 bg-neutral-light">
+        <div className="max-w-5xl mx-auto px-4">
+          {/* Section Heading */}
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-foreground">
+              {dnrPage.regulationsHeading || 'Fishing & Boating Regulations'}
+            </h2>
+            <p className="text-muted-foreground text-base mt-2">
+              {dnrPage.regulationsSubheading || 'Stay safe and informed with key rules for enjoying Potato Lake. These summaries highlight important DNR guidelines for fishing and boating.'}
+            </p>
+          </div>
+          
+                      <div className="flex flex-col md:flex-row gap-4">
+              {/* Fishing Regulations Card */}
+              <div className="flex-1 bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  {dnrPage.dnrFishingCardHeading || 'Fishing Regulations'}
+                </h3>
+                {dnrPage.dnrFishingCardItems && Array.isArray(dnrPage.dnrFishingCardItems) && (
+                  <ul className="list-disc list-inside text-muted-foreground text-sm space-y-1 mb-4">
+                    {dnrPage.dnrFishingCardItems.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+                {dnrPage.dnrFishingCardCtaText && dnrPage.dnrFishingCardCtaUrl && (
+                  <a 
+                    href={dnrPage.dnrFishingCardCtaUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
+                  >
+                    {dnrPage.dnrFishingCardCtaText}
+                  </a>
+                )}
+              </div>
+
+              {/* Boating Safety Card */}
+              <div className="flex-1 bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  {dnrPage.dnrBoatingCardHeading || 'Boating Safety'}
+                </h3>
+                {dnrPage.dnrBoatingCardItems && Array.isArray(dnrPage.dnrBoatingCardItems) && (
+                  <ul className="list-disc list-inside text-muted-foreground text-sm space-y-1 mb-4">
+                    {dnrPage.dnrBoatingCardItems.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+                {dnrPage.dnrBoatingCardCtaText && dnrPage.dnrBoatingCardCtaUrl && (
+                  <a 
+                    href={dnrPage.dnrBoatingCardCtaUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
+                  >
+                    {dnrPage.dnrBoatingCardCtaText}
+                  </a>
+                )}
+              </div>
+            </div>
+        </div>
+      </section>
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4 text-primary">Fishing Regulations</h3>
-              <ul className="space-y-2 text-neutral-dark">
-                <li>• Fishing license requirements</li>
-                <li>• Size and possession limits</li>
-                <li>• Seasonal restrictions</li>
-                <li>• Special regulations</li>
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4 text-primary">Boating Safety</h3>
-              <ul className="space-y-2 text-neutral-dark">
-                <li>• Boat registration requirements</li>
-                <li>• Safety equipment requirements</li>
-                <li>• Speed limits and restrictions</li>
-                <li>• Invasive species prevention</li>
-              </ul>
-            </div>
-          </div>
 
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
             <h3 className="text-2xl font-semibold mb-4 text-primary">Lake Map</h3>
