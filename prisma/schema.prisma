@@ -44,6 +44,11 @@ model HomePageImage {
 
 model ResortsPage {
   id             Int      @id @default(autoincrement())
+  heroTitle      String   @default("Resorts & Lodging")
+  heroSubtitle   String?
+  heroImageUrl   String?
+  ctaText        String?
+  ctaLink        String?
   sectionHeading String
   sectionText    String
   resorts        Resort[]

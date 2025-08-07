@@ -18,10 +18,22 @@ interface Resort {
   order: number
 }
 
+interface ResortsPageData {
+  id: number
+  heroTitle: string
+  heroSubtitle: string | null
+  heroImageUrl: string | null
+  ctaText: string | null
+  ctaLink: string | null
+  sectionHeading: string
+  sectionText: string
+}
+
 export default function ResortsEditPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [resorts, setResorts] = useState<Resort[]>([])
+  const [pageData, setPageData] = useState<ResortsPageData | null>(null)
   const [editingResort, setEditingResort] = useState<Resort | null>(null)
   const [isAdding, setIsAdding] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -30,12 +42,14 @@ export default function ResortsEditPage() {
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null)
   const [draggedResort, setDraggedResort] = useState<number | null>(null)
+  const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin/login')
     } else if (status === 'authenticated') {
       fetchResorts()
+      fetchPageData()
     }
   }, [status, router])
 
@@ -52,6 +66,18 @@ export default function ResortsEditPage() {
       console.error('Error fetching resorts:', err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchPageData = async () => {
+    try {
+      const response = await fetch('/api/admin/resorts-page')
+      if (!response.ok) throw new Error('Failed to fetch page data')
+      const data = await response.json()
+      setPageData(data)
+      setHeroImageUrl(data.heroImageUrl)
+    } catch (err) {
+      console.error('Error fetching page data:', err)
     }
   }
 
@@ -117,6 +143,43 @@ export default function ResortsEditPage() {
     } catch (err) {
       setError('Failed to delete resort: ' + err)
       console.error('Error deleting resort:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handlePageDataSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    
+    const pageDataToSave = {
+      heroTitle: formData.get('heroTitle') as string,
+      heroSubtitle: formData.get('heroSubtitle') as string,
+      heroImageUrl: heroImageUrl,
+      ctaText: formData.get('ctaText') as string,
+      ctaLink: formData.get('ctaLink') as string,
+      sectionHeading: formData.get('sectionHeading') as string,
+      sectionText: formData.get('sectionText') as string
+    }
+
+    try {
+      setIsLoading(true)
+      setError(null)
+      setSuccess(null)
+
+      const response = await fetch('/api/admin/resorts-page', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pageDataToSave)
+      })
+
+      if (!response.ok) throw new Error('Failed to save page data')
+
+      setSuccess('Page settings updated successfully!')
+      await fetchPageData()
+    } catch (err) {
+      setError('Failed to save page data: ' + err)
+      console.error('Error saving page data:', err)
     } finally {
       setIsLoading(false)
     }
@@ -206,6 +269,135 @@ export default function ResortsEditPage() {
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
+          {/* Page Settings Section */}
+          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+            <h2 className="text-2xl font-semibold text-neutral-dark mb-6">
+              Page Settings
+            </h2>
+            
+            {pageData && (
+              <form onSubmit={handlePageDataSave} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-dark mb-2">
+                      Hero Title
+                    </label>
+                    <input
+                      type="text"
+                      name="heroTitle"
+                      defaultValue={pageData.heroTitle}
+                      className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                      placeholder="Enter hero title"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-dark mb-2">
+                      Hero Subtitle
+                    </label>
+                    <input
+                      type="text"
+                      name="heroSubtitle"
+                      defaultValue={pageData.heroSubtitle || ''}
+                      className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                      placeholder="Enter hero subtitle"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Hero Background Image
+                  </label>
+                  <FileUpload
+                    type="image"
+                    currentUrl={heroImageUrl}
+                    onUpload={(url) => {
+                      setHeroImageUrl(url)
+                      setUploadError(null)
+                    }}
+                    onError={(error) => {
+                      setUploadError(error)
+                    }}
+                    label="Upload Hero Image"
+                    accept="image/*"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                  />
+                  {uploadError && (
+                    <div className="mt-2 text-sm text-red-600">{uploadError}</div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-dark mb-2">
+                      CTA Button Text
+                    </label>
+                    <input
+                      type="text"
+                      name="ctaText"
+                      defaultValue={pageData.ctaText || ''}
+                      className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                      placeholder="Enter CTA button text"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-dark mb-2">
+                      CTA Button Link
+                    </label>
+                    <input
+                      type="text"
+                      name="ctaLink"
+                      defaultValue={pageData.ctaLink || ''}
+                      className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                      placeholder="Enter CTA button link"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    name="sectionHeading"
+                    defaultValue={pageData.sectionHeading}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter section heading"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Section Text
+                  </label>
+                  <textarea
+                    name="sectionText"
+                    rows={4}
+                    defaultValue={pageData.sectionText}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter section text"
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Saving...' : 'Save Page Settings'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-neutral-dark">

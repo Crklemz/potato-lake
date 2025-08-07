@@ -43,6 +43,11 @@ export interface Resort {
 
 export interface ResortsPage {
   id: number
+  heroTitle: string
+  heroSubtitle: string | null
+  heroImageUrl: string | null
+  ctaText: string | null
+  ctaLink: string | null
   sectionHeading: string
   sectionText: string
   resorts: Resort[]

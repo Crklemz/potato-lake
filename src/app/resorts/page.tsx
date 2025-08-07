@@ -20,6 +20,11 @@ async function getResortsData() {
       // Create default resorts page if none exists
       const defaultResortsPage = await prisma.resortsPage.create({
         data: {
+          heroTitle: 'Resorts & Lodging',
+          heroSubtitle: 'Find your perfect getaway on Potato Lake',
+          heroImageUrl: null,
+          ctaText: 'Book Your Stay',
+          ctaLink: '/contact',
           sectionHeading: 'Resorts on Potato Lake',
           sectionText: 'Potato Lake offers a variety of resorts and accommodations to suit every visitor\'s needs. From cozy cabins to full-service resorts, you\'ll find the perfect place to stay while enjoying all that our beautiful lake has to offer.',
           resorts: {
@@ -57,11 +62,52 @@ async function getResortsData() {
 function ResortsPageContent({ resortsPage }: { resortsPage: ResortsPage }) {
   return (
     <div className="min-h-screen bg-neutral-light">
+      {/* Hero Section */}
+      <section className="relative min-h-[33vh] md:min-h-[40vh] w-full">
+        {resortsPage.heroImageUrl ? (
+          <div className="absolute inset-0">
+            <Image 
+              src={resortsPage.heroImageUrl} 
+              alt="Resorts on Potato Lake"
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Dark gradient overlay */}
+            <div className="absolute inset-0 bg-black/40"></div>
+          </div>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent"></div>
+        )}
+        
+        {/* Hero content */}
+        <div className="relative z-10 flex items-center justify-center min-h-[33vh] md:min-h-[40vh] px-4">
+          <div className="text-center text-white max-w-4xl mx-auto">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg">
+              {resortsPage.heroTitle}
+            </h1>
+            {resortsPage.heroSubtitle && (
+              <p className="text-lg md:text-xl lg:text-2xl mb-6 drop-shadow-lg opacity-90">
+                {resortsPage.heroSubtitle}
+              </p>
+            )}
+            {resortsPage.ctaText && resortsPage.ctaLink && (
+              <a 
+                href={resortsPage.ctaLink}
+                className="inline-block bg-white text-primary px-8 py-3 rounded-lg font-semibold text-lg hover:bg-neutral-light transition-colors shadow-lg"
+              >
+                {resortsPage.ctaText}
+              </a>
+            )}
+          </div>
+        </div>
+      </section>
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-center mb-8 text-neutral-dark">
+          <h2 className="text-4xl font-bold text-center mb-8 text-neutral-dark">
             {resortsPage.sectionHeading}
-          </h1>
+          </h2>
           
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-primary">
