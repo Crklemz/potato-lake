@@ -27,8 +27,6 @@ interface ResortsPageData {
   ctaLink: string | null
   introHeading: string
   introText: string
-  sectionHeading: string
-  sectionText: string
 }
 
 export default function ResortsEditPage() {
@@ -161,9 +159,7 @@ export default function ResortsEditPage() {
       ctaText: formData.get('ctaText') as string,
       ctaLink: formData.get('ctaLink') as string,
       introHeading: formData.get('introHeading') as string,
-      introText: formData.get('introText') as string,
-      sectionHeading: formData.get('sectionHeading') as string,
-      sectionText: formData.get('sectionText') as string
+      introText: formData.get('introText') as string
     }
 
     try {
@@ -389,33 +385,7 @@ export default function ResortsEditPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Section Heading
-                  </label>
-                  <input
-                    type="text"
-                    name="sectionHeading"
-                    defaultValue={pageData.sectionHeading}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter section heading"
-                    required
-                  />
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-dark mb-2">
-                    Section Text
-                  </label>
-                  <textarea
-                    name="sectionText"
-                    rows={4}
-                    defaultValue={pageData.sectionText}
-                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter section text"
-                    required
-                  />
-                </div>
 
                 <div className="flex justify-end">
                   <button

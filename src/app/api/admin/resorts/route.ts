@@ -44,10 +44,7 @@ export async function POST(request: NextRequest) {
     let resortsPage = await prisma.resortsPage.findFirst()
     if (!resortsPage) {
       resortsPage = await prisma.resortsPage.create({
-        data: {
-          sectionHeading: 'Resorts & Lodging',
-          sectionText: 'Find the perfect place to stay at Potato Lake'
-        }
+        data: {}
       })
     }
 

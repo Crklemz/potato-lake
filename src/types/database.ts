@@ -50,8 +50,6 @@ export interface ResortsPage {
   ctaLink: string | null
   introHeading: string
   introText: string
-  sectionHeading: string
-  sectionText: string
   resorts: Resort[]
   updatedAt: Date
 }

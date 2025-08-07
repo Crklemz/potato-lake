@@ -27,8 +27,6 @@ async function getResortsData() {
           ctaLink: '/contact',
           introHeading: 'Welcome to Our Resorts',
           introText: 'Discover the perfect accommodations for your Potato Lake getaway. Our resorts offer comfortable lodging, beautiful lake views, and easy access to all the activities that make Potato Lake special.',
-          sectionHeading: 'Resorts on Potato Lake',
-          sectionText: 'Potato Lake offers a variety of resorts and accommodations to suit every visitor\'s needs. From cozy cabins to full-service resorts, you\'ll find the perfect place to stay while enjoying all that our beautiful lake has to offer.',
           resorts: {
             create: [
               {
@@ -121,18 +119,6 @@ function ResortsPageContent({ resortsPage }: { resortsPage: ResortsPage }) {
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-8 text-neutral-dark">
-            {resortsPage.sectionHeading}
-          </h2>
-          
-          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-primary">
-              Find Your Perfect Getaway
-            </h2>
-            <p className="text-lg text-neutral-dark leading-relaxed">
-              {resortsPage.sectionText}
-            </p>
-          </div>
 
           {resortsPage.resorts.length === 0 ? (
             <div className="text-center py-12">
@@ -206,14 +192,6 @@ function LoadingResortsPage() {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-12 bg-neutral-dark rounded mb-8"></div>
-            
-            <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-              <div className="h-8 bg-primary rounded mb-4"></div>
-              <div className="h-6 bg-neutral-dark rounded mb-2"></div>
-              <div className="h-6 bg-neutral-dark rounded mb-2"></div>
-              <div className="h-6 bg-neutral-dark rounded"></div>
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[1, 2].map((i) => (
