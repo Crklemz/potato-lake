@@ -14,7 +14,11 @@ async function getDnrData() {
         data: {
           dnrHeading: 'Minnesota Department of Natural Resources',
           dnrText: 'The Minnesota DNR provides important information about fishing regulations, boating safety, and lake management. Stay informed about the latest rules and regulations to ensure a safe and enjoyable experience on Potato Lake.',
-          mapUrl: null
+          mapUrl: null,
+          dnrStewardshipHeading: 'Wisconsin DNR & Lake Stewardship',
+          dnrStewardshipText: 'The Wisconsin Department of Natural Resources works in partnership with local organizations like the Potato Lake Association to protect lake health and encourage responsible use. These efforts include water quality monitoring, shoreline protection, aquatic habitat restoration, and invasive species prevention.',
+          dnrStewardshipCtaText: 'Visit Wisconsin Lakes Partnership',
+          dnrStewardshipCtaUrl: 'https://www.uwsp.edu/cnr-ap/UWEXLakes/Pages/partnership.aspx'
         }
       })
       return defaultDnrPage
@@ -70,6 +74,32 @@ function DnrPageContent({ dnrPage }: { dnrPage: DnrPage }) {
           </div>
         </div>
       </section>
+
+      {/* Stewardship Section */}
+      {dnrPage.dnrStewardshipHeading && dnrPage.dnrStewardshipText && (
+        <section className="py-12 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-4">
+                {dnrPage.dnrStewardshipHeading}
+              </h2>
+              <p className="text-lg text-muted-foreground mb-6">
+                {dnrPage.dnrStewardshipText}
+              </p>
+              {dnrPage.dnrStewardshipCtaText && dnrPage.dnrStewardshipCtaUrl && (
+                <a 
+                  href={dnrPage.dnrStewardshipCtaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-block text-primary hover:text-accent font-semibold transition-colors underline decoration-2 underline-offset-2 hover:decoration-accent"
+                >
+                  {dnrPage.dnrStewardshipCtaText}
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">

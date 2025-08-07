@@ -131,6 +131,10 @@ model DnrPage {
   ctaText   String?
   ctaLink   String?
   mapUrl    String?
+  dnrStewardshipHeading String? @default("Wisconsin DNR & Lake Stewardship")
+  dnrStewardshipText String? @default("The Wisconsin Department of Natural Resources works in partnership with local organizations like the Potato Lake Association to protect lake health and encourage responsible use. These efforts include water quality monitoring, shoreline protection, aquatic habitat restoration, and invasive species prevention.")
+  dnrStewardshipCtaText String?
+  dnrStewardshipCtaUrl String?
   updatedAt DateTime @updatedAt
 }
 

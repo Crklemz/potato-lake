@@ -137,7 +137,14 @@ export interface DnrPage {
   id: number
   dnrHeading: string
   dnrText: string
+  heroImageUrl: string | null
+  ctaText: string | null
+  ctaLink: string | null
   mapUrl: string | null
+  dnrStewardshipHeading: string | null
+  dnrStewardshipText: string | null
+  dnrStewardshipCtaText: string | null
+  dnrStewardshipCtaUrl: string | null
   updatedAt: Date
 }
 

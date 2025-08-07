@@ -14,6 +14,10 @@ interface DnrPageData {
   ctaText: string | null
   ctaLink: string | null
   mapUrl: string | null
+  dnrStewardshipHeading: string | null
+  dnrStewardshipText: string | null
+  dnrStewardshipCtaText: string | null
+  dnrStewardshipCtaUrl: string | null
 }
 
 export default function DnrEditPage() {
@@ -68,7 +72,11 @@ export default function DnrEditPage() {
       heroImageUrl: dnrData?.heroImageUrl || '',
       ctaText: formData.get('ctaText') as string,
       ctaLink: formData.get('ctaLink') as string,
-      mapUrl: formData.get('mapUrl') as string
+      mapUrl: formData.get('mapUrl') as string,
+      dnrStewardshipHeading: formData.get('dnrStewardshipHeading') as string,
+      dnrStewardshipText: formData.get('dnrStewardshipText') as string,
+      dnrStewardshipCtaText: formData.get('dnrStewardshipCtaText') as string,
+      dnrStewardshipCtaUrl: formData.get('dnrStewardshipCtaUrl') as string
     }
 
     try {
@@ -231,6 +239,64 @@ export default function DnrEditPage() {
                       </a>
                     </div>
                   )}
+                </div>
+
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold mb-4 text-neutral-dark">Stewardship Section</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Stewardship Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="dnrStewardshipHeading"
+                        defaultValue={dnrData?.dnrStewardshipHeading || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter stewardship section heading"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Stewardship Text
+                      </label>
+                      <textarea
+                        name="dnrStewardshipText"
+                        rows={6}
+                        defaultValue={dnrData?.dnrStewardshipText || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter stewardship section text"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Stewardship CTA Text (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        name="dnrStewardshipCtaText"
+                        defaultValue={dnrData?.dnrStewardshipCtaText || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter stewardship CTA button text"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Stewardship CTA URL (Optional)
+                      </label>
+                      <input
+                        type="url"
+                        name="dnrStewardshipCtaUrl"
+                        defaultValue={dnrData?.dnrStewardshipCtaUrl || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter stewardship CTA button URL"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex gap-4">

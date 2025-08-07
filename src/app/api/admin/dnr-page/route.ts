@@ -20,7 +20,11 @@ export async function GET() {
         data: {
           dnrHeading: 'DNR Information',
           dnrText: 'Important information from the Department of Natural Resources...',
-          mapUrl: null
+          mapUrl: null,
+          dnrStewardshipHeading: 'Wisconsin DNR & Lake Stewardship',
+          dnrStewardshipText: 'The Wisconsin Department of Natural Resources works in partnership with local organizations like the Potato Lake Association to protect lake health and encourage responsible use. These efforts include water quality monitoring, shoreline protection, aquatic habitat restoration, and invasive species prevention.',
+          dnrStewardshipCtaText: 'Visit Wisconsin Lakes Partnership',
+          dnrStewardshipCtaUrl: 'https://www.uwsp.edu/cnr-ap/UWEXLakes/Pages/partnership.aspx'
         }
       })
       return NextResponse.json(defaultDnrPage)
@@ -43,7 +47,18 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { dnrHeading, dnrText, heroImageUrl, ctaText, ctaLink, mapUrl } = body
+    const { 
+      dnrHeading, 
+      dnrText, 
+      heroImageUrl, 
+      ctaText, 
+      ctaLink, 
+      mapUrl,
+      dnrStewardshipHeading,
+      dnrStewardshipText,
+      dnrStewardshipCtaText,
+      dnrStewardshipCtaUrl
+    } = body
 
     const dnrPage = await prisma.dnrPage.findFirst()
     
@@ -59,7 +74,11 @@ export async function PUT(request: NextRequest) {
         heroImageUrl,
         ctaText,
         ctaLink,
-        mapUrl
+        mapUrl,
+        dnrStewardshipHeading,
+        dnrStewardshipText,
+        dnrStewardshipCtaText,
+        dnrStewardshipCtaUrl
       }
     })
 
