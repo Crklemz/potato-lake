@@ -238,7 +238,7 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
               </p>
               <a 
                 href={fishingPage.fishingCtaButtonLink}
-                className="inline-block bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-neutral-light transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-200"
+                className="inline-block bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-neutral-light transition-colors"
               >
                 {fishingPage.fishingCtaButtonText}
               </a>
