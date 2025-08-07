@@ -61,7 +61,11 @@ export async function PUT(request: NextRequest) {
       regulationsCtaLink,
       fishingReportHeading,
       fishingReportText,
-      fishingReportDate
+      fishingReportDate,
+      fishingCtaHeading,
+      fishingCtaText,
+      fishingCtaButtonText,
+      fishingCtaButtonLink
     } = body
 
     const fishingPage = await prisma.fishingPage.findFirst()
@@ -86,7 +90,11 @@ export async function PUT(request: NextRequest) {
         regulationsCtaLink,
         fishingReportHeading,
         fishingReportText,
-        fishingReportDate: fishingReportDate ? new Date(fishingReportDate) : null
+        fishingReportDate: fishingReportDate ? new Date(fishingReportDate) : null,
+        fishingCtaHeading,
+        fishingCtaText,
+        fishingCtaButtonText,
+        fishingCtaButtonLink
       }
     })
 

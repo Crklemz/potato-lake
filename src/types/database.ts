@@ -99,6 +99,10 @@ export interface FishingPage {
   fishingReportHeading: string | null
   fishingReportText: string | null
   fishingReportDate: Date | null
+  fishingCtaHeading: string | null
+  fishingCtaText: string | null
+  fishingCtaButtonText: string | null
+  fishingCtaButtonLink: string | null
   fishSpecies: FishSpecies[]
   galleryImages: FishingGalleryImage[]
   fishingTips: FishingTip[]

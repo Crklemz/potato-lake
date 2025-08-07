@@ -16,11 +16,15 @@ async function main() {
         regulationsCtaLink: 'https://apps.dnr.wi.gov/lakes/lakepages/LakeDetail.aspx?wbic=2355300',
         fishingReportHeading: 'Latest Fishing Report',
         fishingReportText: 'Fishing has been excellent this season! Anglers are reporting good catches of walleye in the early morning and evening hours. Northern pike are active throughout the day, and panfish are biting well in the shallower areas of the lake.',
-        fishingReportDate: new Date('2025-08-01')
+        fishingReportDate: new Date('2025-08-01'),
+        fishingCtaHeading: 'Stay Connected with the Lake Association',
+        fishingCtaText: 'Want the latest fishing updates, lake news, and event info? Join our email list or contact us today.',
+        fishingCtaButtonText: 'Join the Mailing List',
+        fishingCtaButtonLink: '/contact'
       }
     })
   } else {
-    // Update existing fishing page with regulations and fishing report fields if they don't exist
+    // Update existing fishing page with regulations, fishing report, and CTA fields if they don't exist
     await prisma.fishingPage.update({
       where: { id: fishingPage.id },
       data: {
@@ -30,7 +34,11 @@ async function main() {
         regulationsCtaLink: fishingPage.regulationsCtaLink || 'https://apps.dnr.wi.gov/lakes/lakepages/LakeDetail.aspx?wbic=2355300',
         fishingReportHeading: fishingPage.fishingReportHeading || 'Latest Fishing Report',
         fishingReportText: fishingPage.fishingReportText || 'Fishing has been excellent this season! Anglers are reporting good catches of walleye in the early morning and evening hours. Northern pike are active throughout the day, and panfish are biting well in the shallower areas of the lake.',
-        fishingReportDate: fishingPage.fishingReportDate || new Date('2025-08-01')
+        fishingReportDate: fishingPage.fishingReportDate || new Date('2025-08-01'),
+        fishingCtaHeading: fishingPage.fishingCtaHeading || 'Stay Connected with the Lake Association',
+        fishingCtaText: fishingPage.fishingCtaText || 'Want the latest fishing updates, lake news, and event info? Join our email list or contact us today.',
+        fishingCtaButtonText: fishingPage.fishingCtaButtonText || 'Join the Mailing List',
+        fishingCtaButtonLink: fishingPage.fishingCtaButtonLink || '/contact'
       }
     })
   }

@@ -16,7 +16,11 @@ async function getFishingData() {
       const defaultFishingPage = await prisma.fishingPage.create({
         data: {
           fishHeading: 'Excellent Fishing Opportunities',
-          fishText: 'Potato Lake is renowned for its excellent fishing opportunities. The lake is home to a variety of fish species including walleye, northern pike, bass, and panfish. Whether you\'re an experienced angler or just starting out, you\'ll find plenty of great spots to cast your line.'
+          fishText: 'Potato Lake is renowned for its excellent fishing opportunities. The lake is home to a variety of fish species including walleye, northern pike, bass, and panfish. Whether you\'re an experienced angler or just starting out, you\'ll find plenty of great spots to cast your line.',
+          fishingCtaHeading: 'Stay Connected with the Lake Association',
+          fishingCtaText: 'Want the latest fishing updates, lake news, and event info? Join our email list or contact us today.',
+          fishingCtaButtonText: 'Join the Mailing List',
+          fishingCtaButtonLink: '/contact'
         }
       })
       
@@ -63,7 +67,11 @@ async function getFishingData() {
       ...fishingPage,
       fishSpecies,
       galleryImages,
-      fishingTips
+      fishingTips,
+      fishingCtaHeading: fishingPage.fishingCtaHeading,
+      fishingCtaText: fishingPage.fishingCtaText,
+      fishingCtaButtonText: fishingPage.fishingCtaButtonText,
+      fishingCtaButtonLink: fishingPage.fishingCtaButtonLink
     }
   } catch (error) {
     console.error('Error fetching fishing data:', error)
@@ -216,6 +224,28 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
 
       {/* Fishing Tips Section */}
       <FishingTips tips={fishingPage.fishingTips || []} />
+
+      {/* Stay Connected CTA Section */}
+      {fishingPage.fishingCtaHeading && fishingPage.fishingCtaText && fishingPage.fishingCtaButtonText && fishingPage.fishingCtaButtonLink && (
+        <section className="py-16 bg-gradient-to-br from-primary to-accent">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                {fishingPage.fishingCtaHeading}
+              </h2>
+              <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-2xl mx-auto">
+                {fishingPage.fishingCtaText}
+              </p>
+              <a 
+                href={fishingPage.fishingCtaButtonLink}
+                className="inline-block bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-neutral-light transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-200"
+              >
+                {fishingPage.fishingCtaButtonText}
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   )
 }

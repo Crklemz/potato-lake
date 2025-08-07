@@ -79,6 +79,10 @@ model FishingPage {
   fishingReportHeading String?
   fishingReportText   String?
   fishingReportDate   DateTime?
+  fishingCtaHeading  String?
+  fishingCtaText     String?
+  fishingCtaButtonText String?
+  fishingCtaButtonLink String?
   fishSpecies        FishSpecies[]
   galleryImages      FishingGalleryImage[]
   fishingTips        FishingTip[]

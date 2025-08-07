@@ -23,6 +23,10 @@ interface FishingPageData {
   fishingReportHeading: string | null
   fishingReportText: string | null
   fishingReportDate: Date | null
+  fishingCtaHeading: string | null
+  fishingCtaText: string | null
+  fishingCtaButtonText: string | null
+  fishingCtaButtonLink: string | null
 }
 
 interface FishSpecies {
@@ -102,6 +106,8 @@ export default function FishingEditPage() {
       fetchFishingTips()
     }
   }, [status, router])
+
+
 
   const fetchFishingData = async () => {
     try {
@@ -641,7 +647,11 @@ export default function FishingEditPage() {
       regulationsCtaLink: formData.get('regulationsCtaLink') as string,
       fishingReportHeading: formData.get('fishingReportHeading') as string,
       fishingReportText: formData.get('fishingReportText') as string,
-      fishingReportDate: formData.get('fishingReportDate') as string
+      fishingReportDate: formData.get('fishingReportDate') as string,
+      fishingCtaHeading: formData.get('fishingCtaHeading') as string,
+      fishingCtaText: formData.get('fishingCtaText') as string,
+      fishingCtaButtonText: formData.get('fishingCtaButtonText') as string,
+      fishingCtaButtonLink: formData.get('fishingCtaButtonLink') as string
     }
 
     try {
@@ -834,7 +844,7 @@ export default function FishingEditPage() {
                 </div>
 
                 {/* Fish Species Management */}
-                <div className="border-b border-neutral-light pb-6">
+                <div id="fish-species-section" className="border-b border-neutral-light pb-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
                       <h3 className="text-xl font-semibold text-neutral-dark">Fish Species Management</h3>
@@ -999,13 +1009,21 @@ export default function FishingEditPage() {
                                       <h4 className="font-semibold text-neutral-dark">Edit {species.name}</h4>
                                       <div className="flex gap-2">
                                         <button
-                                          onClick={handleUpdateSpecies}
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            handleUpdateSpecies()
+                                          }}
                                           className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
                                         >
                                           Save
                                         </button>
                                         <button
-                                          onClick={() => setEditingSpecies(null)}
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            setEditingSpecies(null)
+                                          }}
                                           className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
                                         >
                                           Cancel
@@ -1113,7 +1131,11 @@ export default function FishingEditPage() {
                                       </div>
                                       <div className="flex gap-2">
                                         <button
-                                          onClick={() => setEditingSpecies(species)}
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            setEditingSpecies(species)
+                                          }}
                                           className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
                                         >
                                           Edit
@@ -1260,6 +1282,70 @@ export default function FishingEditPage() {
                   </div>
                 </div>
 
+                {/* Stay Connected CTA Section */}
+                <div className="border-b border-neutral-light pb-6">
+                  <h3 className="text-xl font-semibold mb-4 text-neutral-dark">Stay Connected CTA Section</h3>
+                  <p className="text-sm text-neutral-dark mb-4">
+                    This section appears at the bottom of the fishing page, above the footer. Leave fields empty to hide the section.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        CTA Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="fishingCtaHeading"
+                        defaultValue={fishingData?.fishingCtaHeading || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="e.g., Stay Connected with the Lake Association"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        CTA Text
+                      </label>
+                      <textarea
+                        name="fishingCtaText"
+                        rows={4}
+                        defaultValue={fishingData?.fishingCtaText || ''}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        placeholder="e.g., Want the latest fishing updates, lake news, and event info? Join our email list or contact us today."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          Button Text
+                        </label>
+                        <input
+                          type="text"
+                          name="fishingCtaButtonText"
+                          defaultValue={fishingData?.fishingCtaButtonText || ''}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                          placeholder="e.g., Join the Mailing List"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          Button Link
+                        </label>
+                        <input
+                          type="url"
+                          name="fishingCtaButtonLink"
+                          defaultValue={fishingData?.fishingCtaButtonLink || ''}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                          placeholder="e.g., /contact"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Fishing Gallery Management */}
                 <div className="border-b border-neutral-light pb-6">
                   <div className="flex items-center justify-between mb-4">
@@ -1385,13 +1471,21 @@ export default function FishingEditPage() {
                                       <h4 className="font-semibold text-neutral-dark">Edit Gallery Image</h4>
                                       <div className="flex gap-2">
                                         <button
-                                          onClick={handleUpdateGalleryImage}
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            handleUpdateGalleryImage()
+                                          }}
                                           className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
                                         >
                                           Save
                                         </button>
                                         <button
-                                          onClick={() => setEditingGalleryImage(null)}
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            setEditingGalleryImage(null)
+                                          }}
                                           className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
                                         >
                                           Cancel
@@ -1470,7 +1564,11 @@ export default function FishingEditPage() {
                                       </div>
                                       <div className="flex gap-2">
                                         <button
-                                          onClick={() => setEditingGalleryImage(image)}
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            setEditingGalleryImage(image)
+                                          }}
                                           className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
                                         >
                                           Edit
@@ -1602,13 +1700,21 @@ export default function FishingEditPage() {
                                       <h4 className="font-semibold text-neutral-dark">Edit Fishing Tip</h4>
                                       <div className="flex gap-2">
                                         <button
-                                          onClick={handleUpdateTip}
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            handleUpdateTip()
+                                          }}
                                           className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
                                         >
                                           Save
                                         </button>
                                         <button
-                                          onClick={() => setEditingTip(null)}
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            setEditingTip(null)
+                                          }}
                                           className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
                                         >
                                           Cancel
@@ -1662,7 +1768,11 @@ export default function FishingEditPage() {
                                       </div>
                                       <div className="flex gap-2">
                                         <button
-                                          onClick={() => setEditingTip(tip)}
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            setEditingTip(tip)
+                                          }}
                                           className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary-dark transition-colors"
                                         >
                                           Edit
