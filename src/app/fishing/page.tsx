@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import type { FishingPage } from '@/types/database'
+import type { FishingPage, FishingRegulationLink } from '@/types/database'
 import FishSpeciesList from '@/components/FishSpeciesList'
 import FishingGallery from '@/components/FishingGallery'
 import FishingTips from '@/components/FishingTips'
@@ -30,7 +30,7 @@ async function getFishingData() {
         fishSpecies: [],
         galleryImages: [],
         fishingTips: [],
-        fishingRegulationLinks: [] as any
+        fishingRegulationLinks: [] as FishingRegulationLink[]
       }
     }
     
@@ -69,7 +69,7 @@ async function getFishingData() {
       fishSpecies,
       galleryImages,
       fishingTips,
-      fishingRegulationLinks: (fishingPage.fishingRegulationLinks as any) || []
+      fishingRegulationLinks: (fishingPage.fishingRegulationLinks as unknown as FishingRegulationLink[]) || []
     }
   } catch (error) {
     console.error('Error fetching fishing data:', error)
