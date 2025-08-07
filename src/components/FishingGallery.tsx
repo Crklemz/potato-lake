@@ -107,7 +107,7 @@ export default function FishingGallery({ images }: FishingGalleryProps) {
   const visibleImages = getVisibleImages()
 
   return (
-    <section className="py-12 bg-white">
+    <section className="py-12 bg-neutral-light">
       <div className="container mx-auto px-4">
         <h2 className="text-2xl md:text-3xl font-bold text-primary mb-8 text-center">
           Fishing Photo Gallery

@@ -92,6 +92,15 @@ model FishingPage {
   fishingCtaText     String?
   fishingCtaButtonText String?
   fishingCtaButtonLink String?
+  infoSectionHeading String?
+  infoSectionSubheading String?
+  regulationsLabel   String?
+  regulationsTextNew String?
+  regulationsLinkText String?
+  regulationsLinkUrl String?
+  reportLabel        String?
+  reportTextNew      String?
+  reportLastUpdated  DateTime?
   fishSpecies        FishSpecies[]
   galleryImages      FishingGalleryImage[]
   fishingTips        FishingTip[]

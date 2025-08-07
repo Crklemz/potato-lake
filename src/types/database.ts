@@ -112,6 +112,15 @@ export interface FishingPage {
   fishingCtaText: string | null
   fishingCtaButtonText: string | null
   fishingCtaButtonLink: string | null
+  infoSectionHeading: string | null
+  infoSectionSubheading: string | null
+  regulationsLabel: string | null
+  regulationsTextNew: string | null
+  regulationsLinkText: string | null
+  regulationsLinkUrl: string | null
+  reportLabel: string | null
+  reportTextNew: string | null
+  reportLastUpdated: Date | null
   fishSpecies: FishSpecies[]
   galleryImages: FishingGalleryImage[]
   fishingTips: FishingTip[]

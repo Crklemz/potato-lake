@@ -65,7 +65,16 @@ export async function PUT(request: NextRequest) {
       fishingCtaHeading,
       fishingCtaText,
       fishingCtaButtonText,
-      fishingCtaButtonLink
+      fishingCtaButtonLink,
+      infoSectionHeading,
+      infoSectionSubheading,
+      regulationsLabel,
+      regulationsTextNew,
+      regulationsLinkText,
+      regulationsLinkUrl,
+      reportLabel,
+      reportTextNew,
+      reportLastUpdated
     } = body
 
     const fishingPage = await prisma.fishingPage.findFirst()
@@ -94,7 +103,16 @@ export async function PUT(request: NextRequest) {
         fishingCtaHeading,
         fishingCtaText,
         fishingCtaButtonText,
-        fishingCtaButtonLink
+        fishingCtaButtonLink,
+        infoSectionHeading,
+        infoSectionSubheading,
+        regulationsLabel,
+        regulationsTextNew,
+        regulationsLinkText,
+        regulationsLinkUrl,
+        reportLabel,
+        reportTextNew,
+        reportLastUpdated: reportLastUpdated ? new Date(reportLastUpdated) : null
       }
     })
 

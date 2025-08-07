@@ -67,11 +67,7 @@ async function getFishingData() {
       ...fishingPage,
       fishSpecies,
       galleryImages,
-      fishingTips,
-      fishingCtaHeading: fishingPage.fishingCtaHeading,
-      fishingCtaText: fishingPage.fishingCtaText,
-      fishingCtaButtonText: fishingPage.fishingCtaButtonText,
-      fishingCtaButtonLink: fishingPage.fishingCtaButtonLink
+      fishingTips
     }
   } catch (error) {
     console.error('Error fetching fishing data:', error)
@@ -166,53 +162,70 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
         </section>
       )}
 
-      {/* Fishing Regulations Section */}
-      {fishingPage.regulationsHeading && (
+      {/* Fishing Info & Updates Section */}
+      {(fishingPage.infoSectionHeading || fishingPage.regulationsTextNew || fishingPage.reportTextNew) && (
         <section className="py-12 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary">
-                <h3 className="text-xl font-semibold mb-4 text-primary">
-                  {fishingPage.regulationsHeading}
-                </h3>
-                {fishingPage.regulationsText && (
-                  <p className="text-neutral-dark mb-4 leading-relaxed">
-                    {fishingPage.regulationsText}
-                  </p>
-                )}
-                {fishingPage.regulationsCtaText && fishingPage.regulationsCtaLink && (
-                  <a 
-                    href={fishingPage.regulationsCtaLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center text-accent hover:text-primary font-semibold transition-colors underline decoration-2 underline-offset-2 hover:decoration-primary"
-                  >
-                    {fishingPage.regulationsCtaText}
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+              {/* Section Header */}
+              {fishingPage.infoSectionHeading && (
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">
+                    {fishingPage.infoSectionHeading}
+                  </h2>
+                  {fishingPage.infoSectionSubheading && (
+                    <p className="text-neutral-dark text-lg">
+                      {fishingPage.infoSectionSubheading}
+                    </p>
+                  )}
+                </div>
+              )}
 
-      {/* Latest Fishing Report */}
-      {fishingPage.fishingReportHeading && fishingPage.fishingReportText && (
-        <section className="py-12 bg-neutral-light">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-lg shadow-md p-8">
-                <h3 className="text-2xl font-semibold mb-4 text-primary">
-                  {fishingPage.fishingReportHeading}
-                </h3>
-                <p className="text-neutral-dark leading-relaxed mb-4">
-                  {fishingPage.fishingReportText}
-                </p>
-                {fishingPage.fishingReportDate && (
-                  <p className="text-sm text-neutral-dark italic">
-                    Last updated on {new Date(fishingPage.fishingReportDate).toLocaleDateString('en-US', { timeZone: 'UTC' })}
-                  </p>
-                )}
+              <div className="bg-neutral-light rounded-lg shadow-lg p-8 border-l-4 border-primary">
+                <div className="space-y-8">
+                  {/* Fishing Regulations */}
+                  {(fishingPage.regulationsTextNew || fishingPage.regulationsLinkText) && (
+                    <div className="border-b border-neutral-dark/20 pb-6">
+                      <h3 className="text-xl font-semibold mb-4 text-primary">
+                        {fishingPage.regulationsLabel || 'Fishing Regulations'}
+                      </h3>
+                      {fishingPage.regulationsTextNew && (
+                        <p className="text-neutral-dark mb-4 leading-relaxed">
+                          {fishingPage.regulationsTextNew}
+                        </p>
+                      )}
+                      {fishingPage.regulationsLinkText && fishingPage.regulationsLinkUrl && (
+                        <a 
+                          href={fishingPage.regulationsLinkUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-accent hover:text-primary font-semibold transition-colors underline decoration-2 underline-offset-2 hover:decoration-primary"
+                        >
+                          {fishingPage.regulationsLinkText}
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Latest Fishing Report */}
+                  {(fishingPage.reportTextNew || fishingPage.reportLastUpdated) && (
+                    <div>
+                      <h3 className="text-xl font-semibold mb-4 text-primary">
+                        {fishingPage.reportLabel || 'Latest Fishing Report'}
+                      </h3>
+                      {fishingPage.reportTextNew && (
+                        <p className="text-neutral-dark leading-relaxed mb-4">
+                          {fishingPage.reportTextNew}
+                        </p>
+                      )}
+                      {fishingPage.reportLastUpdated && (
+                        <p className="text-sm text-neutral-dark italic">
+                          Last updated on {new Date(fishingPage.reportLastUpdated).toLocaleDateString('en-US', { timeZone: 'UTC' })}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
