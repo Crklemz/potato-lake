@@ -101,6 +101,7 @@ model FishingPage {
   reportLabel        String?
   reportTextNew      String?
   reportLastUpdated  DateTime?
+  fishingRegulationLinks Json?
   fishSpecies        FishSpecies[]
   galleryImages      FishingGalleryImage[]
   fishingTips        FishingTip[]

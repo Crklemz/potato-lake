@@ -7,6 +7,11 @@ import Image from 'next/image'
 import AdminHeader from '@/components/AdminHeader'
 import FileUpload from '@/components/FileUpload'
 
+interface FishingRegulationLink {
+  text: string
+  url: string
+}
+
 interface FishingPageData {
   id: number
   fishHeading: string
@@ -36,6 +41,7 @@ interface FishingPageData {
   reportLabel: string | null
   reportTextNew: string | null
   reportLastUpdated: Date | null
+  fishingRegulationLinks: FishingRegulationLink[] | null
 }
 
 interface FishSpecies {
@@ -104,6 +110,8 @@ export default function FishingEditPage() {
   const [isSpeciesSectionCollapsed, setIsSpeciesSectionCollapsed] = useState(true)
   const [isGallerySectionCollapsed, setIsGallerySectionCollapsed] = useState(true)
   const [isTipsSectionCollapsed, setIsTipsSectionCollapsed] = useState(true)
+  const [regulationLinks, setRegulationLinks] = useState<FishingRegulationLink[]>([])
+  const [newRegulationLink, setNewRegulationLink] = useState({ text: '', url: '' })
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -126,6 +134,12 @@ export default function FishingEditPage() {
       if (!response.ok) throw new Error('Failed to fetch fishing page data')
       const data = await response.json()
       setFishingData(data)
+      // Initialize regulation links from the fetched data
+      if (data.fishingRegulationLinks) {
+        setRegulationLinks(data.fishingRegulationLinks)
+      } else {
+        setRegulationLinks([])
+      }
     } catch (err) {
       setError('Failed to load fishing page data: ' + err)
       console.error('Error fetching fishing page data:', err)
@@ -638,6 +652,18 @@ export default function FishingEditPage() {
     }
   }
 
+  // Regulation Links handlers
+  const handleAddRegulationLink = () => {
+    if (newRegulationLink.text.trim() && newRegulationLink.url.trim()) {
+      setRegulationLinks([...regulationLinks, { ...newRegulationLink }])
+      setNewRegulationLink({ text: '', url: '' })
+    }
+  }
+
+  const handleRemoveRegulationLink = (index: number) => {
+    setRegulationLinks(regulationLinks.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
@@ -669,7 +695,8 @@ export default function FishingEditPage() {
       regulationsLinkUrl: formData.get('regulationsLinkUrl') as string,
       reportLabel: formData.get('reportLabel') as string,
       reportTextNew: formData.get('reportTextNew') as string,
-      reportLastUpdated: formData.get('reportLastUpdated') as string
+      reportLastUpdated: formData.get('reportLastUpdated') as string,
+      fishingRegulationLinks: regulationLinks
     }
 
     try {
@@ -1283,6 +1310,73 @@ export default function FishingEditPage() {
                             />
                           </div>
                         </div>
+                      </div>
+
+                      {/* Regulation Links */}
+                      <div className="mt-6">
+                        <h5 className="text-md font-medium mb-3 text-neutral-dark">Regulation Links</h5>
+                        <p className="text-sm text-neutral-dark mb-4">
+                          Add additional links to fishing regulations and resources. These will appear as a bulleted list below the regulations text.
+                        </p>
+                        
+                        {/* Add new link form */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Link Text
+                            </label>
+                            <input
+                              type="text"
+                              value={newRegulationLink.text}
+                              onChange={(e) => setNewRegulationLink({ ...newRegulationLink, text: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="e.g., DNR Fishing Regulations"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-dark mb-2">
+                              Link URL
+                            </label>
+                            <input
+                              type="url"
+                              value={newRegulationLink.url}
+                              onChange={(e) => setNewRegulationLink({ ...newRegulationLink, url: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="https://..."
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAddRegulationLink}
+                          className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors text-sm"
+                        >
+                          Add Link
+                        </button>
+
+                        {/* Display existing links */}
+                        {regulationLinks.length > 0 && (
+                          <div className="mt-4">
+                            <h6 className="text-sm font-medium mb-2 text-neutral-dark">Current Links:</h6>
+                            <div className="space-y-2">
+                              {regulationLinks.map((link, index) => (
+                                <div key={index} className="flex items-center justify-between bg-white p-3 rounded-md border border-gray-200">
+                                  <div className="flex-1">
+                                    <div className="font-medium text-sm">{link.text}</div>
+                                    <div className="text-xs text-gray-500 truncate">{link.url}</div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveRegulationLink(index)}
+                                    className="ml-2 text-red-500 hover:text-red-700 transition-colors"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 

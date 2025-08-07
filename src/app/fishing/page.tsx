@@ -29,7 +29,8 @@ async function getFishingData() {
         ...defaultFishingPage,
         fishSpecies: [],
         galleryImages: [],
-        fishingTips: []
+        fishingTips: [],
+        fishingRegulationLinks: [] as any
       }
     }
     
@@ -67,7 +68,8 @@ async function getFishingData() {
       ...fishingPage,
       fishSpecies,
       galleryImages,
-      fishingTips
+      fishingTips,
+      fishingRegulationLinks: (fishingPage.fishingRegulationLinks as any) || []
     }
   } catch (error) {
     console.error('Error fetching fishing data:', error)
@@ -202,6 +204,23 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
                       >
                         {fishingPage.regulationsLinkText}
                       </a>
+                    )}
+                    {fishingPage.fishingRegulationLinks && fishingPage.fishingRegulationLinks.length > 0 && (
+                      <ul className="mt-4 space-y-2">
+                        {fishingPage.fishingRegulationLinks.map((link, index) => (
+                          <li key={index} className="flex items-start">
+                            <span className="text-accent mr-2 mt-1">•</span>
+                            <a 
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-neutral-dark hover:text-accent transition-colors underline decoration-1 underline-offset-2 hover:decoration-accent"
+                            >
+                              {link.text}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </div>
                 )}

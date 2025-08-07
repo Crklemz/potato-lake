@@ -82,6 +82,11 @@ export interface FishingGalleryImage {
   createdAt: Date
 }
 
+export interface FishingRegulationLink {
+  text: string
+  url: string
+}
+
 export interface FishingTip {
   id: number
   text: string
@@ -121,6 +126,7 @@ export interface FishingPage {
   reportLabel: string | null
   reportTextNew: string | null
   reportLastUpdated: Date | null
+  fishingRegulationLinks: FishingRegulationLink[] | null
   fishSpecies: FishSpecies[]
   galleryImages: FishingGalleryImage[]
   fishingTips: FishingTip[]
