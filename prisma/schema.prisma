@@ -127,6 +127,9 @@ model DnrPage {
   id        Int      @id @default(autoincrement())
   dnrHeading String
   dnrText   String
+  heroImageUrl String?
+  ctaText   String?
+  ctaLink   String?
   mapUrl    String?
   updatedAt DateTime @updatedAt
 }

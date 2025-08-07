@@ -30,20 +30,49 @@ async function getDnrData() {
 function DnrPageContent({ dnrPage }: { dnrPage: DnrPage }) {
   return (
     <div className="min-h-screen bg-neutral-light">
+      {/* Hero Section */}
+      <section className="relative min-h-[33vh] md:min-h-[40vh] w-full">
+        {dnrPage.heroImageUrl ? (
+          <div className="absolute inset-0">
+            <Image 
+              src={dnrPage.heroImageUrl} 
+              alt="DNR Information"
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Dark gradient overlay */}
+            <div className="absolute inset-0 bg-black/40"></div>
+          </div>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent"></div>
+        )}
+        
+        {/* Hero content */}
+        <div className="relative z-10 flex items-center justify-center min-h-[33vh] md:min-h-[40vh] px-4">
+          <div className="text-center text-white max-w-4xl mx-auto">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg">
+              {dnrPage.dnrHeading}
+            </h1>
+            {dnrPage.dnrText && (
+              <p className="text-lg md:text-xl lg:text-2xl mb-6 drop-shadow-lg opacity-90">
+                {dnrPage.dnrText}
+              </p>
+            )}
+            {dnrPage.ctaText && dnrPage.ctaLink && (
+              <a 
+                href={dnrPage.ctaLink}
+                className="inline-block bg-white text-primary px-8 py-3 rounded-lg font-semibold text-lg hover:bg-neutral-light transition-colors shadow-lg"
+              >
+                {dnrPage.ctaText}
+              </a>
+            )}
+          </div>
+        </div>
+      </section>
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-center mb-8 text-neutral-dark">
-            DNR Information
-          </h1>
-          
-          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-primary">
-              {dnrPage.dnrHeading}
-            </h2>
-            <p className="text-lg text-neutral-dark leading-relaxed">
-              {dnrPage.dnrText}
-            </p>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div className="bg-white rounded-lg shadow-md p-6">

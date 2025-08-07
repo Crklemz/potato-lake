@@ -122,7 +122,7 @@ function FishingPageContent({ fishingPage }: { fishingPage: FishingPage }) {
                 href="/dnr"
                 className="text-white underline hover:text-accent transition-colors"
               >
-                Check DNR Info →
+                Potato Lake DNR Overview →
               </a>
             </div>
           </div>

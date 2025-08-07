@@ -4,11 +4,15 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AdminHeader from '@/components/AdminHeader'
+import FileUpload from '@/components/FileUpload'
 
 interface DnrPageData {
   id: number
   dnrHeading: string
   dnrText: string
+  heroImageUrl: string | null
+  ctaText: string | null
+  ctaLink: string | null
   mapUrl: string | null
 }
 
@@ -44,6 +48,16 @@ export default function DnrEditPage() {
     }
   }
 
+  const handleHeroImageUpload = (url: string) => {
+    if (dnrData) {
+      setDnrData({ ...dnrData, heroImageUrl: url })
+    }
+  }
+
+  const handleHeroImageError = (error: string) => {
+    setError('Hero image upload failed: ' + error)
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
@@ -51,6 +65,9 @@ export default function DnrEditPage() {
     const updateData = {
       dnrHeading: formData.get('dnrHeading') as string,
       dnrText: formData.get('dnrText') as string,
+      heroImageUrl: dnrData?.heroImageUrl || '',
+      ctaText: formData.get('ctaText') as string,
+      ctaLink: formData.get('ctaLink') as string,
       mapUrl: formData.get('mapUrl') as string
     }
 
@@ -143,6 +160,50 @@ export default function DnrEditPage() {
                     className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Enter DNR information, regulations, and important details"
                     required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Hero Image
+                  </label>
+                  <FileUpload
+                    type="image"
+                    currentUrl={dnrData?.heroImageUrl}
+                    onUpload={handleHeroImageUpload}
+                    onError={handleHeroImageError}
+                    label="Upload Hero Image"
+                  />
+                  <input
+                    type="hidden"
+                    name="heroImageUrl"
+                    value={dnrData?.heroImageUrl || ''}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    CTA Button Text
+                  </label>
+                  <input
+                    type="text"
+                    name="ctaText"
+                    defaultValue={dnrData?.ctaText || ''}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter CTA button text (optional)"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    CTA Button Link
+                  </label>
+                  <input
+                    type="url"
+                    name="ctaLink"
+                    defaultValue={dnrData?.ctaLink || ''}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter CTA button link URL (optional)"
                   />
                 </div>
 

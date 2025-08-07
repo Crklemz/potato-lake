@@ -43,7 +43,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { dnrHeading, dnrText, mapUrl } = body
+    const { dnrHeading, dnrText, heroImageUrl, ctaText, ctaLink, mapUrl } = body
 
     const dnrPage = await prisma.dnrPage.findFirst()
     
@@ -56,6 +56,9 @@ export async function PUT(request: NextRequest) {
       data: {
         dnrHeading,
         dnrText,
+        heroImageUrl,
+        ctaText,
+        ctaLink,
         mapUrl
       }
     })
