@@ -48,6 +48,8 @@ export interface ResortsPage {
   heroImageUrl: string | null
   ctaText: string | null
   ctaLink: string | null
+  introHeading: string
+  introText: string
   sectionHeading: string
   sectionText: string
   resorts: Resort[]

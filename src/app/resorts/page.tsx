@@ -25,6 +25,8 @@ async function getResortsData() {
           heroImageUrl: null,
           ctaText: 'Book Your Stay',
           ctaLink: '/contact',
+          introHeading: 'Welcome to Our Resorts',
+          introText: 'Discover the perfect accommodations for your Potato Lake getaway. Our resorts offer comfortable lodging, beautiful lake views, and easy access to all the activities that make Potato Lake special.',
           sectionHeading: 'Resorts on Potato Lake',
           sectionText: 'Potato Lake offers a variety of resorts and accommodations to suit every visitor\'s needs. From cozy cabins to full-service resorts, you\'ll find the perfect place to stay while enjoying all that our beautiful lake has to offer.',
           resorts: {
@@ -103,6 +105,20 @@ function ResortsPageContent({ resortsPage }: { resortsPage: ResortsPage }) {
         </div>
       </section>
 
+      {/* Intro Section */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
+              {resortsPage.introHeading}
+            </h2>
+            <p className="text-neutral-dark leading-relaxed max-w-3xl mx-auto">
+              {resortsPage.introText}
+            </p>
+          </div>
+        </div>
+      </section>
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-8 text-neutral-dark">
@@ -173,6 +189,20 @@ function ResortsPageContent({ resortsPage }: { resortsPage: ResortsPage }) {
 function LoadingResortsPage() {
   return (
     <div className="min-h-screen bg-neutral-light">
+      {/* Intro Section Loading */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-primary rounded mb-4 mx-auto w-64"></div>
+              <div className="h-6 bg-neutral-dark rounded mb-2 max-w-2xl mx-auto"></div>
+              <div className="h-6 bg-neutral-dark rounded mb-2 max-w-2xl mx-auto"></div>
+              <div className="h-6 bg-neutral-dark rounded max-w-xl mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse">

@@ -25,6 +25,8 @@ interface ResortsPageData {
   heroImageUrl: string | null
   ctaText: string | null
   ctaLink: string | null
+  introHeading: string
+  introText: string
   sectionHeading: string
   sectionText: string
 }
@@ -158,6 +160,8 @@ export default function ResortsEditPage() {
       heroImageUrl: heroImageUrl,
       ctaText: formData.get('ctaText') as string,
       ctaLink: formData.get('ctaLink') as string,
+      introHeading: formData.get('introHeading') as string,
+      introText: formData.get('introText') as string,
       sectionHeading: formData.get('sectionHeading') as string,
       sectionText: formData.get('sectionText') as string
     }
@@ -355,6 +359,34 @@ export default function ResortsEditPage() {
                       placeholder="Enter CTA button link"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Intro Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    name="introHeading"
+                    defaultValue={pageData.introHeading}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter intro section heading"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-dark mb-2">
+                    Intro Section Text
+                  </label>
+                  <textarea
+                    name="introText"
+                    rows={4}
+                    defaultValue={pageData.introText}
+                    className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Enter intro section text"
+                    required
+                  />
                 </div>
 
                 <div>

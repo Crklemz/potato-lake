@@ -49,6 +49,8 @@ export async function PUT(request: NextRequest) {
       heroImageUrl, 
       ctaText, 
       ctaLink, 
+      introHeading,
+      introText,
       sectionHeading, 
       sectionText 
     } = body
@@ -64,6 +66,8 @@ export async function PUT(request: NextRequest) {
           heroImageUrl: heroImageUrl || null,
           ctaText: ctaText || 'Book Your Stay',
           ctaLink: ctaLink || '/contact',
+          introHeading: introHeading || 'Welcome to Our Resorts',
+          introText: introText || 'Discover the perfect accommodations for your Potato Lake getaway. Our resorts offer comfortable lodging, beautiful lake views, and easy access to all the activities that make Potato Lake special.',
           sectionHeading: sectionHeading || 'Resorts on Potato Lake',
           sectionText: sectionText || 'Potato Lake offers a variety of resorts and accommodations to suit every visitor\'s needs.'
         }
@@ -78,6 +82,8 @@ export async function PUT(request: NextRequest) {
           heroImageUrl,
           ctaText,
           ctaLink,
+          introHeading,
+          introText,
           sectionHeading,
           sectionText
         }
