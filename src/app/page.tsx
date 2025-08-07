@@ -186,10 +186,10 @@ function HomePageContent() {
               </p>
             )}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <a href="/resorts" className="bg-accent text-primary px-10 py-4 rounded-full font-semibold hover:bg-white hover:text-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+              <a href="/resorts" className="inline-block bg-white text-primary px-8 py-3 rounded-lg font-semibold text-lg hover:bg-neutral-light transition-colors shadow-lg">
                 Explore Resorts
               </a>
-              <a href="/fishing" className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-full font-semibold hover:bg-white hover:text-primary transition-all duration-300 transform hover:scale-105">
+              <a href="/fishing" className="inline-block bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-white hover:text-primary transition-colors">
                 Fishing Info
               </a>
             </div>
@@ -387,20 +387,18 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* Membership Call to Action */}
-      <section className="py-24 bg-gradient-to-r from-primary to-accent text-white relative">
-        {/* Dark overlay for better contrast */}
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold mb-6">
+            {/* Membership Call to Action */}
+      <section className="py-16 bg-gradient-to-br from-primary to-accent">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
               {homePage.membershipHeading || 'Join Our Association'}
             </h2>
-            <p className="text-lg mb-8 leading-relaxed">
+            <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-2xl mx-auto">
               {homePage.membershipText || 'Become a member to support lake preservation and get access to exclusive events and resources.'}
             </p>
             <div className="flex flex-col items-center gap-4">
-              <a href="/contact" className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-neutral-light transition-colors">
+              <a href="/contact" className="inline-block bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-neutral-light transition-colors">
                 {homePage.membershipButtonText || 'Join Now'}
               </a>
               <a href="/association" className="text-white/90 hover:text-white underline text-sm font-medium transition-colors">
