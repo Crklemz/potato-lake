@@ -155,6 +155,11 @@ export interface DnrPage {
   dnrBoatingCardCtaUrl: string | null
   regulationsHeading: string | null
   regulationsSubheading: string | null
+  mapHeading: string | null
+  mapCaption: string | null
+  mapEmbedUrl: string | null
+  mapExternalLinkText: string | null
+  mapExternalLinkUrl: string | null
   updatedAt: Date
 }
 

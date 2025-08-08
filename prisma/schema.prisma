@@ -145,6 +145,11 @@ model DnrPage {
   dnrBoatingCardCtaUrl String? @default("https://dnr.wisconsin.gov/topic/Boat")
   regulationsHeading String? @default("Fishing & Boating Regulations")
   regulationsSubheading String? @default("Stay safe and informed with key rules for enjoying Potato Lake. These summaries highlight important DNR guidelines for fishing and boating.")
+  mapHeading String? @default("Potato Lake Map")
+  mapCaption String? @default("View access points, water depth, and aquatic vegetation zones.")
+  mapEmbedUrl String?
+  mapExternalLinkText String? @default("View Full Bathymetric Map")
+  mapExternalLinkUrl String?
   updatedAt DateTime @updatedAt
 }
 

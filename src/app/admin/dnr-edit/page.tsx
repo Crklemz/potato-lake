@@ -28,6 +28,11 @@ interface DnrPageData {
   dnrBoatingCardCtaUrl: string | null
   regulationsHeading: string | null
   regulationsSubheading: string | null
+  mapHeading: string | null
+  mapCaption: string | null
+  mapEmbedUrl: string | null
+  mapExternalLinkText: string | null
+  mapExternalLinkUrl: string | null
 }
 
 export default function DnrEditPage() {
@@ -124,7 +129,12 @@ export default function DnrEditPage() {
       dnrBoatingCardCtaText: formData.get('dnrBoatingCardCtaText') as string,
       dnrBoatingCardCtaUrl: formData.get('dnrBoatingCardCtaUrl') as string,
       regulationsHeading: formData.get('regulationsHeading') as string,
-      regulationsSubheading: formData.get('regulationsSubheading') as string
+      regulationsSubheading: formData.get('regulationsSubheading') as string,
+      mapHeading: formData.get('mapHeading') as string,
+      mapCaption: formData.get('mapCaption') as string,
+      mapEmbedUrl: formData.get('mapEmbedUrl') as string,
+      mapExternalLinkText: formData.get('mapExternalLinkText') as string,
+      mapExternalLinkUrl: formData.get('mapExternalLinkUrl') as string
     }
 
     try {
@@ -287,6 +297,80 @@ export default function DnrEditPage() {
                       </a>
                     </div>
                   )}
+                </div>
+
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold mb-4 text-neutral-dark">Lake Map Section</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Map Section Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="mapHeading"
+                        defaultValue={dnrData?.mapHeading || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter map section heading (e.g., 'Potato Lake Map')"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Map Caption
+                      </label>
+                      <textarea
+                        name="mapCaption"
+                        rows={3}
+                        defaultValue={dnrData?.mapCaption || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter map caption (e.g., 'View access points, water depth, and aquatic vegetation zones.')"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Map Embed URL
+                      </label>
+                      <input
+                        type="url"
+                        name="mapEmbedUrl"
+                        defaultValue={dnrData?.mapEmbedUrl || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter iframe embed URL for interactive map"
+                      />
+                      <p className="text-xs text-neutral-dark mt-1">
+                        This should be an iframe src URL for embedding interactive maps
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        External Link Text
+                      </label>
+                      <input
+                        type="text"
+                        name="mapExternalLinkText"
+                        defaultValue={dnrData?.mapExternalLinkText || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter external link button text (e.g., 'View Full Bathymetric Map')"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        External Link URL
+                      </label>
+                      <input
+                        type="url"
+                        name="mapExternalLinkUrl"
+                        defaultValue={dnrData?.mapExternalLinkUrl || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter external link URL"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="border-t pt-6">

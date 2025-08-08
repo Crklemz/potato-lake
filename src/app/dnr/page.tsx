@@ -18,7 +18,12 @@ async function getDnrData() {
           dnrStewardshipHeading: 'Wisconsin DNR & Lake Stewardship',
           dnrStewardshipText: 'The Wisconsin Department of Natural Resources works in partnership with local organizations like the Potato Lake Association to protect lake health and encourage responsible use. These efforts include water quality monitoring, shoreline protection, aquatic habitat restoration, and invasive species prevention.',
           dnrStewardshipCtaText: 'Visit Wisconsin Lakes Partnership',
-          dnrStewardshipCtaUrl: 'https://www.uwsp.edu/cnr-ap/UWEXLakes/Pages/partnership.aspx'
+          dnrStewardshipCtaUrl: 'https://www.uwsp.edu/cnr-ap/UWEXLakes/Pages/partnership.aspx',
+          mapHeading: 'Potato Lake Map',
+          mapCaption: 'View access points, water depth, and aquatic vegetation zones.',
+          mapEmbedUrl: null,
+          mapExternalLinkText: 'View Full Bathymetric Map',
+          mapExternalLinkUrl: null
         }
       })
       return {
@@ -174,32 +179,64 @@ function DnrPageContent({ dnrPage }: { dnrPage: DnrPage }) {
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-
-          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h3 className="text-2xl font-semibold mb-4 text-primary">Lake Map</h3>
-            {dnrPage.mapUrl ? (
-              <div className="mb-4">
-                <div className="w-full h-64 relative rounded-lg">
-                  <Image 
-                    src={dnrPage.mapUrl} 
-                    alt="Potato Lake Map"
-                    fill
-                    className="object-cover rounded-lg"
+      {/* Lake Map Section */}
+      {dnrPage.mapHeading && (
+        <section className="bg-white py-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="space-y-6 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                {dnrPage.mapHeading}
+              </h2>
+              {dnrPage.mapCaption && (
+                <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                  {dnrPage.mapCaption}
+                </p>
+              )}
+              
+              {dnrPage.mapEmbedUrl ? (
+                <div className="w-full aspect-video rounded-md overflow-hidden shadow-lg">
+                  <iframe
+                    src={dnrPage.mapEmbedUrl}
+                    className="w-full h-full border-0"
+                    title="Potato Lake Interactive Map"
+                    allowFullScreen
                   />
                 </div>
-              </div>
-            ) : (
-              <div className="h-64 bg-accent flex items-center justify-center rounded-lg">
-                <span className="text-primary font-semibold">Interactive Lake Map</span>
-              </div>
-            )}
-            <p className="text-neutral-dark mt-4">
-              View detailed information about Potato Lake including depth contours, 
-              access points, and important landmarks.
-            </p>
+              ) : (
+                <div className="w-full aspect-video bg-neutral-light rounded-md flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-muted-foreground text-lg font-semibold">
+                      Interactive Lake Map
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Map embed URL will be displayed here
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {dnrPage.mapExternalLinkText && dnrPage.mapExternalLinkUrl && (
+                <div className="pt-4">
+                  <a
+                    href={dnrPage.mapExternalLinkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-accent hover:text-primary transition-colors shadow-md"
+                  >
+                    {dnrPage.mapExternalLinkText}
+                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
+        </section>
+      )}
+
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
 
           <div className="bg-white rounded-lg shadow-md p-8">
             <h3 className="text-2xl font-semibold mb-4 text-primary">Important Links</h3>

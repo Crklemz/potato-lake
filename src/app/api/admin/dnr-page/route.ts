@@ -24,7 +24,12 @@ export async function GET() {
           dnrStewardshipHeading: 'Wisconsin DNR & Lake Stewardship',
           dnrStewardshipText: 'The Wisconsin Department of Natural Resources works in partnership with local organizations like the Potato Lake Association to protect lake health and encourage responsible use. These efforts include water quality monitoring, shoreline protection, aquatic habitat restoration, and invasive species prevention.',
           dnrStewardshipCtaText: 'Visit Wisconsin Lakes Partnership',
-          dnrStewardshipCtaUrl: 'https://www.uwsp.edu/cnr-ap/UWEXLakes/Pages/partnership.aspx'
+          dnrStewardshipCtaUrl: 'https://www.uwsp.edu/cnr-ap/UWEXLakes/Pages/partnership.aspx',
+          mapHeading: 'Potato Lake Map',
+          mapCaption: 'View access points, water depth, and aquatic vegetation zones.',
+          mapEmbedUrl: null,
+          mapExternalLinkText: 'View Full Bathymetric Map',
+          mapExternalLinkUrl: null
         }
       })
       return NextResponse.json(defaultDnrPage)
@@ -67,7 +72,12 @@ export async function PUT(request: NextRequest) {
       dnrBoatingCardCtaText,
       dnrBoatingCardCtaUrl,
       regulationsHeading,
-      regulationsSubheading
+      regulationsSubheading,
+      mapHeading,
+      mapCaption,
+      mapEmbedUrl,
+      mapExternalLinkText,
+      mapExternalLinkUrl
     } = body
 
     const dnrPage = await prisma.dnrPage.findFirst()
@@ -98,7 +108,12 @@ export async function PUT(request: NextRequest) {
         dnrBoatingCardCtaText,
         dnrBoatingCardCtaUrl,
         regulationsHeading,
-        regulationsSubheading
+        regulationsSubheading,
+        mapHeading,
+        mapCaption,
+        mapEmbedUrl,
+        mapExternalLinkText,
+        mapExternalLinkUrl
       }
     })
 
