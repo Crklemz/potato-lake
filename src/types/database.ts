@@ -243,4 +243,14 @@ export interface CommunityStory {
   isApproved: boolean
   createdAt: Date
   updatedAt: Date
+}
+
+export interface DnrResource {
+  id: number
+  title: string
+  description: string
+  fileUrl: string
+  order: number
+  createdAt: Date
+  updatedAt: Date
 } 

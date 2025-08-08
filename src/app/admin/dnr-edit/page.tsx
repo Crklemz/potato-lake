@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AdminHeader from '@/components/AdminHeader'
 import FileUpload from '@/components/FileUpload'
+import type { DnrResource } from '@/types/database'
 
 interface DnrPageData {
   id: number
@@ -61,12 +62,21 @@ export default function DnrEditPage() {
   const [newBoatingItem, setNewBoatingItem] = useState('')
   const [newInvasiveItem, setNewInvasiveItem] = useState('')
   const [newMonitoringItem, setNewMonitoringItem] = useState('')
+  const [resources, setResources] = useState<DnrResource[]>([])
+  const [editingResourceId, setEditingResourceId] = useState<number | null>(null)
+  const [resourceFormData, setResourceFormData] = useState({
+    title: '',
+    description: '',
+    fileUrl: '',
+    order: 0
+  })
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin/login')
     } else if (status === 'authenticated') {
       fetchDnrData()
+      fetchResources()
     }
   }, [status, router])
 
@@ -87,6 +97,20 @@ export default function DnrEditPage() {
       console.error('Error fetching DNR page data:', err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchResources = async () => {
+    try {
+      const response = await fetch('/api/admin/dnr-resources')
+      if (response.ok) {
+        const data = await response.json()
+        setResources(data)
+      } else {
+        console.error('Failed to fetch resources')
+      }
+    } catch (error) {
+      console.error('Error fetching resources:', error)
     }
   }
 
@@ -152,6 +176,69 @@ export default function DnrEditPage() {
 
   const removeMonitoringItem = (index: number) => {
     setMonitoringItems(monitoringItems.filter((_, i) => i !== index))
+  }
+
+  const handleResourceSubmit = async () => {
+    try {
+      const url = editingResourceId 
+        ? `/api/admin/dnr-resources/${editingResourceId}`
+        : '/api/admin/dnr-resources'
+      
+      const method = editingResourceId ? 'PUT' : 'POST'
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(resourceFormData)
+      })
+
+      if (response.ok) {
+        setResourceFormData({ title: '', description: '', fileUrl: '', order: 0 })
+        setEditingResourceId(null)
+        await fetchResources()
+        setSuccess('Resource saved successfully!')
+      } else {
+        setError('Failed to save resource')
+      }
+    } catch (error) {
+      setError('Error saving resource: ' + error)
+      console.error('Error saving resource:', error)
+    }
+  }
+
+  const handleEditResource = (resource: DnrResource) => {
+    setEditingResourceId(resource.id)
+    setResourceFormData({
+      title: resource.title,
+      description: resource.description,
+      fileUrl: resource.fileUrl,
+      order: resource.order
+    })
+  }
+
+  const handleDeleteResource = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this resource?')) return
+
+    try {
+      const response = await fetch(`/api/admin/dnr-resources/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        await fetchResources()
+        setSuccess('Resource deleted successfully!')
+      } else {
+        setError('Failed to delete resource')
+      }
+    } catch (error) {
+      setError('Error deleting resource: ' + error)
+      console.error('Error deleting resource:', error)
+    }
+  }
+
+  const handleCancelResource = () => {
+    setEditingResourceId(null)
+    setResourceFormData({ title: '', description: '', fileUrl: '', order: 0 })
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -923,6 +1010,131 @@ export default function DnrEditPage() {
                         If no image is provided, a default icon will be displayed
                       </p>
                     </div>
+                  </div>
+                </div>
+
+                {/* Educational Materials & Downloads Section */}
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold mb-4 text-neutral-dark">Educational Materials & Downloads</h3>
+                  
+                  <div className="bg-neutral-light rounded-lg p-6 mb-6">
+                    <h4 className="text-md font-semibold mb-4 text-neutral-dark">
+                      {editingResourceId ? 'Edit Resource' : 'Add New Resource'}
+                    </h4>
+                    
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-dark mb-2">
+                            Resource Title *
+                          </label>
+                          <input
+                            type="text"
+                            value={resourceFormData.title}
+                            onChange={(e) => setResourceFormData({ ...resourceFormData, title: e.target.value })}
+                            className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-dark mb-2">
+                            Display Order
+                          </label>
+                          <input
+                            type="number"
+                            value={resourceFormData.order}
+                            onChange={(e) => setResourceFormData({ ...resourceFormData, order: parseInt(e.target.value) || 0 })}
+                            className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          Description *
+                        </label>
+                        <textarea
+                          value={resourceFormData.description}
+                          onChange={(e) => setResourceFormData({ ...resourceFormData, description: e.target.value })}
+                          className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                          rows={3}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          File URL *
+                        </label>
+                        <input
+                          type="url"
+                          value={resourceFormData.fileUrl}
+                          onChange={(e) => setResourceFormData({ ...resourceFormData, fileUrl: e.target.value })}
+                          className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                          placeholder="https://example.com/document.pdf"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="flex gap-4">
+                        <button
+                          type="button"
+                          onClick={handleResourceSubmit}
+                          className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-accent hover:text-primary transition-colors"
+                        >
+                          {editingResourceId ? 'Update Resource' : 'Add Resource'}
+                        </button>
+                        {editingResourceId && (
+                          <button
+                            type="button"
+                            onClick={handleCancelResource}
+                            className="px-4 py-2 bg-neutral-dark text-white font-semibold rounded-md hover:bg-neutral-light transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Current Resources List */}
+                  <div className="bg-white rounded-lg shadow-md p-6">
+                    <h4 className="text-md font-semibold mb-4 text-neutral-dark">Current Resources</h4>
+                    {resources.length === 0 ? (
+                      <p className="text-neutral-dark">No resources available. Add your first resource above.</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {resources.map((resource) => (
+                          <div key={resource.id} className="border border-neutral-light rounded-md p-4">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <h5 className="font-semibold text-neutral-dark">{resource.title}</h5>
+                                <p className="text-sm text-neutral-dark mt-1">{resource.description}</p>
+                                <p className="text-xs text-neutral-dark mt-1">
+                                  Order: {resource.order} | File: {resource.fileUrl}
+                                </p>
+                              </div>
+                              <div className="flex gap-2 ml-4">
+                                <button
+                                  onClick={() => handleEditResource(resource)}
+                                  className="px-3 py-1 bg-primary text-white text-sm rounded hover:bg-accent hover:text-primary transition-colors"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteResource(resource.id)}
+                                  className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 

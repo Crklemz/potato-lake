@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import type { DnrPage } from '@/types/database'
+import type { DnrPage, DnrResource } from '@/types/database'
 
 async function getDnrData() {
   try {
@@ -76,7 +76,19 @@ async function getDnrData() {
   }
 }
 
-function DnrPageContent({ dnrPage }: { dnrPage: DnrPage }) {
+async function getDnrResources() {
+  try {
+    const resources = await prisma.dnrResource.findMany({
+      orderBy: { order: 'asc' }
+    })
+    return resources
+  } catch (error) {
+    console.error('Error fetching DNR resources:', error)
+    return []
+  }
+}
+
+function DnrPageContent({ dnrPage, resources }: { dnrPage: DnrPage; resources: DnrResource[] }) {
   return (
     <div className="min-h-screen bg-neutral-light">
       {/* Hero Section */}
@@ -392,6 +404,59 @@ function DnrPageContent({ dnrPage }: { dnrPage: DnrPage }) {
         </section>
       )}
 
+      {/* Educational Materials & Downloads Section */}
+      <section className="bg-neutral-light py-16">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Educational Materials & Downloads
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Access helpful resources and educational materials about lake stewardship, fishing regulations, and environmental protection.
+            </p>
+          </div>
+
+          {resources && resources.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {resources.map((resource) => (
+                <div key={resource.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow flex flex-col h-full">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-foreground">{resource.title}</h3>
+                    <svg className="w-6 h-6 text-red-500 flex-shrink-0 ml-2" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                  </div>
+                  <p className="text-muted-foreground mb-4 flex-grow">{resource.description}</p>
+                  <div className="mt-auto">
+                    <a
+                      href={resource.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-accent hover:text-primary transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                      </svg>
+                      Download PDF
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="bg-white rounded-lg shadow-md p-8 max-w-md mx-auto">
+                <svg className="w-16 h-16 text-muted-foreground mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                <h3 className="text-lg font-semibold text-foreground mb-2">No Materials Available</h3>
+                <p className="text-muted-foreground">No educational materials are available at this time. Check back soon for new resources.</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
 
@@ -471,11 +536,14 @@ function LoadingDnrPage() {
 
 export default async function DnrPage() {
   try {
-    const dnrPage = await getDnrData()
+    const [dnrPage, resources] = await Promise.all([
+      getDnrData(),
+      getDnrResources()
+    ])
     
     return (
       <Suspense fallback={<LoadingDnrPage />}>
-        <DnrPageContent dnrPage={dnrPage} />
+        <DnrPageContent dnrPage={dnrPage} resources={resources} />
       </Suspense>
     )
   } catch (error) {
