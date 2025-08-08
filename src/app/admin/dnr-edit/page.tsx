@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AdminHeader from '@/components/AdminHeader'
 import FileUpload from '@/components/FileUpload'
-import type { DnrResource } from '@/types/database'
+import type { DnrResource, DnrLink } from '@/types/database'
 
 interface DnrPageData {
   id: number
@@ -70,6 +70,14 @@ export default function DnrEditPage() {
     fileUrl: '',
     order: 0
   })
+  const [links, setLinks] = useState<DnrLink[]>([])
+  const [editingLinkId, setEditingLinkId] = useState<number | null>(null)
+  const [linkFormData, setLinkFormData] = useState({
+    title: '',
+    url: '',
+    description: '',
+    order: 0
+  })
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -77,6 +85,7 @@ export default function DnrEditPage() {
     } else if (status === 'authenticated') {
       fetchDnrData()
       fetchResources()
+      fetchLinks()
     }
   }, [status, router])
 
@@ -111,6 +120,20 @@ export default function DnrEditPage() {
       }
     } catch (error) {
       console.error('Error fetching resources:', error)
+    }
+  }
+
+  const fetchLinks = async () => {
+    try {
+      const response = await fetch('/api/admin/dnr-links')
+      if (response.ok) {
+        const data = await response.json()
+        setLinks(data)
+      } else {
+        console.error('Failed to fetch links')
+      }
+    } catch (error) {
+      console.error('Error fetching links:', error)
     }
   }
 
@@ -239,6 +262,100 @@ export default function DnrEditPage() {
   const handleCancelResource = () => {
     setEditingResourceId(null)
     setResourceFormData({ title: '', description: '', fileUrl: '', order: 0 })
+  }
+
+  const handleLinkSubmit = async () => {
+    try {
+      const url = editingLinkId ? `/api/admin/dnr-links/${editingLinkId}` : '/api/admin/dnr-links'
+      const method = editingLinkId ? 'PUT' : 'POST'
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(linkFormData)
+      })
+
+      if (response.ok) {
+        await fetchLinks()
+        setEditingLinkId(null)
+        setLinkFormData({ title: '', url: '', description: '', order: 0 })
+      } else {
+        console.error('Failed to save link')
+      }
+    } catch (error) {
+      console.error('Error saving link:', error)
+    }
+  }
+
+  const handleEditLink = (link: DnrLink) => {
+    setEditingLinkId(link.id)
+    setLinkFormData({
+      title: link.title,
+      url: link.url,
+      description: link.description || '',
+      order: link.order
+    })
+  }
+
+  const handleDeleteLink = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this link?')) return
+
+    try {
+      const response = await fetch(`/api/admin/dnr-links/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        await fetchLinks()
+      } else {
+        console.error('Failed to delete link')
+      }
+    } catch (error) {
+      console.error('Error deleting link:', error)
+    }
+  }
+
+  const handleCancelLink = () => {
+    setEditingLinkId(null)
+    setLinkFormData({ title: '', url: '', description: '', order: 0 })
+  }
+
+  const handleReorderLinks = async (links: DnrLink[]) => {
+    try {
+      const response = await fetch('/api/admin/dnr-links/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ links })
+      })
+
+      if (response.ok) {
+        await fetchLinks()
+      } else {
+        console.error('Failed to reorder links')
+      }
+    } catch (error) {
+      console.error('Error reordering links:', error)
+    }
+  }
+
+  const moveLinkUp = (index: number) => {
+    if (index === 0) return
+    const newLinks = [...links]
+    const temp = newLinks[index]
+    newLinks[index] = newLinks[index - 1]
+    newLinks[index - 1] = temp
+    setLinks(newLinks)
+    handleReorderLinks(newLinks)
+  }
+
+  const moveLinkDown = (index: number) => {
+    if (index === links.length - 1) return
+    const newLinks = [...links]
+    const temp = newLinks[index]
+    newLinks[index] = newLinks[index + 1]
+    newLinks[index + 1] = temp
+    setLinks(newLinks)
+    handleReorderLinks(newLinks)
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -1125,6 +1242,133 @@ export default function DnrEditPage() {
                                 </button>
                                 <button
                                   onClick={() => handleDeleteResource(resource.id)}
+                                  className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* DNR Links Management */}
+                <div className="bg-neutral-light rounded-lg p-6 mb-6">
+                  <h3 className="text-lg font-semibold mb-4 text-neutral-dark">DNR Links Management</h3>
+                  
+                  {/* Add New Link Form */}
+                  <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h4 className="text-md font-semibold mb-4 text-neutral-dark">
+                      {editingLinkId ? 'Edit Link' : 'Add New Link'}
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          Title *
+                        </label>
+                        <input
+                          type="text"
+                          value={linkFormData.title}
+                          onChange={(e) => setLinkFormData({ ...linkFormData, title: e.target.value })}
+                          className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                          placeholder="Link title"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          URL *
+                        </label>
+                        <input
+                          type="url"
+                          value={linkFormData.url}
+                          onChange={(e) => setLinkFormData({ ...linkFormData, url: e.target.value })}
+                          className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                          placeholder="https://example.com"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-neutral-dark mb-2">
+                          Description
+                        </label>
+                        <textarea
+                          value={linkFormData.description}
+                          onChange={(e) => setLinkFormData({ ...linkFormData, description: e.target.value })}
+                          className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                          rows={3}
+                          placeholder="Optional description"
+                        />
+                      </div>
+                      
+                      <div className="flex gap-4">
+                        <button
+                          type="button"
+                          onClick={handleLinkSubmit}
+                          className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-accent hover:text-primary transition-colors"
+                        >
+                          {editingLinkId ? 'Update Link' : 'Add Link'}
+                        </button>
+                        {editingLinkId && (
+                          <button
+                            type="button"
+                            onClick={handleCancelLink}
+                            className="px-4 py-2 bg-neutral-dark text-white font-semibold rounded-md hover:bg-neutral-light transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Current Links List */}
+                  <div className="bg-white rounded-lg shadow-md p-6">
+                    <h4 className="text-md font-semibold mb-4 text-neutral-dark">Current Links</h4>
+                    {links.length === 0 ? (
+                      <p className="text-neutral-dark">No links available. Add your first link above.</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {links.map((link, index) => (
+                          <div key={link.id} className="border border-neutral-light rounded-md p-4">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <h5 className="font-semibold text-neutral-dark">{link.title}</h5>
+                                <p className="text-sm text-neutral-dark mt-1">{link.description}</p>
+                                <p className="text-xs text-neutral-dark mt-1">
+                                  Order: {link.order} | URL: {link.url}
+                                </p>
+                              </div>
+                              <div className="flex gap-2 ml-4">
+                                <button
+                                  onClick={() => moveLinkUp(index)}
+                                  disabled={index === 0}
+                                  className="px-2 py-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                                  title="Move Up"
+                                >
+                                  ↑
+                                </button>
+                                <button
+                                  onClick={() => moveLinkDown(index)}
+                                  disabled={index === links.length - 1}
+                                  className="px-2 py-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                                  title="Move Down"
+                                >
+                                  ↓
+                                </button>
+                                <button
+                                  onClick={() => handleEditLink(link)}
+                                  className="px-3 py-1 bg-primary text-white text-sm rounded hover:bg-accent hover:text-primary transition-colors"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteLink(link.id)}
                                   className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
                                 >
                                   Delete

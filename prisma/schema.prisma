@@ -307,3 +307,13 @@ model DnrResource {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model DnrLink {
+  id          Int      @id @default(autoincrement())
+  title       String
+  url         String
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

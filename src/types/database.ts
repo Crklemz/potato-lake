@@ -253,4 +253,14 @@ export interface DnrResource {
   order: number
   createdAt: Date
   updatedAt: Date
+}
+
+export interface DnrLink {
+  id: number
+  title: string
+  url: string
+  description: string | null
+  order: number
+  createdAt: Date
+  updatedAt: Date
 } 

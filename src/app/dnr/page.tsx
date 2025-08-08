@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import type { DnrPage, DnrResource } from '@/types/database'
+import type { DnrPage, DnrResource, DnrLink } from '@/types/database'
 
 async function getDnrData() {
   try {
@@ -88,7 +88,19 @@ async function getDnrResources() {
   }
 }
 
-function DnrPageContent({ dnrPage, resources }: { dnrPage: DnrPage; resources: DnrResource[] }) {
+async function getDnrLinks() {
+  try {
+    const links = await prisma.dnrLink.findMany({
+      orderBy: { order: 'asc' }
+    })
+    return links
+  } catch (error) {
+    console.error('Error fetching DNR links:', error)
+    return []
+  }
+}
+
+function DnrPageContent({ dnrPage, resources, links }: { dnrPage: DnrPage; resources: DnrResource[]; links: DnrLink[] }) {
   return (
     <div className="min-h-screen bg-neutral-light">
       {/* Hero Section */}
@@ -457,28 +469,54 @@ function DnrPageContent({ dnrPage, resources }: { dnrPage: DnrPage; resources: D
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
+      {/* DNR Link Bank Section */}
+      {links && links.length > 0 && (
+        <section className="bg-white py-16">
+          <div className="max-w-4xl mx-auto px-4 md:px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Quick Links to Wisconsin DNR Resources
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Access official Wisconsin DNR information, regulations, and resources to help you enjoy Potato Lake responsibly.
+              </p>
+            </div>
 
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h3 className="text-2xl font-semibold mb-4 text-primary">Important Links</h3>
             <div className="space-y-4">
-              <a href="https://www.dnr.state.mn.us/" target="_blank" rel="noopener noreferrer" className="block text-accent hover:text-primary font-semibold">
-                Minnesota DNR Website →
-              </a>
-              <a href="https://www.dnr.state.mn.us/fishing/index.html" target="_blank" rel="noopener noreferrer" className="block text-accent hover:text-primary font-semibold">
-                Fishing Regulations →
-              </a>
-              <a href="https://www.dnr.state.mn.us/boating/index.html" target="_blank" rel="noopener noreferrer" className="block text-accent hover:text-primary font-semibold">
-                Boating Safety Information →
-              </a>
-              <a href="https://www.dnr.state.mn.us/invasives/index.html" target="_blank" rel="noopener noreferrer" className="block text-accent hover:text-primary font-semibold">
-                Invasive Species Information →
-              </a>
+              {links.map((link) => (
+                <div key={link.id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block group"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-primary group-hover:text-accent transition-colors">
+                          {link.title}
+                        </h3>
+                        {link.description && (
+                          <p className="text-muted-foreground mt-1 leading-relaxed">
+                            {link.description}
+                          </p>
+                        )}
+                      </div>
+                      <div className="ml-4 flex-shrink-0">
+                        <svg className="w-5 h-5 text-primary group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+      )}
+
+
     </div>
   )
 }
@@ -536,14 +574,15 @@ function LoadingDnrPage() {
 
 export default async function DnrPage() {
   try {
-    const [dnrPage, resources] = await Promise.all([
+    const [dnrPage, resources, links] = await Promise.all([
       getDnrData(),
-      getDnrResources()
+      getDnrResources(),
+      getDnrLinks()
     ])
     
     return (
       <Suspense fallback={<LoadingDnrPage />}>
-        <DnrPageContent dnrPage={dnrPage} resources={resources} />
+        <DnrPageContent dnrPage={dnrPage} resources={resources} links={links} />
       </Suspense>
     )
   } catch (error) {
