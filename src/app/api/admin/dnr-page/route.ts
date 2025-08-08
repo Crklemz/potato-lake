@@ -82,7 +82,13 @@ export async function PUT(request: NextRequest) {
       invasiveBody,
       invasiveTips,
       reportSightingUrl,
-      invasiveInfoUrl
+      invasiveInfoUrl,
+      monitoringHeading,
+      monitoringText,
+      monitoringPrograms,
+      monitoringCtaText,
+      monitoringCtaUrl,
+      monitoringImageUrl
     } = body
 
     const dnrPage = await prisma.dnrPage.findFirst()
@@ -123,7 +129,13 @@ export async function PUT(request: NextRequest) {
         invasiveBody,
         invasiveTips,
         reportSightingUrl,
-        invasiveInfoUrl
+        invasiveInfoUrl,
+        monitoringHeading,
+        monitoringText,
+        monitoringPrograms,
+        monitoringCtaText,
+        monitoringCtaUrl,
+        monitoringImageUrl
       }
     })
 

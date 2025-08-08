@@ -165,6 +165,12 @@ export interface DnrPage {
   invasiveTips: string[] | null
   reportSightingUrl: string | null
   invasiveInfoUrl: string | null
+  monitoringHeading: string | null
+  monitoringText: string | null
+  monitoringPrograms: string[] | null
+  monitoringCtaText: string | null
+  monitoringCtaUrl: string | null
+  monitoringImageUrl: string | null
   updatedAt: Date
 }
 

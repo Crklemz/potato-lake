@@ -155,6 +155,12 @@ model DnrPage {
   invasiveTips Json? @default("[\"Inspect boats and trailers before entering or leaving the lake\", \"Remove all aquatic plants and animals\", \"Drain water from equipment and live wells\", \"Do not release bait into the lake\", \"Report any suspicious plants or animals\"]")
   reportSightingUrl String? @default("https://dnr.wisconsin.gov/topic/Invasives/report.html")
   invasiveInfoUrl String? @default("https://dnr.wisconsin.gov/topic/Invasives/")
+  monitoringHeading String? @default("Get Involved in Lake Monitoring")
+  monitoringText String? @default("Support the health of Potato Lake by participating in citizen science programs coordinated through the Wisconsin DNR. Volunteers help monitor water clarity, track invasive species, and gather valuable seasonal data like ice-out dates. No experience needed — just a love for the lake!")
+  monitoringPrograms Json? @default("[\"Water clarity readings\", \"Aquatic plant surveys\", \"Ice-out tracking\"]")
+  monitoringCtaText String? @default("Sign Up to Volunteer")
+  monitoringCtaUrl String?
+  monitoringImageUrl String?
   updatedAt DateTime @updatedAt
 }
 

@@ -23,7 +23,13 @@ async function getDnrData() {
           mapCaption: 'View access points, water depth, and aquatic vegetation zones.',
           mapEmbedUrl: null,
           mapExternalLinkText: 'View Full Bathymetric Map',
-          mapExternalLinkUrl: null
+          mapExternalLinkUrl: null,
+          monitoringHeading: 'Get Involved in Lake Monitoring',
+          monitoringText: 'Support the health of Potato Lake by participating in citizen science programs coordinated through the Wisconsin DNR. Volunteers help monitor water clarity, track invasive species, and gather valuable seasonal data like ice-out dates. No experience needed — just a love for the lake!',
+          monitoringPrograms: ['Water clarity readings', 'Aquatic plant surveys', 'Ice-out tracking'],
+          monitoringCtaText: 'Sign Up to Volunteer',
+          monitoringCtaUrl: null,
+          monitoringImageUrl: null
         }
       })
       return {
@@ -36,10 +42,11 @@ async function getDnrData() {
     
     return {
       ...dnrPage,
-      dnrFishingCardItems: dnrPage.dnrFishingCardItems as string[],
-      dnrBoatingCardItems: dnrPage.dnrBoatingCardItems as string[],
-      invasiveTips: dnrPage.invasiveTips as string[]
-    }
+      dnrFishingCardItems: Array.isArray(dnrPage.dnrFishingCardItems) ? dnrPage.dnrFishingCardItems : [],
+      dnrBoatingCardItems: Array.isArray(dnrPage.dnrBoatingCardItems) ? dnrPage.dnrBoatingCardItems : [],
+      invasiveTips: Array.isArray(dnrPage.invasiveTips) ? dnrPage.invasiveTips : [],
+      monitoringPrograms: Array.isArray(dnrPage.monitoringPrograms) ? dnrPage.monitoringPrograms : []
+    } as DnrPage
   } catch (error) {
     console.error('Error fetching DNR data:', error)
     throw new Error('Failed to load DNR data')
@@ -293,6 +300,68 @@ function DnrPageContent({ dnrPage }: { dnrPage: DnrPage }) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Monitoring Section */}
+      {dnrPage.monitoringHeading && (
+        <section className="bg-white py-16">
+          <div className="max-w-5xl mx-auto px-4 md:px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              {/* Left Column - Text Content */}
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                  {dnrPage.monitoringHeading}
+                </h2>
+                {dnrPage.monitoringText && (
+                  <p className="text-lg text-muted-foreground">
+                    {dnrPage.monitoringText}
+                  </p>
+                )}
+                
+                {dnrPage.monitoringPrograms && Array.isArray(dnrPage.monitoringPrograms) && dnrPage.monitoringPrograms.length > 0 && (
+                  <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+                    {dnrPage.monitoringPrograms.map((program, index) => (
+                      <li key={index} className="text-base">{program}</li>
+                    ))}
+                  </ul>
+                )}
+                
+                {dnrPage.monitoringCtaText && dnrPage.monitoringCtaUrl && (
+                  <a
+                    href={dnrPage.monitoringCtaUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-accent hover:text-primary transition-colors shadow-md"
+                  >
+                    {dnrPage.monitoringCtaText}
+                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                )}
+              </div>
+
+              {/* Right Column - Image or Icon */}
+              <div className="flex justify-center">
+                {dnrPage.monitoringImageUrl ? (
+                  <Image
+                    src={dnrPage.monitoringImageUrl}
+                    alt="Lake Monitoring"
+                    width={400}
+                    height={300}
+                    className="rounded-md w-full h-auto max-w-md"
+                  />
+                ) : (
+                  <div className="w-full max-w-md h-64 bg-white rounded-md flex items-center justify-center shadow-md">
+                    <svg className="w-24 h-24 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
                 )}
               </div>
             </div>

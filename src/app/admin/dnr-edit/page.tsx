@@ -38,6 +38,12 @@ interface DnrPageData {
   invasiveTips: string[] | null
   reportSightingUrl: string | null
   invasiveInfoUrl: string | null
+  monitoringHeading: string | null
+  monitoringText: string | null
+  monitoringPrograms: string[] | null
+  monitoringCtaText: string | null
+  monitoringCtaUrl: string | null
+  monitoringImageUrl: string | null
 }
 
 export default function DnrEditPage() {
@@ -50,9 +56,11 @@ export default function DnrEditPage() {
   const [fishingItems, setFishingItems] = useState<string[]>([])
   const [boatingItems, setBoatingItems] = useState<string[]>([])
   const [invasiveItems, setInvasiveItems] = useState<string[]>([])
+  const [monitoringItems, setMonitoringItems] = useState<string[]>([])
   const [newFishingItem, setNewFishingItem] = useState('')
   const [newBoatingItem, setNewBoatingItem] = useState('')
   const [newInvasiveItem, setNewInvasiveItem] = useState('')
+  const [newMonitoringItem, setNewMonitoringItem] = useState('')
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -73,6 +81,7 @@ export default function DnrEditPage() {
       setFishingItems(data.dnrFishingCardItems || [])
       setBoatingItems(data.dnrBoatingCardItems || [])
       setInvasiveItems(data.invasiveTips || [])
+      setMonitoringItems(data.monitoringPrograms || [])
     } catch (err) {
       setError('Failed to load DNR page data: ' + err)
       console.error('Error fetching DNR page data:', err)
@@ -89,6 +98,16 @@ export default function DnrEditPage() {
 
   const handleHeroImageError = (error: string) => {
     setError('Hero image upload failed: ' + error)
+  }
+
+  const handleMonitoringImageUpload = (url: string) => {
+    if (dnrData) {
+      setDnrData({ ...dnrData, monitoringImageUrl: url })
+    }
+  }
+
+  const handleMonitoringImageError = (error: string) => {
+    setError('Monitoring image upload failed: ' + error)
   }
 
   const addFishingItem = () => {
@@ -122,6 +141,17 @@ export default function DnrEditPage() {
 
   const removeInvasiveItem = (index: number) => {
     setInvasiveItems(invasiveItems.filter((_, i) => i !== index))
+  }
+
+  const addMonitoringItem = () => {
+    if (newMonitoringItem.trim()) {
+      setMonitoringItems([...monitoringItems, newMonitoringItem.trim()])
+      setNewMonitoringItem('')
+    }
+  }
+
+  const removeMonitoringItem = (index: number) => {
+    setMonitoringItems(monitoringItems.filter((_, i) => i !== index))
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -158,7 +188,13 @@ export default function DnrEditPage() {
       invasiveBody: formData.get('invasiveBody') as string,
       invasiveTips: invasiveItems,
       reportSightingUrl: formData.get('reportSightingUrl') as string,
-      invasiveInfoUrl: formData.get('invasiveInfoUrl') as string
+      invasiveInfoUrl: formData.get('invasiveInfoUrl') as string,
+      monitoringHeading: formData.get('monitoringHeading') as string,
+      monitoringText: formData.get('monitoringText') as string,
+      monitoringPrograms: monitoringItems,
+      monitoringCtaText: formData.get('monitoringCtaText') as string,
+      monitoringCtaUrl: formData.get('monitoringCtaUrl') as string,
+      monitoringImageUrl: dnrData?.monitoringImageUrl || ''
     }
 
     try {
@@ -763,6 +799,129 @@ export default function DnrEditPage() {
                         className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                         placeholder="Enter URL for more invasive species information"
                       />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Monitoring Section */}
+                <div className="bg-neutral-light rounded-lg p-6 mb-6">
+                  <h3 className="text-lg font-semibold text-neutral-dark mb-4">
+                    Lake Monitoring Section
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Section Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="monitoringHeading"
+                        defaultValue={dnrData?.monitoringHeading || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter monitoring section heading"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Section Body Text
+                      </label>
+                      <textarea
+                        name="monitoringText"
+                        rows={4}
+                        defaultValue={dnrData?.monitoringText || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter monitoring section body text"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Monitoring Programs
+                      </label>
+                      <div className="space-y-2">
+                        {monitoringItems.map((item, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <span className="flex-1 px-3 py-2 bg-neutral-light rounded-md text-sm">
+                              {item}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeMonitoringItem(index)}
+                              className="px-2 py-1 text-red-600 hover:text-red-800 text-sm font-medium"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newMonitoringItem}
+                            onChange={(e) => setNewMonitoringItem(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && addMonitoringItem()}
+                            placeholder="Enter new monitoring program"
+                            className="flex-1 px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={addMonitoringItem}
+                            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-accent hover:text-primary transition-colors text-sm font-medium"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-xs text-neutral-dark mt-1">
+                        Add 3-5 monitoring program examples
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        CTA Button Text
+                      </label>
+                      <input
+                        type="text"
+                        name="monitoringCtaText"
+                        defaultValue={dnrData?.monitoringCtaText || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter CTA button text"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        CTA Button URL
+                      </label>
+                      <input
+                        type="url"
+                        name="monitoringCtaUrl"
+                        defaultValue={dnrData?.monitoringCtaUrl || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter URL for monitoring signup"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Monitoring Image (Optional)
+                      </label>
+                      <FileUpload
+                        type="image"
+                        currentUrl={dnrData?.monitoringImageUrl}
+                        onUpload={handleMonitoringImageUpload}
+                        onError={handleMonitoringImageError}
+                        label="Upload Monitoring Image"
+                      />
+                      <input
+                        type="hidden"
+                        name="monitoringImageUrl"
+                        value={dnrData?.monitoringImageUrl || ''}
+                      />
+                      <p className="text-xs text-neutral-dark mt-1">
+                        If no image is provided, a default icon will be displayed
+                      </p>
                     </div>
                   </div>
                 </div>
