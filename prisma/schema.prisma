@@ -171,6 +171,9 @@ model DnrPage {
 model NewsPage {
   id          Int     @id @default(autoincrement())
   mainHeading String
+  heroTitle   String  @default("News & Events")
+  heroSubtitle String?
+  heroImageUrl String?
   events      Event[]
   news        News[]
   updatedAt   DateTime @updatedAt

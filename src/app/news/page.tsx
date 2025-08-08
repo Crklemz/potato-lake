@@ -21,6 +21,9 @@ async function getNewsData() {
       const defaultNewsPage = await prisma.newsPage.create({
         data: {
           mainHeading: 'News & Events',
+          heroTitle: 'News & Events',
+          heroSubtitle: 'Stay connected with the latest happenings around Potato Lake',
+          heroImageUrl: null,
           events: {
             create: [
               {
@@ -67,11 +70,41 @@ function formatDate(date: Date) {
 function NewsPageContent({ newsPage }: { newsPage: NewsPage }) {
   return (
     <div className="min-h-screen bg-neutral-light">
+      {/* Hero Section */}
+      <section className="relative min-h-[33vh] md:min-h-[40vh] w-full">
+        {newsPage.heroImageUrl ? (
+          <div className="absolute inset-0">
+            <Image 
+              src={newsPage.heroImageUrl} 
+              alt="News & Events"
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Dark gradient overlay */}
+            <div className="absolute inset-0 bg-black/40"></div>
+          </div>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent"></div>
+        )}
+        
+        {/* Hero content */}
+        <div className="relative z-10 flex items-center justify-center min-h-[33vh] md:min-h-[40vh] px-4">
+          <div className="text-center text-white max-w-4xl mx-auto">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg">
+              {newsPage.heroTitle}
+            </h1>
+            {newsPage.heroSubtitle && (
+              <p className="text-lg md:text-xl lg:text-2xl mb-6 drop-shadow-lg opacity-90">
+                {newsPage.heroSubtitle}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-center mb-8 text-neutral-dark">
-            {newsPage.mainHeading}
-          </h1>
           
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-primary">
@@ -147,10 +180,21 @@ function NewsPageContent({ newsPage }: { newsPage: NewsPage }) {
 function LoadingNewsPage() {
   return (
     <div className="min-h-screen bg-neutral-light">
+      {/* Hero Section Loading */}
+      <section className="relative min-h-[33vh] md:min-h-[40vh] w-full bg-gradient-to-br from-primary to-accent">
+        <div className="relative z-10 flex items-center justify-center min-h-[33vh] md:min-h-[40vh] px-4">
+          <div className="text-center text-white max-w-4xl mx-auto">
+            <div className="animate-pulse">
+              <div className="h-12 md:h-16 lg:h-20 bg-white/20 rounded mb-4"></div>
+              <div className="h-6 md:h-8 lg:h-10 bg-white/20 rounded w-3/4 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-12 bg-neutral-dark rounded mb-8"></div>
             
             <div className="bg-white rounded-lg shadow-md p-8 mb-8">
               <div className="h-8 bg-primary rounded mb-4"></div>

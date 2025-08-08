@@ -199,6 +199,9 @@ export interface News {
 export interface NewsPage {
   id: number
   mainHeading: string
+  heroTitle: string
+  heroSubtitle: string | null
+  heroImageUrl: string | null
   events: Event[]
   news: News[]
   updatedAt: Date
