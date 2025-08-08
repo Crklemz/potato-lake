@@ -32,21 +32,44 @@ async function getDnrData() {
           monitoringImageUrl: null
         }
       })
-      return {
-        ...defaultDnrPage,
-        dnrFishingCardItems: defaultDnrPage.dnrFishingCardItems as string[],
-        dnrBoatingCardItems: defaultDnrPage.dnrBoatingCardItems as string[],
-        invasiveTips: defaultDnrPage.invasiveTips as string[]
+      // Helper function to safely convert JSON to string array
+      const safeJsonToStringArray = (value: unknown): string[] => {
+        if (!value) return []
+        if (Array.isArray(value)) {
+          return value.filter(item => typeof item === 'string').map(item => item as string)
+        }
+        return []
       }
+
+      const processedDefaultDnrPage = {
+        ...defaultDnrPage,
+        dnrFishingCardItems: safeJsonToStringArray(defaultDnrPage.dnrFishingCardItems),
+        dnrBoatingCardItems: safeJsonToStringArray(defaultDnrPage.dnrBoatingCardItems),
+        invasiveTips: safeJsonToStringArray(defaultDnrPage.invasiveTips),
+        monitoringPrograms: safeJsonToStringArray(defaultDnrPage.monitoringPrograms)
+      }
+
+      return processedDefaultDnrPage as DnrPage
     }
     
-    return {
+    // Helper function to safely convert JSON to string array
+    const safeJsonToStringArray = (value: unknown): string[] => {
+      if (!value) return []
+      if (Array.isArray(value)) {
+        return value.filter(item => typeof item === 'string').map(item => item as string)
+      }
+      return []
+    }
+
+    const processedDnrPage = {
       ...dnrPage,
-      dnrFishingCardItems: Array.isArray(dnrPage.dnrFishingCardItems) ? dnrPage.dnrFishingCardItems : [],
-      dnrBoatingCardItems: Array.isArray(dnrPage.dnrBoatingCardItems) ? dnrPage.dnrBoatingCardItems : [],
-      invasiveTips: Array.isArray(dnrPage.invasiveTips) ? dnrPage.invasiveTips : [],
-      monitoringPrograms: Array.isArray(dnrPage.monitoringPrograms) ? dnrPage.monitoringPrograms : []
-    } as DnrPage
+      dnrFishingCardItems: safeJsonToStringArray(dnrPage.dnrFishingCardItems),
+      dnrBoatingCardItems: safeJsonToStringArray(dnrPage.dnrBoatingCardItems),
+      invasiveTips: safeJsonToStringArray(dnrPage.invasiveTips),
+      monitoringPrograms: safeJsonToStringArray(dnrPage.monitoringPrograms)
+    }
+
+    return processedDnrPage as DnrPage
   } catch (error) {
     console.error('Error fetching DNR data:', error)
     throw new Error('Failed to load DNR data')
