@@ -122,22 +122,14 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-xl font-semibold mb-4 text-primary">News & Events</h3>
               <p className="text-neutral-dark mb-4">
-                Manage news page content and upcoming events.
+                Manage news page content, individual news items, and upcoming events.
               </p>
-              <div className="space-y-2">
-                <button 
-                  onClick={() => router.push('/admin/news-edit')}
-                  className="w-full bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
-                >
-                  Edit News Page
-                </button>
-                <button 
-                  onClick={() => router.push('/admin/events-edit')}
-                  className="w-full bg-accent text-primary px-4 py-2 rounded-md font-semibold hover:bg-primary hover:text-white transition-colors"
-                >
-                  Manage Events
-                </button>
-              </div>
+              <button 
+                onClick={() => router.push('/admin/news-edit')}
+                className="w-full bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-accent hover:text-primary transition-colors"
+              >
+                Manage News & Events
+              </button>
             </div>
 
             {/* Area Services Management */}
