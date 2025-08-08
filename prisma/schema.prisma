@@ -161,6 +161,10 @@ model DnrPage {
   monitoringCtaText String? @default("Sign Up to Volunteer")
   monitoringCtaUrl String?
   monitoringImageUrl String?
+  footerCtaHeading String?
+  footerCtaSubheading String?
+  footerCtaText String?
+  footerCtaUrl String?
   updatedAt DateTime @updatedAt
 }
 

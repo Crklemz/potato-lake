@@ -171,6 +171,10 @@ export interface DnrPage {
   monitoringCtaText: string | null
   monitoringCtaUrl: string | null
   monitoringImageUrl: string | null
+  footerCtaHeading: string | null
+  footerCtaSubheading: string | null
+  footerCtaText: string | null
+  footerCtaUrl: string | null
   updatedAt: Date
 }
 

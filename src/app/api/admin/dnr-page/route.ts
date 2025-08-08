@@ -88,7 +88,11 @@ export async function PUT(request: NextRequest) {
       monitoringPrograms,
       monitoringCtaText,
       monitoringCtaUrl,
-      monitoringImageUrl
+      monitoringImageUrl,
+      footerCtaHeading,
+      footerCtaSubheading,
+      footerCtaText,
+      footerCtaUrl
     } = body
 
     const dnrPage = await prisma.dnrPage.findFirst()
@@ -135,7 +139,11 @@ export async function PUT(request: NextRequest) {
         monitoringPrograms,
         monitoringCtaText,
         monitoringCtaUrl,
-        monitoringImageUrl
+        monitoringImageUrl,
+        footerCtaHeading,
+        footerCtaSubheading,
+        footerCtaText,
+        footerCtaUrl
       }
     })
 

@@ -45,6 +45,10 @@ interface DnrPageData {
   monitoringCtaText: string | null
   monitoringCtaUrl: string | null
   monitoringImageUrl: string | null
+  footerCtaHeading: string | null
+  footerCtaSubheading: string | null
+  footerCtaText: string | null
+  footerCtaUrl: string | null
 }
 
 export default function DnrEditPage() {
@@ -202,6 +206,20 @@ export default function DnrEditPage() {
   }
 
   const handleResourceSubmit = async () => {
+    // Validate required fields
+    if (!resourceFormData.title.trim()) {
+      setError('Resource title is required')
+      return
+    }
+    if (!resourceFormData.description.trim()) {
+      setError('Resource description is required')
+      return
+    }
+    if (!resourceFormData.fileUrl.trim()) {
+      setError('Resource file URL is required')
+      return
+    }
+
     try {
       const url = editingResourceId 
         ? `/api/admin/dnr-resources/${editingResourceId}`
@@ -265,6 +283,16 @@ export default function DnrEditPage() {
   }
 
   const handleLinkSubmit = async () => {
+    // Validate required fields
+    if (!linkFormData.title.trim()) {
+      setError('Link title is required')
+      return
+    }
+    if (!linkFormData.url.trim()) {
+      setError('Link URL is required')
+      return
+    }
+
     try {
       const url = editingLinkId ? `/api/admin/dnr-links/${editingLinkId}` : '/api/admin/dnr-links'
       const method = editingLinkId ? 'PUT' : 'POST'
@@ -279,10 +307,12 @@ export default function DnrEditPage() {
         await fetchLinks()
         setEditingLinkId(null)
         setLinkFormData({ title: '', url: '', description: '', order: 0 })
+        setSuccess('Link saved successfully!')
       } else {
-        console.error('Failed to save link')
+        setError('Failed to save link')
       }
     } catch (error) {
+      setError('Error saving link: ' + error)
       console.error('Error saving link:', error)
     }
   }
@@ -398,7 +428,11 @@ export default function DnrEditPage() {
       monitoringPrograms: monitoringItems,
       monitoringCtaText: formData.get('monitoringCtaText') as string,
       monitoringCtaUrl: formData.get('monitoringCtaUrl') as string,
-      monitoringImageUrl: dnrData?.monitoringImageUrl || ''
+      monitoringImageUrl: dnrData?.monitoringImageUrl || '',
+      footerCtaHeading: formData.get('footerCtaHeading') as string,
+      footerCtaSubheading: formData.get('footerCtaSubheading') as string,
+      footerCtaText: formData.get('footerCtaText') as string,
+      footerCtaUrl: formData.get('footerCtaUrl') as string
     }
 
     try {
@@ -1145,13 +1179,12 @@ export default function DnrEditPage() {
                           <label className="block text-sm font-medium text-neutral-dark mb-2">
                             Resource Title *
                           </label>
-                          <input
-                            type="text"
-                            value={resourceFormData.title}
-                            onChange={(e) => setResourceFormData({ ...resourceFormData, title: e.target.value })}
-                            className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                            required
-                          />
+                                                  <input
+                          type="text"
+                          value={resourceFormData.title}
+                          onChange={(e) => setResourceFormData({ ...resourceFormData, title: e.target.value })}
+                          className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        />
                         </div>
                         
                         <div>
@@ -1177,7 +1210,6 @@ export default function DnrEditPage() {
                           onChange={(e) => setResourceFormData({ ...resourceFormData, description: e.target.value })}
                           className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                           rows={3}
-                          required
                         />
                       </div>
                       
@@ -1191,7 +1223,6 @@ export default function DnrEditPage() {
                           onChange={(e) => setResourceFormData({ ...resourceFormData, fileUrl: e.target.value })}
                           className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                           placeholder="https://example.com/document.pdf"
-                          required
                         />
                       </div>
                       
@@ -1275,7 +1306,6 @@ export default function DnrEditPage() {
                           onChange={(e) => setLinkFormData({ ...linkFormData, title: e.target.value })}
                           className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                           placeholder="Link title"
-                          required
                         />
                       </div>
                       
@@ -1289,7 +1319,6 @@ export default function DnrEditPage() {
                           onChange={(e) => setLinkFormData({ ...linkFormData, url: e.target.value })}
                           className="w-full px-3 py-2 border border-neutral-dark rounded-md focus:outline-none focus:ring-primary focus:border-primary"
                           placeholder="https://example.com"
-                          required
                         />
                       </div>
                       
@@ -1379,6 +1408,65 @@ export default function DnrEditPage() {
                         ))}
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* Page Footer CTA Section */}
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold mb-4 text-neutral-dark">Page Footer CTA</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Footer CTA Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="footerCtaHeading"
+                        defaultValue={dnrData?.footerCtaHeading || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter footer CTA heading (e.g., 'Get Involved with Lake Conservation')"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Footer CTA Subheading
+                      </label>
+                      <textarea
+                        name="footerCtaSubheading"
+                        rows={3}
+                        defaultValue={dnrData?.footerCtaSubheading || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter footer CTA subheading text"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Footer CTA Button Text
+                      </label>
+                      <input
+                        type="text"
+                        name="footerCtaText"
+                        defaultValue={dnrData?.footerCtaText || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter footer CTA button text (e.g., 'Join the Association')"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Footer CTA Button URL
+                      </label>
+                      <input
+                        type="text"
+                        name="footerCtaUrl"
+                        defaultValue={dnrData?.footerCtaUrl || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter footer CTA button URL (e.g., /association#get-involved or https://example.com)"
+                      />
+                    </div>
                   </div>
                 </div>
 

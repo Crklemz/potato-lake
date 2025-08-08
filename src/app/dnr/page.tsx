@@ -516,6 +516,34 @@ function DnrPageContent({ dnrPage, resources, links }: { dnrPage: DnrPage; resou
         </section>
       )}
 
+      {/* Page Footer CTA Section */}
+      {(dnrPage.footerCtaHeading || dnrPage.footerCtaSubheading || dnrPage.footerCtaText) && (
+        <section className="py-16 bg-gradient-to-br from-primary to-accent">
+          <div className="container mx-auto px-4">
+            <div className="max-w-2xl mx-auto text-center">
+              {dnrPage.footerCtaHeading && (
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                  {dnrPage.footerCtaHeading}
+                </h2>
+              )}
+              {dnrPage.footerCtaSubheading && (
+                <p className="text-xl text-white/90 mb-8 leading-relaxed">
+                  {dnrPage.footerCtaSubheading}
+                </p>
+              )}
+              {dnrPage.footerCtaText && dnrPage.footerCtaUrl && (
+                <a 
+                  href={dnrPage.footerCtaUrl}
+                  className="inline-block bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-neutral-light transition-colors"
+                >
+                  {dnrPage.footerCtaText}
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
 
     </div>
   )
