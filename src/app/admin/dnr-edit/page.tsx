@@ -33,6 +33,11 @@ interface DnrPageData {
   mapEmbedUrl: string | null
   mapExternalLinkText: string | null
   mapExternalLinkUrl: string | null
+  invasiveHeading: string | null
+  invasiveBody: string | null
+  invasiveTips: string[] | null
+  reportSightingUrl: string | null
+  invasiveInfoUrl: string | null
 }
 
 export default function DnrEditPage() {
@@ -44,8 +49,10 @@ export default function DnrEditPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [fishingItems, setFishingItems] = useState<string[]>([])
   const [boatingItems, setBoatingItems] = useState<string[]>([])
+  const [invasiveItems, setInvasiveItems] = useState<string[]>([])
   const [newFishingItem, setNewFishingItem] = useState('')
   const [newBoatingItem, setNewBoatingItem] = useState('')
+  const [newInvasiveItem, setNewInvasiveItem] = useState('')
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -65,6 +72,7 @@ export default function DnrEditPage() {
       setDnrData(data)
       setFishingItems(data.dnrFishingCardItems || [])
       setBoatingItems(data.dnrBoatingCardItems || [])
+      setInvasiveItems(data.invasiveTips || [])
     } catch (err) {
       setError('Failed to load DNR page data: ' + err)
       console.error('Error fetching DNR page data:', err)
@@ -105,6 +113,17 @@ export default function DnrEditPage() {
     setBoatingItems(boatingItems.filter((_, i) => i !== index))
   }
 
+  const addInvasiveItem = () => {
+    if (newInvasiveItem.trim()) {
+      setInvasiveItems([...invasiveItems, newInvasiveItem.trim()])
+      setNewInvasiveItem('')
+    }
+  }
+
+  const removeInvasiveItem = (index: number) => {
+    setInvasiveItems(invasiveItems.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
@@ -134,7 +153,12 @@ export default function DnrEditPage() {
       mapCaption: formData.get('mapCaption') as string,
       mapEmbedUrl: formData.get('mapEmbedUrl') as string,
       mapExternalLinkText: formData.get('mapExternalLinkText') as string,
-      mapExternalLinkUrl: formData.get('mapExternalLinkUrl') as string
+      mapExternalLinkUrl: formData.get('mapExternalLinkUrl') as string,
+      invasiveHeading: formData.get('invasiveHeading') as string,
+      invasiveBody: formData.get('invasiveBody') as string,
+      invasiveTips: invasiveItems,
+      reportSightingUrl: formData.get('reportSightingUrl') as string,
+      invasiveInfoUrl: formData.get('invasiveInfoUrl') as string
     }
 
     try {
@@ -639,6 +663,106 @@ export default function DnrEditPage() {
                           />
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold mb-4 text-neutral-dark">Invasive Species Section</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Section Heading
+                      </label>
+                      <input
+                        type="text"
+                        name="invasiveHeading"
+                        defaultValue={dnrData?.invasiveHeading || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter invasive species section heading"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Section Body Text
+                      </label>
+                      <textarea
+                        name="invasiveBody"
+                        rows={4}
+                        defaultValue={dnrData?.invasiveBody || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter invasive species section body text"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Prevention Tips
+                      </label>
+                      <div className="space-y-2">
+                        {invasiveItems.map((item, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <span className="flex-1 px-3 py-2 bg-neutral-light rounded-md text-sm">
+                              {item}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeInvasiveItem(index)}
+                              className="px-2 py-1 text-red-600 hover:text-red-800 text-sm font-medium"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newInvasiveItem}
+                            onChange={(e) => setNewInvasiveItem(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && addInvasiveItem()}
+                            placeholder="Enter new prevention tip"
+                            className="flex-1 px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={addInvasiveItem}
+                            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-accent hover:text-primary transition-colors text-sm font-medium"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-xs text-neutral-dark mt-1">
+                        Add 3-6 prevention tips for invasive species
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        Report Sighting Button URL
+                      </label>
+                      <input
+                        type="url"
+                        name="reportSightingUrl"
+                        defaultValue={dnrData?.reportSightingUrl || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter URL for reporting invasive species sightings"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-dark mb-2">
+                        More Information Button URL
+                      </label>
+                      <input
+                        type="url"
+                        name="invasiveInfoUrl"
+                        defaultValue={dnrData?.invasiveInfoUrl || ''}
+                        className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                        placeholder="Enter URL for more invasive species information"
+                      />
                     </div>
                   </div>
                 </div>

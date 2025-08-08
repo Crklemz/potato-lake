@@ -77,7 +77,12 @@ export async function PUT(request: NextRequest) {
       mapCaption,
       mapEmbedUrl,
       mapExternalLinkText,
-      mapExternalLinkUrl
+      mapExternalLinkUrl,
+      invasiveHeading,
+      invasiveBody,
+      invasiveTips,
+      reportSightingUrl,
+      invasiveInfoUrl
     } = body
 
     const dnrPage = await prisma.dnrPage.findFirst()
@@ -113,7 +118,12 @@ export async function PUT(request: NextRequest) {
         mapCaption,
         mapEmbedUrl,
         mapExternalLinkText,
-        mapExternalLinkUrl
+        mapExternalLinkUrl,
+        invasiveHeading,
+        invasiveBody,
+        invasiveTips,
+        reportSightingUrl,
+        invasiveInfoUrl
       }
     })
 

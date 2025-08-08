@@ -29,14 +29,16 @@ async function getDnrData() {
       return {
         ...defaultDnrPage,
         dnrFishingCardItems: defaultDnrPage.dnrFishingCardItems as string[],
-        dnrBoatingCardItems: defaultDnrPage.dnrBoatingCardItems as string[]
+        dnrBoatingCardItems: defaultDnrPage.dnrBoatingCardItems as string[],
+        invasiveTips: defaultDnrPage.invasiveTips as string[]
       }
     }
     
     return {
       ...dnrPage,
       dnrFishingCardItems: dnrPage.dnrFishingCardItems as string[],
-      dnrBoatingCardItems: dnrPage.dnrBoatingCardItems as string[]
+      dnrBoatingCardItems: dnrPage.dnrBoatingCardItems as string[],
+      invasiveTips: dnrPage.invasiveTips as string[]
     }
   } catch (error) {
     console.error('Error fetching DNR data:', error)
@@ -230,6 +232,69 @@ function DnrPageContent({ dnrPage }: { dnrPage: DnrPage }) {
                   </a>
                 </div>
               )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Invasive Species Section */}
+      {dnrPage.invasiveHeading && (
+        <section className="bg-neutral-light py-16">
+          <div className="max-w-4xl mx-auto px-4 md:px-6">
+            <div className="flex flex-col gap-6">
+              <div className="text-center">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center justify-center gap-3">
+                  <svg className="w-8 h-8 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L1 21h22L12 2zm0 3.17L19.83 19H4.17L12 5.17zM11 16h2v2h-2zm0-6h2v4h-2z"/>
+                  </svg>
+                  {dnrPage.invasiveHeading}
+                </h2>
+                {dnrPage.invasiveBody && (
+                  <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                    {dnrPage.invasiveBody}
+                  </p>
+                )}
+              </div>
+
+              {dnrPage.invasiveTips && Array.isArray(dnrPage.invasiveTips) && dnrPage.invasiveTips.length > 0 && (
+                <div className="bg-white rounded-lg shadow-md p-8">
+                  <h3 className="text-xl font-semibold text-foreground mb-4">Prevention Tips</h3>
+                  <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+                    {dnrPage.invasiveTips.map((tip, index) => (
+                      <li key={index} className="text-base">{tip}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {dnrPage.reportSightingUrl && (
+                  <a
+                    href={dnrPage.reportSightingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-accent hover:text-primary transition-colors shadow-md"
+                  >
+                    Report a Sighting
+                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                )}
+                {dnrPage.invasiveInfoUrl && (
+                  <a
+                    href={dnrPage.invasiveInfoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-white text-primary border-2 border-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-colors shadow-md"
+                  >
+                    More on Invasive Species
+                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </section>

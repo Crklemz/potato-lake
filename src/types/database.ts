@@ -160,6 +160,11 @@ export interface DnrPage {
   mapEmbedUrl: string | null
   mapExternalLinkText: string | null
   mapExternalLinkUrl: string | null
+  invasiveHeading: string | null
+  invasiveBody: string | null
+  invasiveTips: string[] | null
+  reportSightingUrl: string | null
+  invasiveInfoUrl: string | null
   updatedAt: Date
 }
 
